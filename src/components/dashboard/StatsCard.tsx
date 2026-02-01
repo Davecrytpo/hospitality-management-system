@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface StatsCardProps {
   title: string;
@@ -9,6 +10,7 @@ interface StatsCardProps {
   icon: LucideIcon;
   iconColor?: string;
   description?: string;
+  href?: string;
 }
 
 export function StatsCard({
@@ -18,10 +20,25 @@ export function StatsCard({
   changeType = "neutral",
   icon: Icon,
   iconColor = "bg-medical-primary/10 text-medical-primary",
-  description
+  description,
+  href
 }: StatsCardProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (href) {
+      navigate(href);
+    }
+  };
+
   return (
-    <div className="rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md">
+    <div 
+      onClick={handleClick}
+      className={cn(
+        "rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md",
+        href && "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+      )}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>

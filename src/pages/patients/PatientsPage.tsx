@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, UserPlus, Search, Filter, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +24,36 @@ const mockPatients = [
 ];
 
 export default function PatientsPage() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filteredPatients = mockPatients.filter(patient =>
+    patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    patient.phone.includes(searchQuery)
+  );
+
+  const handleView = (patient: typeof mockPatients[0]) => {
+    navigate("/patients/history");
+    toast.success(`Viewing ${patient.name}'s records`);
+  };
+
+  const handleEdit = (patient: typeof mockPatients[0]) => {
+    navigate("/patients/register");
+    toast.info(`Editing ${patient.name}`);
+  };
+
+  const handleDelete = (patient: typeof mockPatients[0]) => {
+    toast.error(`Delete ${patient.name}?`, {
+      description: "This action requires database integration",
+      action: {
+        label: "Confirm",
+        onClick: () => toast.success(`${patient.name} would be deleted`)
+      }
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -39,7 +71,7 @@ export default function PatientsPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/patients")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -49,7 +81,7 @@ export default function PatientsPage() {
               <p className="text-xs text-muted-foreground">+12% from last month</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Showing active patients")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Active</CardTitle>
             </CardHeader>
@@ -57,7 +89,7 @@ export default function PatientsPage() {
               <div className="text-2xl font-bold text-medical-success">2,156</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Showing inactive patients")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Inactive</CardTitle>
             </CardHeader>
@@ -65,7 +97,7 @@ export default function PatientsPage() {
               <div className="text-2xl font-bold text-muted-foreground">645</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/departments/emergency")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Critical</CardTitle>
             </CardHeader>
@@ -82,9 +114,21 @@ export default function PatientsPage() {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search patients..." className="pl-8 w-64" />
+                  <Input 
+                    placeholder="Search patients..." 
+                    className="pl-8 w-64"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-                <Button variant="outline" size="icon">
+                <Button 
+                  variant={showFilters ? "default" : "outline"} 
+                  size="icon"
+                  onClick={() => {
+                    setShowFilters(!showFilters);
+                    toast.info(showFilters ? "Filters hidden" : "Filters shown");
+                  }}
+                >
                   <Filter className="h-4 w-4" />
                 </Button>
               </div>
@@ -105,8 +149,12 @@ export default function PatientsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockPatients.map((patient) => (
-                  <TableRow key={patient.id}>
+                {filteredPatients.map((patient) => (
+                  <TableRow 
+                    key={patient.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleView(patient)}
+                  >
                     <TableCell className="font-medium">{patient.id}</TableCell>
                     <TableCell>{patient.name}</TableCell>
                     <TableCell>{patient.age}</TableCell>
@@ -123,7 +171,7 @@ export default function PatientsPage() {
                         {patient.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -131,13 +179,13 @@ export default function PatientsPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleView(patient)}>
                             <Eye className="mr-2 h-4 w-4" /> View
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(patient)}>
                             <Edit className="mr-2 h-4 w-4" /> Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(patient)}>
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -145,6 +193,13 @@ export default function PatientsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
+                {filteredPatients.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      No patients found matching "{searchQuery}"
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>

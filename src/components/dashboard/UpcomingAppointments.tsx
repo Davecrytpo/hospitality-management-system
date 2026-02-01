@@ -1,5 +1,7 @@
 import { Calendar, Clock, User, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Appointment {
   id: string;
@@ -74,6 +76,13 @@ const typeStyles = {
 };
 
 export function UpcomingAppointments() {
+  const navigate = useNavigate();
+
+  const handleAppointmentClick = (apt: Appointment) => {
+    navigate("/appointments");
+    toast.info(`Viewing appointment: ${apt.patientName} - ${apt.time}`);
+  };
+
   return (
     <div className="rounded-xl border bg-card shadow-sm">
       <div className="flex items-center justify-between border-b p-6">
@@ -88,14 +97,21 @@ export function UpcomingAppointments() {
             </p>
           </div>
         </div>
-        <button className="text-sm font-medium text-medical-primary hover:underline">
+        <button 
+          onClick={() => navigate("/appointments/calendar")}
+          className="text-sm font-medium text-medical-primary hover:underline"
+        >
           View Calendar
         </button>
       </div>
       
       <div className="divide-y">
         {appointments.map((apt) => (
-          <div key={apt.id} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
+          <div 
+            key={apt.id} 
+            onClick={() => handleAppointmentClick(apt)}
+            className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors cursor-pointer"
+          >
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-medical-surface">
                 <Clock className="h-4 w-4 text-medical-primary" />
@@ -131,7 +147,10 @@ export function UpcomingAppointments() {
       </div>
       
       <div className="border-t p-4 text-center">
-        <button className="text-sm font-medium text-medical-primary hover:underline">
+        <button 
+          onClick={() => navigate("/appointments")}
+          className="text-sm font-medium text-medical-primary hover:underline"
+        >
           Load More Appointments
         </button>
       </div>
