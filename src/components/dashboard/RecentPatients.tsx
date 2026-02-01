@@ -16,6 +16,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Patient {
   id: string;
@@ -94,6 +96,24 @@ const statusStyles = {
 };
 
 export function RecentPatients() {
+  const navigate = useNavigate();
+
+  const handleViewDetails = (patientId: string) => {
+    navigate("/patients/history");
+    toast.success(`Viewing details for ${patientId}`);
+  };
+
+  const handleEditPatient = (patientId: string) => {
+    navigate("/patients/register");
+    toast.info(`Editing patient ${patientId}`);
+  };
+
+  const handleDeletePatient = (patientId: string, patientName: string) => {
+    toast.error(`Patient ${patientName} would be deleted`, {
+      description: "This action requires database integration",
+    });
+  };
+
   return (
     <div className="rounded-xl border bg-card shadow-sm">
       <div className="flex items-center justify-between border-b p-6">
@@ -101,7 +121,9 @@ export function RecentPatients() {
           <h3 className="text-lg font-semibold text-card-foreground">Recent Patients</h3>
           <p className="text-sm text-muted-foreground">Latest patient registrations and visits</p>
         </div>
-        <Button variant="outline" size="sm">View All</Button>
+        <Button variant="outline" size="sm" onClick={() => navigate("/patients")}>
+          View All
+        </Button>
       </div>
       
       <Table>
@@ -118,7 +140,11 @@ export function RecentPatients() {
         </TableHeader>
         <TableBody>
           {patients.map((patient) => (
-            <TableRow key={patient.id}>
+            <TableRow 
+              key={patient.id}
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => handleViewDetails(patient.id)}
+            >
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Avatar className="h-9 w-9">
@@ -140,7 +166,7 @@ export function RecentPatients() {
                   {patient.status}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()}>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -148,15 +174,18 @@ export function RecentPatients() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleViewDetails(patient.id)}>
                       <Eye className="mr-2 h-4 w-4" />
                       View Details
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEditPatient(patient.id)}>
                       <Edit className="mr-2 h-4 w-4" />
                       Edit Patient
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-medical-danger">
+                    <DropdownMenuItem 
+                      className="text-medical-danger"
+                      onClick={() => handleDeletePatient(patient.id, patient.name)}
+                    >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
                     </DropdownMenuItem>

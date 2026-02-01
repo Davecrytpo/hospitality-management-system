@@ -36,6 +36,7 @@ const Index = () => {
           icon={Users}
           iconColor="bg-medical-primary/10 text-medical-primary"
           description="vs last month"
+          href="/patients"
         />
         <StatsCard
           title="Today's Appointments"
@@ -45,6 +46,7 @@ const Index = () => {
           icon={Calendar}
           iconColor="bg-medical-secondary/10 text-medical-secondary"
           description="vs yesterday"
+          href="/appointments"
         />
         <StatsCard
           title="Admitted Patients"
@@ -54,6 +56,7 @@ const Index = () => {
           icon={BedDouble}
           iconColor="bg-medical-accent/10 text-medical-accent"
           description="vs last week"
+          href="/admissions"
         />
         <StatsCard
           title="Available Doctors"
@@ -62,6 +65,7 @@ const Index = () => {
           changeType="neutral"
           icon={Stethoscope}
           iconColor="bg-medical-success/10 text-medical-success"
+          href="/doctors"
         />
       </div>
 
@@ -102,12 +106,14 @@ const Index = () => {
           value="23"
           icon={UserCheck}
           iconColor="bg-medical-info/10 text-medical-info"
+          href="/doctors"
         />
         <StatsCard
           title="Lab Tests Pending"
           value="67"
           icon={Activity}
           iconColor="bg-medical-warning/10 text-medical-warning"
+          href="/lab"
         />
         <StatsCard
           title="Today's Revenue"
@@ -116,12 +122,14 @@ const Index = () => {
           changeType="increase"
           icon={DollarSign}
           iconColor="bg-medical-success/10 text-medical-success"
+          href="/billing"
         />
         <StatsCard
           title="Emergency Cases"
           value="8"
           icon={AlertTriangle}
           iconColor="bg-medical-danger/10 text-medical-danger"
+          href="/departments/emergency"
         />
       </div>
     </DashboardLayout>

@@ -1,11 +1,19 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Plus, Search, Filter, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Calendar, Plus, Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const mockAppointments = [
   { id: "A001", patient: "John Smith", doctor: "Dr. Sarah Johnson", date: "2024-01-15", time: "09:00", type: "Consultation", status: "Confirmed" },
@@ -16,6 +24,37 @@ const mockAppointments = [
 ];
 
 export default function AppointmentsPage() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filteredAppointments = mockAppointments.filter(apt =>
+    apt.patient.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    apt.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    apt.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleView = (apt: typeof mockAppointments[0]) => {
+    toast.success(`Viewing appointment ${apt.id}`, {
+      description: `${apt.patient} with ${apt.doctor}`
+    });
+  };
+
+  const handleEdit = (apt: typeof mockAppointments[0]) => {
+    navigate("/appointments/new");
+    toast.info(`Editing appointment ${apt.id}`);
+  };
+
+  const handleCancel = (apt: typeof mockAppointments[0]) => {
+    toast.error(`Cancel appointment?`, {
+      description: `${apt.patient} - ${apt.date} at ${apt.time}`,
+      action: {
+        label: "Confirm",
+        onClick: () => toast.success("Appointment cancelled")
+      }
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -33,7 +72,7 @@ export default function AppointmentsPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/appointments/calendar")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -42,7 +81,7 @@ export default function AppointmentsPage() {
               <div className="text-2xl font-bold">24</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Filtering confirmed appointments")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
               <CheckCircle className="h-4 w-4 text-medical-success" />
@@ -51,7 +90,7 @@ export default function AppointmentsPage() {
               <div className="text-2xl font-bold text-medical-success">18</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Filtering pending appointments")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Pending</CardTitle>
               <AlertCircle className="h-4 w-4 text-medical-warning" />
@@ -60,7 +99,7 @@ export default function AppointmentsPage() {
               <div className="text-2xl font-bold text-medical-warning">4</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Filtering cancelled appointments")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Cancelled</CardTitle>
               <XCircle className="h-4 w-4 text-medical-danger" />
@@ -78,9 +117,21 @@ export default function AppointmentsPage() {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search appointments..." className="pl-8 w-64" />
+                  <Input 
+                    placeholder="Search appointments..." 
+                    className="pl-8 w-64"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-                <Button variant="outline" size="icon">
+                <Button 
+                  variant={showFilters ? "default" : "outline"} 
+                  size="icon"
+                  onClick={() => {
+                    setShowFilters(!showFilters);
+                    toast.info(showFilters ? "Filters hidden" : "Filters shown");
+                  }}
+                >
                   <Filter className="h-4 w-4" />
                 </Button>
               </div>
@@ -97,11 +148,16 @@ export default function AppointmentsPage() {
                   <TableHead>Time</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockAppointments.map((apt) => (
-                  <TableRow key={apt.id}>
+                {filteredAppointments.map((apt) => (
+                  <TableRow 
+                    key={apt.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleView(apt)}
+                  >
                     <TableCell className="font-medium">{apt.id}</TableCell>
                     <TableCell>{apt.patient}</TableCell>
                     <TableCell>{apt.doctor}</TableCell>
@@ -125,8 +181,35 @@ export default function AppointmentsPage() {
                         {apt.status}
                       </Badge>
                     </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleView(apt)}>
+                            <Eye className="mr-2 h-4 w-4" /> View
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(apt)}>
+                            <Edit className="mr-2 h-4 w-4" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleCancel(apt)}>
+                            <Trash2 className="mr-2 h-4 w-4" /> Cancel
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                 ))}
+                {filteredAppointments.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      No appointments found matching "{searchQuery}"
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>

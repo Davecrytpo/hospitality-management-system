@@ -1,5 +1,4 @@
 import { 
-  Search, 
   Bell, 
   MessageSquare, 
   Menu,
@@ -7,10 +6,8 @@ import {
   User,
   Settings,
   LogOut,
-  Moon,
-  Sun
+  Search
 } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,9 +17,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardHeaderProps {
   onMenuToggle: () => void;
@@ -30,7 +29,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHeaderProps) {
-  const [isDark, setIsDark] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-card px-4 lg:px-6">
@@ -45,13 +44,9 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
           <Menu className="h-5 w-5" />
         </Button>
         
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input 
-            placeholder="Search patients, doctors, records..." 
-            className="w-64 pl-9 lg:w-80"
-          />
+        {/* Search - Desktop */}
+        <div className="hidden md:block">
+          <GlobalSearch />
         </div>
       </div>
 
@@ -63,13 +58,7 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
         </Button>
         
         {/* Theme Toggle */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => setIsDark(!isDark)}
-        >
-          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-        </Button>
+        <ThemeToggle />
 
         {/* Messages */}
         <DropdownMenu>
@@ -99,7 +88,10 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
               <p className="text-sm text-muted-foreground">Urgent: Critical lab values detected</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-center text-medical-primary">
+            <DropdownMenuItem 
+              className="text-center text-medical-primary cursor-pointer"
+              onClick={() => navigate("/support")}
+            >
               View All Messages
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -118,18 +110,27 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
+            <DropdownMenuItem 
+              className="flex flex-col items-start gap-1 p-3 cursor-pointer"
+              onClick={() => navigate("/patients")}
+            >
               <span className="font-medium">New Patient Registration</span>
               <p className="text-sm text-muted-foreground">Sarah Johnson has been registered</p>
               <span className="text-xs text-muted-foreground">5 minutes ago</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
+            <DropdownMenuItem 
+              className="flex flex-col items-start gap-1 p-3 cursor-pointer"
+              onClick={() => navigate("/departments/emergency")}
+            >
               <span className="font-medium">Emergency Alert</span>
               <p className="text-sm text-muted-foreground">Trauma case incoming to ER</p>
               <span className="text-xs text-muted-foreground">12 minutes ago</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-center text-medical-primary">
+            <DropdownMenuItem 
+              className="text-center text-medical-primary cursor-pointer"
+              onClick={() => navigate("/support")}
+            >
               View All Notifications
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -153,16 +154,22 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={() => navigate("/settings")}
+            >
               <User className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={() => navigate("/settings")}
+            >
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-medical-danger">
+            <DropdownMenuItem className="text-medical-danger cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>
