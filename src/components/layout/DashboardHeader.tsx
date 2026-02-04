@@ -6,7 +6,8 @@ import {
   User,
   Settings,
   LogOut,
-  Search
+  Search,
+  Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,9 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface DashboardHeaderProps {
   onMenuToggle: () => void;
@@ -30,6 +33,12 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHeaderProps) {
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Logged out successfully");
+    navigate("/auth");
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-card px-4 lg:px-6">
@@ -55,6 +64,14 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
         {/* Mobile Search */}
         <Button variant="ghost" size="icon" className="md:hidden">
           <Search className="h-5 w-5" />
+        </Button>
+        
+        {/* Patient Portal Link */}
+        <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
+          <Link to="/patient-portal/login">
+            <Heart className="mr-2 h-4 w-4" />
+            Patient Portal
+          </Link>
         </Button>
         
         {/* Theme Toggle */}
@@ -169,7 +186,7 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-medical-danger cursor-pointer">
+            <DropdownMenuItem className="text-destructive cursor-pointer" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>
