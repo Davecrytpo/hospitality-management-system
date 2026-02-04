@@ -73,6 +73,18 @@ import InsurancePage from "./pages/billing/InsurancePage";
 import SettingsPage from "./pages/settings/SettingsPage";
 import SupportPage from "./pages/support/SupportPage";
 
+// Patient Portal
+import PatientRegisterPage from "./pages/patient-portal/PatientRegisterPage";
+import PatientLoginPage from "./pages/patient-portal/PatientLoginPage";
+import PatientDashboard from "./pages/patient-portal/PatientDashboard";
+import PatientAppointmentsPage from "./pages/patient-portal/PatientAppointmentsPage";
+import PatientPrescriptionsPage from "./pages/patient-portal/PatientPrescriptionsPage";
+import PatientRecordsPage from "./pages/patient-portal/PatientRecordsPage";
+import PatientProfilePage from "./pages/patient-portal/PatientProfilePage";
+
+// Auth
+import AuthPage from "./pages/auth/AuthPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -150,6 +162,18 @@ const App = () => (
             {/* Settings & Support */}
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/support" element={<SupportPage />} />
+            
+            {/* Patient Portal */}
+            <Route path="/patient-register" element={<PatientRegisterPage />} />
+            <Route path="/patient-portal/login" element={<PatientLoginPage />} />
+            <Route path="/patient-portal" element={<PatientDashboard />} />
+            <Route path="/patient-portal/appointments" element={<PatientAppointmentsPage />} />
+            <Route path="/patient-portal/prescriptions" element={<PatientPrescriptionsPage />} />
+            <Route path="/patient-portal/records" element={<PatientRecordsPage />} />
+            <Route path="/patient-portal/profile" element={<PatientProfilePage />} />
+            
+            {/* Auth */}
+            <Route path="/auth" element={<AuthPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
