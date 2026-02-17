@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -15,6 +16,7 @@ import PatientHistoryPage from "./pages/patients/PatientHistoryPage";
 
 // Doctors
 import DoctorsPage from "./pages/doctors/DoctorsPage";
+import AddDoctorPage from "./pages/doctors/AddDoctorPage";
 import DoctorSchedulesPage from "./pages/doctors/DoctorSchedulesPage";
 import SpecializationsPage from "./pages/doctors/SpecializationsPage";
 
@@ -87,6 +89,14 @@ import AuthPage from "./pages/auth/AuthPage";
 
 const queryClient = new QueryClient();
 
+const AdminRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole="admin">{children}</AuthGuard>
+);
+
+const PatientRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole="patient">{children}</AuthGuard>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="hospital-theme" attribute="class" enableSystem>
@@ -95,86 +105,88 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
-            
-            {/* Patients */}
-            <Route path="/patients" element={<PatientsPage />} />
-            <Route path="/patients/register" element={<RegisterPatientPage />} />
-            <Route path="/patients/search" element={<PatientSearchPage />} />
-            <Route path="/patients/history" element={<PatientHistoryPage />} />
-            
-            {/* Doctors */}
-            <Route path="/doctors" element={<DoctorsPage />} />
-            <Route path="/doctors/schedules" element={<DoctorSchedulesPage />} />
-            <Route path="/doctors/specializations" element={<SpecializationsPage />} />
-            
-            {/* Appointments */}
-            <Route path="/appointments" element={<AppointmentsPage />} />
-            <Route path="/appointments/new" element={<NewAppointmentPage />} />
-            <Route path="/appointments/calendar" element={<CalendarPage />} />
-            
-            {/* Admissions */}
-            <Route path="/admissions" element={<AdmissionsPage />} />
-            <Route path="/admissions/new" element={<NewAdmissionPage />} />
-            <Route path="/admissions/discharge" element={<DischargePage />} />
-            <Route path="/admissions/beds" element={<BedManagementPage />} />
-            
-            {/* Medical Records */}
-            <Route path="/records" element={<RecordsPage />} />
-            <Route path="/records/diagnosis" element={<DiagnosisPage />} />
-            <Route path="/records/treatments" element={<TreatmentsPage />} />
-            
-            {/* Prescriptions */}
-            <Route path="/prescriptions" element={<PrescriptionsPage />} />
-            <Route path="/prescriptions/new" element={<NewPrescriptionPage />} />
-            <Route path="/prescriptions/templates" element={<PrescriptionTemplatesPage />} />
-            
-            {/* Pharmacy */}
-            <Route path="/pharmacy" element={<PharmacyPage />} />
-            <Route path="/pharmacy/dispense" element={<DispensePage />} />
-            <Route path="/pharmacy/stock" element={<StockManagementPage />} />
-            
-            {/* Laboratory */}
-            <Route path="/lab" element={<LabPage />} />
-            <Route path="/lab/results" element={<LabResultsPage />} />
-            <Route path="/lab/reports" element={<LabReportsPage />} />
-            
-            {/* Diagnostics */}
-            <Route path="/diagnostics/imaging" element={<ImagingPage />} />
-            <Route path="/diagnostics/radiology" element={<RadiologyPage />} />
-            <Route path="/diagnostics/reports" element={<DiagnosticReportsPage />} />
-            
-            {/* Vitals */}
-            <Route path="/vitals" element={<VitalsPage />} />
-            
-            {/* Departments */}
-            <Route path="/departments" element={<DepartmentsPage />} />
-            <Route path="/departments/emergency" element={<EmergencyPage />} />
-            <Route path="/departments/opd" element={<OPDPage />} />
-            <Route path="/departments/ipd" element={<IPDPage />} />
-            
-            {/* Billing */}
-            <Route path="/billing" element={<BillingPage />} />
-            <Route path="/billing/new" element={<NewInvoicePage />} />
-            <Route path="/billing/payments" element={<PaymentsPage />} />
-            <Route path="/billing/insurance" element={<InsurancePage />} />
-            
-            {/* Settings & Support */}
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/support" element={<SupportPage />} />
-            
-            {/* Patient Portal */}
+            {/* Auth (public) */}
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/patient-register" element={<PatientRegisterPage />} />
             <Route path="/patient-portal/login" element={<PatientLoginPage />} />
-            <Route path="/patient-portal" element={<PatientDashboard />} />
-            <Route path="/patient-portal/appointments" element={<PatientAppointmentsPage />} />
-            <Route path="/patient-portal/prescriptions" element={<PatientPrescriptionsPage />} />
-            <Route path="/patient-portal/records" element={<PatientRecordsPage />} />
-            <Route path="/patient-portal/profile" element={<PatientProfilePage />} />
-            
-            {/* Auth */}
-            <Route path="/auth" element={<AuthPage />} />
-            
+
+            {/* Admin protected routes */}
+            <Route path="/" element={<AdminRoute><Index /></AdminRoute>} />
+
+            {/* Patients */}
+            <Route path="/patients" element={<AdminRoute><PatientsPage /></AdminRoute>} />
+            <Route path="/patients/register" element={<AdminRoute><RegisterPatientPage /></AdminRoute>} />
+            <Route path="/patients/search" element={<AdminRoute><PatientSearchPage /></AdminRoute>} />
+            <Route path="/patients/history" element={<AdminRoute><PatientHistoryPage /></AdminRoute>} />
+
+            {/* Doctors */}
+            <Route path="/doctors" element={<AdminRoute><DoctorsPage /></AdminRoute>} />
+            <Route path="/doctors/add" element={<AdminRoute><AddDoctorPage /></AdminRoute>} />
+            <Route path="/doctors/schedules" element={<AdminRoute><DoctorSchedulesPage /></AdminRoute>} />
+            <Route path="/doctors/specializations" element={<AdminRoute><SpecializationsPage /></AdminRoute>} />
+
+            {/* Appointments */}
+            <Route path="/appointments" element={<AdminRoute><AppointmentsPage /></AdminRoute>} />
+            <Route path="/appointments/new" element={<AdminRoute><NewAppointmentPage /></AdminRoute>} />
+            <Route path="/appointments/calendar" element={<AdminRoute><CalendarPage /></AdminRoute>} />
+
+            {/* Admissions */}
+            <Route path="/admissions" element={<AdminRoute><AdmissionsPage /></AdminRoute>} />
+            <Route path="/admissions/new" element={<AdminRoute><NewAdmissionPage /></AdminRoute>} />
+            <Route path="/admissions/discharge" element={<AdminRoute><DischargePage /></AdminRoute>} />
+            <Route path="/admissions/beds" element={<AdminRoute><BedManagementPage /></AdminRoute>} />
+
+            {/* Medical Records */}
+            <Route path="/records" element={<AdminRoute><RecordsPage /></AdminRoute>} />
+            <Route path="/records/diagnosis" element={<AdminRoute><DiagnosisPage /></AdminRoute>} />
+            <Route path="/records/treatments" element={<AdminRoute><TreatmentsPage /></AdminRoute>} />
+
+            {/* Prescriptions */}
+            <Route path="/prescriptions" element={<AdminRoute><PrescriptionsPage /></AdminRoute>} />
+            <Route path="/prescriptions/new" element={<AdminRoute><NewPrescriptionPage /></AdminRoute>} />
+            <Route path="/prescriptions/templates" element={<AdminRoute><PrescriptionTemplatesPage /></AdminRoute>} />
+
+            {/* Pharmacy */}
+            <Route path="/pharmacy" element={<AdminRoute><PharmacyPage /></AdminRoute>} />
+            <Route path="/pharmacy/dispense" element={<AdminRoute><DispensePage /></AdminRoute>} />
+            <Route path="/pharmacy/stock" element={<AdminRoute><StockManagementPage /></AdminRoute>} />
+
+            {/* Laboratory */}
+            <Route path="/lab" element={<AdminRoute><LabPage /></AdminRoute>} />
+            <Route path="/lab/results" element={<AdminRoute><LabResultsPage /></AdminRoute>} />
+            <Route path="/lab/reports" element={<AdminRoute><LabReportsPage /></AdminRoute>} />
+
+            {/* Diagnostics */}
+            <Route path="/diagnostics/imaging" element={<AdminRoute><ImagingPage /></AdminRoute>} />
+            <Route path="/diagnostics/radiology" element={<AdminRoute><RadiologyPage /></AdminRoute>} />
+            <Route path="/diagnostics/reports" element={<AdminRoute><DiagnosticReportsPage /></AdminRoute>} />
+
+            {/* Vitals */}
+            <Route path="/vitals" element={<AdminRoute><VitalsPage /></AdminRoute>} />
+
+            {/* Departments */}
+            <Route path="/departments" element={<AdminRoute><DepartmentsPage /></AdminRoute>} />
+            <Route path="/departments/emergency" element={<AdminRoute><EmergencyPage /></AdminRoute>} />
+            <Route path="/departments/opd" element={<AdminRoute><OPDPage /></AdminRoute>} />
+            <Route path="/departments/ipd" element={<AdminRoute><IPDPage /></AdminRoute>} />
+
+            {/* Billing */}
+            <Route path="/billing" element={<AdminRoute><BillingPage /></AdminRoute>} />
+            <Route path="/billing/new" element={<AdminRoute><NewInvoicePage /></AdminRoute>} />
+            <Route path="/billing/payments" element={<AdminRoute><PaymentsPage /></AdminRoute>} />
+            <Route path="/billing/insurance" element={<AdminRoute><InsurancePage /></AdminRoute>} />
+
+            {/* Settings & Support */}
+            <Route path="/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
+            <Route path="/support" element={<AdminRoute><SupportPage /></AdminRoute>} />
+
+            {/* Patient Portal (protected) */}
+            <Route path="/patient-portal" element={<PatientRoute><PatientDashboard /></PatientRoute>} />
+            <Route path="/patient-portal/appointments" element={<PatientRoute><PatientAppointmentsPage /></PatientRoute>} />
+            <Route path="/patient-portal/prescriptions" element={<PatientRoute><PatientPrescriptionsPage /></PatientRoute>} />
+            <Route path="/patient-portal/records" element={<PatientRoute><PatientRecordsPage /></PatientRoute>} />
+            <Route path="/patient-portal/profile" element={<PatientRoute><PatientProfilePage /></PatientRoute>} />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
