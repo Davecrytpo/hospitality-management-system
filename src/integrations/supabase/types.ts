@@ -199,6 +199,39 @@ export type Database = {
           },
         ]
       }
+      patient_2fa_codes: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          delivery_method: string
+          expires_at: string
+          id: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          delivery_method: string
+          expires_at: string
+          id?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          delivery_method?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       patient_invitations: {
         Row: {
           created_at: string
