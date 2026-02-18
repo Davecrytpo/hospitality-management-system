@@ -93,26 +93,16 @@ export default function AuthPage() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth`,
+          data: {
+            full_name: fullName,
+            role: "admin",
+          },
         },
       });
 
       if (error) throw error;
 
       if (data.user) {
-        // Create admin profile
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .insert({
-            user_id: data.user.id,
-            email,
-            full_name: fullName,
-            role: "admin", // Staff members signing up are admins
-          });
-
-        if (profileError) {
-          console.error("Profile error:", profileError);
-        }
-
         toast.success("Account created! Please check your email to verify your account.");
         setActiveTab("login");
       }

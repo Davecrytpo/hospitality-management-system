@@ -57,6 +57,7 @@ const navigation: NavItem[] = [
     icon: UserCog,
     children: [
       { title: "All Doctors", href: "/doctors" },
+      { title: "Add Doctor", href: "/doctors/add" },
       { title: "Schedules", href: "/doctors/schedules" },
       { title: "Specializations", href: "/doctors/specializations" },
     ]
