@@ -19,7 +19,6 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
 
   useEffect(() => {
-    // Check if already authenticated
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -29,18 +28,21 @@ export default function AuthPage() {
           .eq("user_id", session.user.id)
           .single();
 
-        if (profile?.role === "patient") {
-          navigate("/patient-portal");
-        } else {
-          navigate("/");
+        if (profile) {
+          if (profile.role === "patient") {
+            navigate("/patient-portal", { replace: true });
+          } else {
+            navigate("/", { replace: true });
+          }
         }
+        // If no profile found, stay on auth page (don't redirect = no loop)
       }
     };
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        // Will be handled by the login/signup handlers
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        // Stay on auth page
       }
     });
 

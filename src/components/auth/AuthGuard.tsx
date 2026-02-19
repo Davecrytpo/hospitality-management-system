@@ -16,38 +16,54 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
     let mounted = true;
 
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
 
-      if (!session) {
-        navigate("/auth", { replace: true });
-        return;
-      }
-
-      if (requiredRole) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .single();
-
-        if (!profile || profile.role !== requiredRole) {
-          if (profile?.role === "patient") {
-            navigate("/patient-portal", { replace: true });
-          } else {
-            navigate("/auth", { replace: true });
-          }
+        if (!session) {
+          if (mounted) navigate("/auth", { replace: true });
           return;
         }
-      }
 
-      if (mounted) setIsAuthorized(true);
+        if (requiredRole) {
+          const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("user_id", session.user.id)
+            .single();
+
+          if (error || !profile) {
+            // Profile not found - sign out to prevent loop
+            console.error("Profile not found for user:", session.user.id);
+            await supabase.auth.signOut();
+            if (mounted) navigate("/auth", { replace: true });
+            return;
+          }
+
+          if (profile.role !== requiredRole) {
+            if (profile.role === "patient") {
+              if (mounted) navigate("/patient-portal", { replace: true });
+            } else if (profile.role === "admin" || profile.role === "doctor") {
+              if (mounted) navigate("/", { replace: true });
+            } else {
+              await supabase.auth.signOut();
+              if (mounted) navigate("/auth", { replace: true });
+            }
+            return;
+          }
+        }
+
+        if (mounted) setIsAuthorized(true);
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        if (mounted) navigate("/auth", { replace: true });
+      }
     };
 
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
-        navigate("/auth", { replace: true });
+        if (mounted) navigate("/auth", { replace: true });
       }
     });
 
