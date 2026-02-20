@@ -1,21 +1,47 @@
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { UserPlus, Search, Filter, Star } from "lucide-react";
+import { UserPlus, Search, Filter, Star, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const mockDoctors = [
-  { id: "D001", name: "Dr. Sarah Johnson", specialty: "Cardiology", status: "Available", rating: 4.9, patients: 156 },
-  { id: "D002", name: "Dr. Michael Chen", specialty: "Neurology", status: "In Consultation", rating: 4.8, patients: 142 },
-  { id: "D003", name: "Dr. Emily Davis", specialty: "Pediatrics", status: "Available", rating: 4.7, patients: 198 },
-  { id: "D004", name: "Dr. James Wilson", specialty: "Orthopedics", status: "On Leave", rating: 4.9, patients: 167 },
-  { id: "D005", name: "Dr. Lisa Anderson", specialty: "Dermatology", status: "Available", rating: 4.6, patients: 134 },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function DoctorsPage() {
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("doctors")
+        .select("*")
+        .order("first_name", { ascending: true });
+
+      if (error) throw error;
+      setDoctors(data || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load doctors");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredDoctors = doctors.filter(doctor =>
+    `${doctor.first_name} ${doctor.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -38,7 +64,7 @@ export default function DoctorsPage() {
               <CardTitle className="text-sm font-medium">Total Doctors</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">47</div>
+              <div className="text-2xl font-bold">{doctors.length}</div>
             </CardContent>
           </Card>
           <Card>
@@ -46,23 +72,9 @@ export default function DoctorsPage() {
               <CardTitle className="text-sm font-medium">Available Now</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-medical-success">32</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">On Leave</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-medical-warning">5</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Rating</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">4.8</div>
+              <div className="text-2xl font-bold text-medical-success">
+                {doctors.filter(d => d.is_available).length}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -74,49 +86,53 @@ export default function DoctorsPage() {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search doctors..." className="pl-8 w-64" />
+                  <Input 
+                    placeholder="Search doctors..." 
+                    className="pl-8 w-64"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-                <Button variant="outline" size="icon">
-                  <Filter className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {mockDoctors.map((doctor) => (
-                <Link key={doctor.id} to={`/doctors/${doctor.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-4">
-                        <Avatar className="h-12 w-12">
-                          <AvatarFallback>{doctor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{doctor.name}</h4>
-                          <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
-                          <div className="mt-2 flex items-center gap-2">
-                            <Badge
-                              variant={
-                                doctor.status === "Available" ? "default" :
-                                doctor.status === "On Leave" ? "secondary" : "outline"
-                              }
-                            >
-                              {doctor.status}
-                            </Badge>
-                            <span className="flex items-center text-sm">
-                              <Star className="mr-1 h-3 w-3 fill-yellow-400 text-yellow-400" />
-                              {doctor.rating}
-                            </span>
+            {isLoading ? (
+              <div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin text-medical-primary" /></div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredDoctors.map((doctor) => (
+                  <Link key={doctor.id} to={`/doctors/${doctor.id}`}>
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-4">
+                          <Avatar className="h-12 w-12">
+                            <AvatarFallback>{doctor.first_name[0]}{doctor.last_name[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h4 className="font-semibold">Dr. {doctor.first_name} {doctor.last_name}</h4>
+                            <p className="text-sm text-muted-foreground">{doctor.specialization}</p>
+                            <div className="mt-2 flex items-center gap-2">
+                              <Badge variant={doctor.is_available ? "default" : "secondary"}>
+                                {doctor.is_available ? "Available" : "Busy"}
+                              </Badge>
+                              <span className="flex items-center text-sm font-bold text-medical-primary">
+                                {doctor.department}
+                              </span>
+                            </div>
                           </div>
-                          <p className="mt-1 text-xs text-muted-foreground">{doctor.patients} patients</p>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+                {filteredDoctors.length === 0 && (
+                  <div className="col-span-full text-center py-10 text-muted-foreground italic">
+                    No doctors found matching "{searchQuery}"
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
