@@ -112,7 +112,11 @@ export default function BillingPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link to={`/billing/${invoice.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
                         <Button variant="ghost" size="icon"><Printer className="h-4 w-4" /></Button>
                       </div>
                     </TableCell>

@@ -85,34 +85,36 @@ export default function DoctorsPage() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {mockDoctors.map((doctor) => (
-                <Card key={doctor.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="h-12 w-12">
-                        <AvatarFallback>{doctor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">{doctor.name}</h4>
-                        <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
-                        <div className="mt-2 flex items-center gap-2">
-                          <Badge
-                            variant={
-                              doctor.status === "Available" ? "default" :
-                              doctor.status === "On Leave" ? "secondary" : "outline"
-                            }
-                          >
-                            {doctor.status}
-                          </Badge>
-                          <span className="flex items-center text-sm">
-                            <Star className="mr-1 h-3 w-3 fill-yellow-400 text-yellow-400" />
-                            {doctor.rating}
-                          </span>
+                <Link key={doctor.id} to={`/doctors/${doctor.id}`}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback>{doctor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{doctor.name}</h4>
+                          <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+                          <div className="mt-2 flex items-center gap-2">
+                            <Badge
+                              variant={
+                                doctor.status === "Available" ? "default" :
+                                doctor.status === "On Leave" ? "secondary" : "outline"
+                              }
+                            >
+                              {doctor.status}
+                            </Badge>
+                            <span className="flex items-center text-sm">
+                              <Star className="mr-1 h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              {doctor.rating}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">{doctor.patients} patients</p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">{doctor.patients} patients</p>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </CardContent>

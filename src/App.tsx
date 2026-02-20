@@ -13,10 +13,12 @@ import PatientsPage from "./pages/patients/PatientsPage";
 import RegisterPatientPage from "./pages/patients/RegisterPatientPage";
 import PatientSearchPage from "./pages/patients/PatientSearchPage";
 import PatientHistoryPage from "./pages/patients/PatientHistoryPage";
+import PatientDetailsPage from "./pages/patients/PatientDetailsPage";
 
 // Doctors
 import DoctorsPage from "./pages/doctors/DoctorsPage";
 import AddDoctorPage from "./pages/doctors/AddDoctorPage";
+import DoctorDetailsPage from "./pages/doctors/DoctorDetailsPage";
 import DoctorSchedulesPage from "./pages/doctors/DoctorSchedulesPage";
 import SpecializationsPage from "./pages/doctors/SpecializationsPage";
 
@@ -45,11 +47,13 @@ import PrescriptionTemplatesPage from "./pages/prescriptions/TemplatesPage";
 import PharmacyPage from "./pages/pharmacy/PharmacyPage";
 import DispensePage from "./pages/pharmacy/DispensePage";
 import StockManagementPage from "./pages/pharmacy/StockManagementPage";
+import AddMedicinePage from "./pages/pharmacy/AddMedicinePage";
 
 // Laboratory
 import LabPage from "./pages/lab/LabPage";
 import LabResultsPage from "./pages/lab/LabResultsPage";
 import LabReportsPage from "./pages/lab/LabReportsPage";
+import LabOrderPage from "./pages/lab/LabOrderPage";
 
 // Diagnostics
 import ImagingPage from "./pages/diagnostics/ImagingPage";
@@ -68,12 +72,15 @@ import IPDPage from "./pages/departments/IPDPage";
 // Billing
 import BillingPage from "./pages/billing/BillingPage";
 import NewInvoicePage from "./pages/billing/NewInvoicePage";
+import ViewInvoicePage from "./pages/billing/ViewInvoicePage";
 import PaymentsPage from "./pages/billing/PaymentsPage";
 import InsurancePage from "./pages/billing/InsurancePage";
+import InsuranceClaimPage from "./pages/billing/InsuranceClaimPage";
 
 // Settings & Support
 import SettingsPage from "./pages/settings/SettingsPage";
 import SupportPage from "./pages/support/SupportPage";
+import StaffManagementPage from "./pages/staff/StaffManagementPage";
 
 // Patient Portal
 import PatientRegisterPage from "./pages/patient-portal/PatientRegisterPage";
@@ -118,10 +125,12 @@ const App = () => (
             <Route path="/patients/register" element={<AdminRoute><RegisterPatientPage /></AdminRoute>} />
             <Route path="/patients/search" element={<AdminRoute><PatientSearchPage /></AdminRoute>} />
             <Route path="/patients/history" element={<AdminRoute><PatientHistoryPage /></AdminRoute>} />
+            <Route path="/patients/:id" element={<AdminRoute><PatientDetailsPage /></AdminRoute>} />
 
             {/* Doctors */}
             <Route path="/doctors" element={<AdminRoute><DoctorsPage /></AdminRoute>} />
             <Route path="/doctors/add" element={<AdminRoute><AddDoctorPage /></AdminRoute>} />
+            <Route path="/doctors/:id" element={<AdminRoute><DoctorDetailsPage /></AdminRoute>} />
             <Route path="/doctors/schedules" element={<AdminRoute><DoctorSchedulesPage /></AdminRoute>} />
             <Route path="/doctors/specializations" element={<AdminRoute><SpecializationsPage /></AdminRoute>} />
 
@@ -148,11 +157,13 @@ const App = () => (
 
             {/* Pharmacy */}
             <Route path="/pharmacy" element={<AdminRoute><PharmacyPage /></AdminRoute>} />
+            <Route path="/pharmacy/add" element={<AdminRoute><AddMedicinePage /></AdminRoute>} />
             <Route path="/pharmacy/dispense" element={<AdminRoute><DispensePage /></AdminRoute>} />
             <Route path="/pharmacy/stock" element={<AdminRoute><StockManagementPage /></AdminRoute>} />
 
             {/* Laboratory */}
             <Route path="/lab" element={<AdminRoute><LabPage /></AdminRoute>} />
+            <Route path="/lab/new" element={<AdminRoute><LabOrderPage /></AdminRoute>} />
             <Route path="/lab/results" element={<AdminRoute><LabResultsPage /></AdminRoute>} />
             <Route path="/lab/reports" element={<AdminRoute><LabReportsPage /></AdminRoute>} />
 
@@ -173,12 +184,15 @@ const App = () => (
             {/* Billing */}
             <Route path="/billing" element={<AdminRoute><BillingPage /></AdminRoute>} />
             <Route path="/billing/new" element={<AdminRoute><NewInvoicePage /></AdminRoute>} />
+            <Route path="/billing/:id" element={<AdminRoute><ViewInvoicePage /></AdminRoute>} />
             <Route path="/billing/payments" element={<AdminRoute><PaymentsPage /></AdminRoute>} />
             <Route path="/billing/insurance" element={<AdminRoute><InsurancePage /></AdminRoute>} />
+            <Route path="/billing/insurance/new" element={<AdminRoute><InsuranceClaimPage /></AdminRoute>} />
 
             {/* Settings & Support */}
             <Route path="/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
             <Route path="/support" element={<AdminRoute><SupportPage /></AdminRoute>} />
+            <Route path="/staff" element={<AdminRoute><StaffManagementPage /></AdminRoute>} />
 
             {/* Patient Portal (protected) */}
             <Route path="/patient-portal" element={<PatientRoute><PatientDashboard /></PatientRoute>} />

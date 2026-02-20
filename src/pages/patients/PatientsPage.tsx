@@ -35,7 +35,7 @@ export default function PatientsPage() {
   );
 
   const handleView = (patient: typeof mockPatients[0]) => {
-    navigate("/patients/history");
+    navigate(`/patients/${patient.id}`);
     toast.success(`Viewing ${patient.name}'s records`);
   };
 

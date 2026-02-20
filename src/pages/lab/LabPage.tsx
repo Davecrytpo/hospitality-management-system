@@ -23,9 +23,11 @@ export default function LabPage() {
             <h1 className="text-2xl font-bold">Lab Tests</h1>
             <p className="text-muted-foreground">Manage laboratory test orders</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Order Test
+          <Button asChild>
+            <Link to="/lab/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Order Test
+            </Link>
           </Button>
         </div>
 

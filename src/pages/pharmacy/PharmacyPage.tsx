@@ -23,9 +23,11 @@ export default function PharmacyPage() {
             <h1 className="text-2xl font-bold">Pharmacy Inventory</h1>
             <p className="text-muted-foreground">Manage medication stock and supplies</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Medicine
+          <Button asChild>
+            <Link to="/pharmacy/add">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Medicine
+            </Link>
           </Button>
         </div>
 

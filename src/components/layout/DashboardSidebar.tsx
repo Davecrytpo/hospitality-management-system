@@ -151,6 +151,11 @@ const navigation: NavItem[] = [
       { title: "Insurance Claims", href: "/billing/insurance" },
     ]
   },
+  {
+    title: "Staff Management",
+    icon: Users,
+    href: "/staff"
+  },
 ];
 
 const bottomNavigation: NavItem[] = [

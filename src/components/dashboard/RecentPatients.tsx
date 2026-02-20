@@ -99,7 +99,7 @@ export function RecentPatients() {
   const navigate = useNavigate();
 
   const handleViewDetails = (patientId: string) => {
-    navigate("/patients/history");
+    navigate(`/patients/${patientId}`);
     toast.success(`Viewing details for ${patientId}`);
   };
 

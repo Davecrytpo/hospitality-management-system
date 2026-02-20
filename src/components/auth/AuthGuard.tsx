@@ -25,13 +25,13 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
         }
 
         if (requiredRole) {
-          const { data: profile, error } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("role")
             .eq("user_id", session.user.id)
             .single();
 
-          if (error || !profile) {
+          if (profileError || !profile) {
             // Profile not found - sign out to prevent loop
             console.error("Profile not found for user:", session.user.id);
             await supabase.auth.signOut();
@@ -40,13 +40,15 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
           }
 
           if (profile.role !== requiredRole) {
-            if (profile.role === "patient") {
-              if (mounted) navigate("/patient-portal", { replace: true });
-            } else if (profile.role === "admin" || profile.role === "doctor") {
-              if (mounted) navigate("/", { replace: true });
-            } else {
-              await supabase.auth.signOut();
-              if (mounted) navigate("/auth", { replace: true });
+            if (mounted) {
+              if (profile.role === "patient") {
+                navigate("/patient-portal", { replace: true });
+              } else if (profile.role === "admin" || profile.role === "doctor") {
+                navigate("/", { replace: true });
+              } else {
+                await supabase.auth.signOut();
+                navigate("/auth", { replace: true });
+              }
             }
             return;
           }

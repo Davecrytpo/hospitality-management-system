@@ -31,7 +31,7 @@ export default function AuthPage() {
         if (profile) {
           if (profile.role === "patient") {
             navigate("/patient-portal", { replace: true });
-          } else {
+          } else if (profile.role === "admin" || profile.role === "doctor") {
             navigate("/", { replace: true });
           }
         }
@@ -62,19 +62,27 @@ export default function AuthPage() {
 
       if (error) throw error;
 
-      // Check user role
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("user_id", data.user.id)
-        .single();
+      if (data.user) {
+        // Check user role
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .single();
 
-      toast.success("Login successful!");
-      
-      if (profile?.role === "patient") {
-        navigate("/patient-portal");
-      } else {
-        navigate("/");
+        if (profileError || !profile) {
+          toast.error("Profile not found. Please ensure your account is correctly set up.");
+          // Don't navigate if profile is missing
+          return;
+        }
+
+        toast.success("Login successful!");
+        
+        if (profile.role === "patient") {
+          navigate("/patient-portal");
+        } else {
+          navigate("/");
+        }
       }
     } catch (err: any) {
       console.error("Login error:", err);
@@ -105,7 +113,23 @@ export default function AuthPage() {
       if (error) throw error;
 
       if (data.user) {
-        toast.success("Account created! Please check your email to verify your account.");
+        // Create admin profile explicitly if trigger didn't handle it
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .upsert({
+            user_id: data.user.id,
+            email,
+            full_name: fullName,
+            role: "admin",
+          });
+
+        if (profileError) {
+          console.error("Profile error:", profileError);
+          toast.error("Account created but profile setup failed. Please contact support.");
+        } else {
+          toast.success("Account created! Please check your email to verify your account.");
+        }
+        
         setActiveTab("login");
       }
     } catch (err: any) {

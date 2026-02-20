@@ -22,9 +22,11 @@ export default function InsurancePage() {
             <h1 className="text-2xl font-bold">Insurance Claims</h1>
             <p className="text-muted-foreground">Manage insurance claims and reimbursements</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New Claim
+          <Button asChild>
+            <Link to="/billing/insurance/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Claim
+            </Link>
           </Button>
         </div>
 
