@@ -11,10 +11,9 @@ import PublicLandingPage from "./pages/PublicLandingPage";
 import KioskCheckinPage from "./pages/KioskCheckinPage";
 import PublicVerificationPage from "./pages/PublicVerificationPage";
 import NotFound from "./pages/NotFound";
-import Index from "./pages/Index";
 
-// Auth
-import AuthPage from "./pages/auth/AuthPage";
+// Admin Dashboard Base
+import Index from "./pages/Index";
 
 // Patients
 import PatientsPage from "./pages/patients/PatientsPage";
@@ -30,6 +29,43 @@ import AddDoctorPage from "./pages/doctors/AddDoctorPage";
 import DoctorDetailsPage from "./pages/doctors/DoctorDetailsPage";
 import DoctorSchedulesPage from "./pages/doctors/DoctorSchedulesPage";
 import SpecializationsPage from "./pages/doctors/SpecializationsPage";
+
+// Doctor Portal Specific
+import DoctorDashboardPage from "./pages/doctor/DoctorDashboardPage";
+import ConsultationRoomPage from "./pages/doctor/ConsultationRoomPage";
+import MyPatientListPage from "./pages/doctor/MyPatientListPage";
+import IPDRoundingPage from "./pages/doctor/IPDRoundingPage";
+import SurgerySchedulePage from "./pages/doctor/SurgerySchedulePage";
+import ClinicalAnalyticsPage from "./pages/doctor/ClinicalAnalyticsPage";
+
+// Nurse Portal
+import NurseStationPage from "./pages/nurse/NurseStationPage";
+import WardVitalsMonitorPage from "./pages/nurse/WardVitalsMonitorPage";
+import MARPage from "./pages/nurse/MARPage";
+import ShiftHandoverPage from "./pages/nurse/ShiftHandoverPage";
+import ConsumablesTrackerPage from "./pages/nurse/ConsumablesTrackerPage";
+import IncidentReportingPage from "./pages/nurse/IncidentReportingPage";
+
+// Pharmacy Portal
+import PharmacistQueuePage from "./pages/pharmacy/PharmacistQueuePage";
+import SupplierManagementPage from "./pages/pharmacy/SupplierManagementPage";
+import DrugInteractionCheckerPage from "./pages/pharmacy/DrugInteractionCheckerPage";
+
+// Lab Portal
+import LabSampleTrackingPage from "./pages/lab/LabSampleTrackingPage";
+import LabEquipmentCalibrationPage from "./pages/lab/LabEquipmentCalibrationPage";
+import BloodBankPage from "./pages/lab/BloodBankPage";
+import DiagnosticImagingWorkspacePage from "./pages/lab/DiagnosticImagingWorkspacePage";
+
+// Front Office & Finance
+import ReceptionDeskPage from "./pages/frontoffice/ReceptionDeskPage";
+import QueueManagementPage from "./pages/frontoffice/QueueManagementPage";
+import FeedbackComplaintsPage from "./pages/frontoffice/FeedbackComplaintsPage";
+import RevenueDashboardPage from "./pages/frontoffice/RevenueDashboardPage";
+import ExpensesPayrollPage from "./pages/frontoffice/ExpensesPayrollPage";
+import TaxCompliancePage from "./pages/frontoffice/TaxCompliancePage";
+import VendorPortalPage from "./pages/frontoffice/VendorPortalPage";
+import MaintenanceHousekeepingPage from "./pages/frontoffice/MaintenanceHousekeepingPage";
 
 // Appointments
 import AppointmentsPage from "./pages/appointments/AppointmentsPage";
@@ -60,9 +96,6 @@ import DispensePage from "./pages/pharmacy/DispensePage";
 import StockManagementPage from "./pages/pharmacy/StockManagementPage";
 import AddMedicinePage from "./pages/pharmacy/AddMedicinePage";
 import MedicineEditPage from "./pages/pharmacy/MedicineEditPage";
-import PharmacistQueuePage from "./pages/pharmacy/PharmacistQueuePage";
-import DrugInteractionCheckerPage from "./pages/pharmacy/DrugInteractionCheckerPage";
-import SupplierManagementPage from "./pages/pharmacy/SupplierManagementPage";
 
 // Laboratory
 import LabPage from "./pages/lab/LabPage";
@@ -70,10 +103,6 @@ import LabResultsPage from "./pages/lab/LabResultsPage";
 import LabReportsPage from "./pages/lab/LabReportsPage";
 import LabOrderPage from "./pages/lab/LabOrderPage";
 import LabResultEntryPage from "./pages/lab/LabResultEntryPage";
-import LabSampleTrackingPage from "./pages/lab/LabSampleTrackingPage";
-import LabEquipmentCalibrationPage from "./pages/lab/LabEquipmentCalibrationPage";
-import BloodBankPage from "./pages/lab/BloodBankPage";
-import DiagnosticImagingWorkspacePage from "./pages/lab/DiagnosticImagingWorkspacePage";
 
 // Diagnostics
 import ImagingPage from "./pages/diagnostics/ImagingPage";
@@ -90,8 +119,8 @@ import DepartmentsPage from "./pages/departments/DepartmentsPage";
 import EmergencyPage from "./pages/departments/EmergencyPage";
 import OPDPage from "./pages/departments/OPDPage";
 import IPDPage from "./pages/departments/IPDPage";
-import ERRealtimeBoardPage from "./pages/departments/ERRealtimeBoardPage";
 import AmbulanceTrackingPage from "./pages/departments/AmbulanceTrackingPage";
+import ERRealtimeBoardPage from "./pages/departments/ERRealtimeBoardPage";
 import MortuaryManagementPage from "./pages/departments/MortuaryManagementPage";
 import TelemedicinePage from "./pages/departments/TelemedicinePage";
 
@@ -103,32 +132,6 @@ import PaymentsPage from "./pages/billing/PaymentsPage";
 import InsurancePage from "./pages/billing/InsurancePage";
 import InsuranceClaimPage from "./pages/billing/InsuranceClaimPage";
 import PaymentReceiptPage from "./pages/billing/PaymentReceiptPage";
-
-// Doctor Portal
-import DoctorDashboardPage from "./pages/doctor/DoctorDashboardPage";
-import MyPatientListPage from "./pages/doctor/MyPatientListPage";
-import ConsultationRoomPage from "./pages/doctor/ConsultationRoomPage";
-import IPDRoundingPage from "./pages/doctor/IPDRoundingPage";
-import SurgerySchedulePage from "./pages/doctor/SurgerySchedulePage";
-import ClinicalAnalyticsPage from "./pages/doctor/ClinicalAnalyticsPage";
-
-// Nurse Portal
-import NurseStationPage from "./pages/nurse/NurseStationPage";
-import WardVitalsMonitorPage from "./pages/nurse/WardVitalsMonitorPage";
-import MARPage from "./pages/nurse/MARPage";
-import ShiftHandoverPage from "./pages/nurse/ShiftHandoverPage";
-import ConsumablesTrackerPage from "./pages/nurse/ConsumablesTrackerPage";
-import IncidentReportingPage from "./pages/nurse/IncidentReportingPage";
-
-// Front Office
-import ReceptionDeskPage from "./pages/frontoffice/ReceptionDeskPage";
-import QueueManagementPage from "./pages/frontoffice/QueueManagementPage";
-import FeedbackComplaintsPage from "./pages/frontoffice/FeedbackComplaintsPage";
-import RevenueDashboardPage from "./pages/frontoffice/RevenueDashboardPage";
-import ExpensesPayrollPage from "./pages/frontoffice/ExpensesPayrollPage";
-import TaxCompliancePage from "./pages/frontoffice/TaxCompliancePage";
-import VendorPortalPage from "./pages/frontoffice/VendorPortalPage";
-import MaintenanceHousekeepingPage from "./pages/frontoffice/MaintenanceHousekeepingPage";
 
 // Settings & Support
 import SettingsPage from "./pages/settings/SettingsPage";
@@ -146,10 +149,42 @@ import PatientRecordsPage from "./pages/patient-portal/PatientRecordsPage";
 import PatientProfilePage from "./pages/patient-portal/PatientProfilePage";
 import OnlineBillPaymentPage from "./pages/patient-portal/OnlineBillPaymentPage";
 
+// Auth
+import AuthPage from "./pages/auth/AuthPage";
+
 const queryClient = new QueryClient();
 
+// Route Guard Wrappers
 const AdminRoute = ({ children }: { children: React.ReactNode }) => (
   <AuthGuard requiredRole="admin">{children}</AuthGuard>
+);
+
+const DoctorRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "doctor"]}>{children}</AuthGuard>
+);
+
+const NurseRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "nurse"]}>{children}</AuthGuard>
+);
+
+const PharmacyRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "pharmacist"]}>{children}</AuthGuard>
+);
+
+const LabRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "lab_tech"]}>{children}</AuthGuard>
+);
+
+const FinanceRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "finance"]}>{children}</AuthGuard>
+);
+
+const ReceptionRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "receptionist"]}>{children}</AuthGuard>
+);
+
+const StaffRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "doctor", "nurse", "pharmacist", "lab_tech", "finance", "receptionist"]}>{children}</AuthGuard>
 );
 
 const PatientRoute = ({ children }: { children: React.ReactNode }) => (
@@ -172,137 +207,138 @@ const App = () => (
             <Route path="/verify" element={<PublicVerificationPage />} />
             <Route path="/patient-portal/login" element={<PatientLoginPage />} />
 
-            {/* Admin Core */}
-            <Route path="/dashboard" element={<AdminRoute><Index /></AdminRoute>} />
+            {/* General Staff Dashboard */}
+            <Route path="/dashboard" element={<StaffRoute><Index /></StaffRoute>} />
 
-            {/* Patients */}
-            <Route path="/patients" element={<AdminRoute><PatientsPage /></AdminRoute>} />
-            <Route path="/patients/register" element={<AdminRoute><RegisterPatientPage /></AdminRoute>} />
-            <Route path="/patients/search" element={<AdminRoute><PatientSearchPage /></AdminRoute>} />
-            <Route path="/patients/history" element={<AdminRoute><PatientHistoryPage /></AdminRoute>} />
-            <Route path="/patients/:id" element={<AdminRoute><PatientDetailsPage /></AdminRoute>} />
-            <Route path="/patients/:id/edit" element={<AdminRoute><PatientEditPage /></AdminRoute>} />
+            {/* Clinical / Doctor Portal */}
+            <Route path="/doctor/dashboard" element={<DoctorRoute><DoctorDashboardPage /></DoctorRoute>} />
+            <Route path="/doctor/consultation/:id" element={<DoctorRoute><ConsultationRoomPage /></DoctorRoute>} />
+            <Route path="/doctor/patients" element={<DoctorRoute><MyPatientListPage /></DoctorRoute>} />
+            <Route path="/doctor/rounds" element={<DoctorRoute><IPDRoundingPage /></DoctorRoute>} />
+            <Route path="/doctor/surgeries" element={<DoctorRoute><SurgerySchedulePage /></DoctorRoute>} />
+            <Route path="/doctor/analytics" element={<DoctorRoute><ClinicalAnalyticsPage /></DoctorRoute>} />
 
-            {/* Doctors */}
+            {/* Nurse Portal */}
+            <Route path="/nurse/station" element={<NurseRoute><NurseStationPage /></NurseRoute>} />
+            <Route path="/nurse/vitals" element={<NurseRoute><WardVitalsMonitorPage /></NurseRoute>} />
+            <Route path="/nurse/mar" element={<NurseRoute><MARPage /></NurseRoute>} />
+            <Route path="/nurse/handover" element={<NurseRoute><ShiftHandoverPage /></NurseRoute>} />
+            <Route path="/nurse/inventory" element={<NurseRoute><ConsumablesTrackerPage /></NurseRoute>} />
+            <Route path="/nurse/incidents" element={<NurseRoute><IncidentReportingPage /></NurseRoute>} />
+
+            {/* Patients (Admin & Doctor & Nurse) */}
+            <Route path="/patients" element={<StaffRoute><PatientsPage /></StaffRoute>} />
+            <Route path="/patients/register" element={<StaffRoute><RegisterPatientPage /></StaffRoute>} />
+            <Route path="/patients/search" element={<StaffRoute><PatientSearchPage /></StaffRoute>} />
+            <Route path="/patients/history" element={<StaffRoute><PatientHistoryPage /></StaffRoute>} />
+            <Route path="/patients/:id" element={<StaffRoute><PatientDetailsPage /></StaffRoute>} />
+            <Route path="/patients/:id/edit" element={<StaffRoute><PatientEditPage /></StaffRoute>} />
+
+            {/* Staff Management (Admin Only) */}
             <Route path="/doctors" element={<AdminRoute><DoctorsPage /></AdminRoute>} />
             <Route path="/doctors/add" element={<AdminRoute><AddDoctorPage /></AdminRoute>} />
             <Route path="/doctors/:id" element={<AdminRoute><DoctorDetailsPage /></AdminRoute>} />
             <Route path="/doctors/schedules" element={<AdminRoute><DoctorSchedulesPage /></AdminRoute>} />
             <Route path="/doctors/specializations" element={<AdminRoute><SpecializationsPage /></AdminRoute>} />
+            <Route path="/staff" element={<AdminRoute><StaffManagementPage /></AdminRoute>} />
 
             {/* Appointments */}
-            <Route path="/appointments" element={<AdminRoute><AppointmentsPage /></AdminRoute>} />
-            <Route path="/appointments/new" element={<AdminRoute><NewAppointmentPage /></AdminRoute>} />
-            <Route path="/appointments/calendar" element={<AdminRoute><CalendarPage /></AdminRoute>} />
+            <Route path="/appointments" element={<StaffRoute><AppointmentsPage /></StaffRoute>} />
+            <Route path="/appointments/new" element={<StaffRoute><NewAppointmentPage /></StaffRoute>} />
+            <Route path="/appointments/calendar" element={<StaffRoute><CalendarPage /></StaffRoute>} />
 
             {/* Admissions */}
-            <Route path="/admissions" element={<AdminRoute><AdmissionsPage /></AdminRoute>} />
-            <Route path="/admissions/new" element={<AdminRoute><NewAdmissionPage /></AdminRoute>} />
-            <Route path="/admissions/discharge" element={<AdminRoute><DischargePage /></AdminRoute>} />
-            <Route path="/admissions/beds" element={<AdminRoute><BedManagementPage /></AdminRoute>} />
-            <Route path="/admissions/assign" element={<AdminRoute><BedAssignmentPage /></AdminRoute>} />
+            <Route path="/admissions" element={<StaffRoute><AdmissionsPage /></StaffRoute>} />
+            <Route path="/admissions/new" element={<StaffRoute><NewAdmissionPage /></StaffRoute>} />
+            <Route path="/admissions/discharge" element={<StaffRoute><DischargePage /></StaffRoute>} />
+            <Route path="/admissions/beds" element={<StaffRoute><BedManagementPage /></StaffRoute>} />
+            <Route path="/admissions/assign" element={<StaffRoute><BedAssignmentPage /></StaffRoute>} />
 
             {/* Medical Records */}
-            <Route path="/records" element={<AdminRoute><RecordsPage /></AdminRoute>} />
-            <Route path="/records/diagnosis" element={<AdminRoute><DiagnosisPage /></AdminRoute>} />
-            <Route path="/records/treatments" element={<AdminRoute><TreatmentsPage /></AdminRoute>} />
+            <Route path="/records" element={<StaffRoute><RecordsPage /></StaffRoute>} />
+            <Route path="/records/diagnosis" element={<StaffRoute><DiagnosisPage /></StaffRoute>} />
+            <Route path="/records/treatments" element={<StaffRoute><TreatmentsPage /></StaffRoute>} />
 
             {/* Prescriptions */}
-            <Route path="/prescriptions" element={<AdminRoute><PrescriptionsPage /></AdminRoute>} />
-            <Route path="/prescriptions/new" element={<AdminRoute><NewPrescriptionPage /></AdminRoute>} />
-            <Route path="/prescriptions/templates" element={<AdminRoute><PrescriptionTemplatesPage /></AdminRoute>} />
-            <Route path="/prescriptions/:id" element={<AdminRoute><PrescriptionViewPage /></AdminRoute>} />
+            <Route path="/prescriptions" element={<StaffRoute><PrescriptionsPage /></StaffRoute>} />
+            <Route path="/prescriptions/new" element={<StaffRoute><NewPrescriptionPage /></StaffRoute>} />
+            <Route path="/prescriptions/templates" element={<StaffRoute><PrescriptionTemplatesPage /></StaffRoute>} />
+            <Route path="/prescriptions/:id" element={<StaffRoute><PrescriptionViewPage /></StaffRoute>} />
 
-            {/* Pharmacy */}
-            <Route path="/pharmacy" element={<AdminRoute><PharmacyPage /></AdminRoute>} />
-            <Route path="/pharmacy/add" element={<AdminRoute><AddMedicinePage /></AdminRoute>} />
-            <Route path="/pharmacy/:id/edit" element={<AdminRoute><MedicineEditPage /></AdminRoute>} />
-            <Route path="/pharmacy/dispense" element={<AdminRoute><DispensePage /></AdminRoute>} />
-            <Route path="/pharmacy/stock" element={<AdminRoute><StockManagementPage /></AdminRoute>} />
-            <Route path="/pharmacy/queue" element={<AdminRoute><PharmacistQueuePage /></AdminRoute>} />
-            <Route path="/pharmacy/interactions" element={<AdminRoute><DrugInteractionCheckerPage /></AdminRoute>} />
-            <Route path="/pharmacy/suppliers" element={<AdminRoute><SupplierManagementPage /></AdminRoute>} />
+            {/* Pharmacy Portal */}
+            <Route path="/pharmacy" element={<PharmacyRoute><PharmacyPage /></PharmacyRoute>} />
+            <Route path="/pharmacy/queue" element={<PharmacyRoute><PharmacistQueuePage /></PharmacyRoute>} />
+            <Route path="/pharmacy/add" element={<PharmacyRoute><AddMedicinePage /></PharmacyRoute>} />
+            <Route path="/pharmacy/:id/edit" element={<PharmacyRoute><MedicineEditPage /></PharmacyRoute>} />
+            <Route path="/pharmacy/dispense" element={<PharmacyRoute><DispensePage /></PharmacyRoute>} />
+            <Route path="/pharmacy/stock" element={<PharmacyRoute><StockManagementPage /></PharmacyRoute>} />
+            <Route path="/pharmacy/suppliers" element={<PharmacyRoute><SupplierManagementPage /></PharmacyRoute>} />
+            <Route path="/pharmacy/checker" element={<PharmacyRoute><DrugInteractionCheckerPage /></PharmacyRoute>} />
 
-            {/* Laboratory */}
-            <Route path="/lab" element={<AdminRoute><LabPage /></AdminRoute>} />
-            <Route path="/lab/new" element={<AdminRoute><LabOrderPage /></AdminRoute>} />
-            <Route path="/lab/results" element={<AdminRoute><LabResultsPage /></AdminRoute>} />
-            <Route path="/lab/:id/entry" element={<AdminRoute><LabResultEntryPage /></AdminRoute>} />
-            <Route path="/lab/reports" element={<AdminRoute><LabReportsPage /></AdminRoute>} />
-            <Route path="/lab/samples" element={<AdminRoute><LabSampleTrackingPage /></AdminRoute>} />
-            <Route path="/lab/calibration" element={<AdminRoute><LabEquipmentCalibrationPage /></AdminRoute>} />
-            <Route path="/lab/blood-bank" element={<AdminRoute><BloodBankPage /></AdminRoute>} />
-            <Route path="/lab/imaging-workspace" element={<AdminRoute><DiagnosticImagingWorkspacePage /></AdminRoute>} />
+            {/* Laboratory Portal */}
+            <Route path="/lab" element={<LabRoute><LabPage /></LabRoute>} />
+            <Route path="/lab/new" element={<LabRoute><LabOrderPage /></LabRoute>} />
+            <Route path="/lab/results" element={<LabRoute><LabResultsPage /></LabRoute>} />
+            <Route path="/lab/:id/entry" element={<LabRoute><LabResultEntryPage /></LabRoute>} />
+            <Route path="/lab/reports" element={<LabRoute><LabReportsPage /></LabRoute>} />
+            <Route path="/lab/tracking" element={<LabRoute><LabSampleTrackingPage /></LabRoute>} />
+            <Route path="/lab/calibration" element={<LabRoute><LabEquipmentCalibrationPage /></LabRoute>} />
+            <Route path="/lab/blood-bank" element={<LabRoute><BloodBankPage /></LabRoute>} />
+            <Route path="/lab/imaging-workspace" element={<LabRoute><DiagnosticImagingWorkspacePage /></LabRoute>} />
 
             {/* Diagnostics */}
-            <Route path="/diagnostics/imaging" element={<AdminRoute><ImagingPage /></AdminRoute>} />
-            <Route path="/diagnostics/imaging/new" element={<AdminRoute><ImagingOrderPage /></AdminRoute>} />
-            <Route path="/diagnostics/radiology" element={<AdminRoute><RadiologyPage /></AdminRoute>} />
-            <Route path="/diagnostics/reports" element={<AdminRoute><DiagnosticReportsPage /></AdminRoute>} />
+            <Route path="/diagnostics/imaging" element={<StaffRoute><ImagingPage /></StaffRoute>} />
+            <Route path="/diagnostics/imaging/new" element={<StaffRoute><ImagingOrderPage /></StaffRoute>} />
+            <Route path="/diagnostics/radiology" element={<StaffRoute><RadiologyPage /></StaffRoute>} />
+            <Route path="/diagnostics/reports" element={<StaffRoute><DiagnosticReportsPage /></StaffRoute>} />
 
             {/* Vitals */}
-            <Route path="/vitals" element={<AdminRoute><VitalsPage /></AdminRoute>} />
-            <Route path="/vitals/triage" element={<AdminRoute><TriageAssessmentPage /></AdminRoute>} />
+            <Route path="/vitals" element={<StaffRoute><VitalsPage /></StaffRoute>} />
+            <Route path="/vitals/triage" element={<StaffRoute><TriageAssessmentPage /></StaffRoute>} />
 
-            {/* Departments */}
-            <Route path="/departments" element={<AdminRoute><DepartmentsPage /></AdminRoute>} />
-            <Route path="/departments/emergency" element={<AdminRoute><EmergencyPage /></AdminRoute>} />
-            <Route path="/departments/opd" element={<AdminRoute><OPDPage /></AdminRoute>} />
-            <Route path="/departments/ipd" element={<AdminRoute><IPDPage /></AdminRoute>} />
-            <Route path="/departments/er-board" element={<AdminRoute><ERRealtimeBoardPage /></AdminRoute>} />
-            <Route path="/departments/ambulance" element={<AdminRoute><AmbulanceTrackingPage /></AdminRoute>} />
-            <Route path="/departments/mortuary" element={<AdminRoute><MortuaryManagementPage /></AdminRoute>} />
-            <Route path="/departments/telemedicine" element={<AdminRoute><TelemedicinePage /></AdminRoute>} />
+            {/* Front Office & Finance Portal */}
+            <Route path="/reception" element={<ReceptionRoute><ReceptionDeskPage /></ReceptionRoute>} />
+            <Route path="/reception/queue" element={<ReceptionRoute><QueueManagementPage /></ReceptionRoute>} />
+            <Route path="/reception/feedback" element={<ReceptionRoute><FeedbackComplaintsPage /></ReceptionRoute>} />
+            <Route path="/finance/revenue" element={<FinanceRoute><RevenueDashboardPage /></FinanceRoute>} />
+            <Route path="/finance/payroll" element={<FinanceRoute><ExpensesPayrollPage /></FinanceRoute>} />
+            <Route path="/finance/tax" element={<FinanceRoute><TaxCompliancePage /></FinanceRoute>} />
+            <Route path="/finance/vendors" element={<FinanceRoute><VendorPortalPage /></FinanceRoute>} />
+            <Route path="/maintenance" element={<StaffRoute><MaintenanceHousekeepingPage /></StaffRoute>} />
+
+            {/* Departments & Operations */}
+            <Route path="/departments" element={<StaffRoute><DepartmentsPage /></StaffRoute>} />
+            <Route path="/departments/emergency" element={<StaffRoute><EmergencyPage /></StaffRoute>} />
+            <Route path="/departments/opd" element={<StaffRoute><OPDPage /></StaffRoute>} />
+            <Route path="/departments/ipd" element={<StaffRoute><IPDPage /></StaffRoute>} />
+            <Route path="/departments/ambulance" element={<StaffRoute><AmbulanceTrackingPage /></StaffRoute>} />
+            <Route path="/departments/er-board" element={<StaffRoute><ERRealtimeBoardPage /></StaffRoute>} />
+            <Route path="/departments/mortuary" element={<StaffRoute><MortuaryManagementPage /></StaffRoute>} />
+            <Route path="/departments/telemedicine" element={<StaffRoute><TelemedicinePage /></StaffRoute>} />
 
             {/* Billing */}
-            <Route path="/billing" element={<AdminRoute><BillingPage /></AdminRoute>} />
-            <Route path="/billing/new" element={<AdminRoute><NewInvoicePage /></AdminRoute>} />
-            <Route path="/billing/:id" element={<AdminRoute><ViewInvoicePage /></AdminRoute>} />
-            <Route path="/billing/payments" element={<AdminRoute><PaymentsPage /></AdminRoute>} />
-            <Route path="/billing/insurance" element={<AdminRoute><InsurancePage /></AdminRoute>} />
-            <Route path="/billing/insurance/new" element={<AdminRoute><InsuranceClaimPage /></AdminRoute>} />
-            <Route path="/billing/receipt/:id" element={<AdminRoute><PaymentReceiptPage /></AdminRoute>} />
-
-            {/* Doctor Portal */}
-            <Route path="/doctor/dashboard" element={<AdminRoute><DoctorDashboardPage /></AdminRoute>} />
-            <Route path="/doctor/my-patients" element={<AdminRoute><MyPatientListPage /></AdminRoute>} />
-            <Route path="/doctor/consultation" element={<AdminRoute><ConsultationRoomPage /></AdminRoute>} />
-            <Route path="/doctor/ipd-rounding" element={<AdminRoute><IPDRoundingPage /></AdminRoute>} />
-            <Route path="/doctor/surgery" element={<AdminRoute><SurgerySchedulePage /></AdminRoute>} />
-            <Route path="/doctor/analytics" element={<AdminRoute><ClinicalAnalyticsPage /></AdminRoute>} />
-
-            {/* Nurse Portal */}
-            <Route path="/nurse/station" element={<AdminRoute><NurseStationPage /></AdminRoute>} />
-            <Route path="/nurse/vitals-monitor" element={<AdminRoute><WardVitalsMonitorPage /></AdminRoute>} />
-            <Route path="/nurse/mar" element={<AdminRoute><MARPage /></AdminRoute>} />
-            <Route path="/nurse/handover" element={<AdminRoute><ShiftHandoverPage /></AdminRoute>} />
-            <Route path="/nurse/consumables" element={<AdminRoute><ConsumablesTrackerPage /></AdminRoute>} />
-            <Route path="/nurse/incidents" element={<AdminRoute><IncidentReportingPage /></AdminRoute>} />
-
-            {/* Front Office */}
-            <Route path="/reception" element={<AdminRoute><ReceptionDeskPage /></AdminRoute>} />
-            <Route path="/queue" element={<AdminRoute><QueueManagementPage /></AdminRoute>} />
-            <Route path="/feedback" element={<AdminRoute><FeedbackComplaintsPage /></AdminRoute>} />
-            <Route path="/finance/revenue" element={<AdminRoute><RevenueDashboardPage /></AdminRoute>} />
-            <Route path="/finance/expenses" element={<AdminRoute><ExpensesPayrollPage /></AdminRoute>} />
-            <Route path="/finance/compliance" element={<AdminRoute><TaxCompliancePage /></AdminRoute>} />
-            <Route path="/finance/vendors" element={<AdminRoute><VendorPortalPage /></AdminRoute>} />
-            <Route path="/maintenance" element={<AdminRoute><MaintenanceHousekeepingPage /></AdminRoute>} />
+            <Route path="/billing" element={<FinanceRoute><BillingPage /></FinanceRoute>} />
+            <Route path="/billing/new" element={<FinanceRoute><NewInvoicePage /></FinanceRoute>} />
+            <Route path="/billing/:id" element={<FinanceRoute><ViewInvoicePage /></FinanceRoute>} />
+            <Route path="/billing/payments" element={<FinanceRoute><PaymentsPage /></FinanceRoute>} />
+            <Route path="/billing/insurance" element={<FinanceRoute><InsurancePage /></FinanceRoute>} />
+            <Route path="/billing/insurance/new" element={<FinanceRoute><InsuranceClaimPage /></FinanceRoute>} />
+            <Route path="/billing/receipt/:id" element={<FinanceRoute><PaymentReceiptPage /></FinanceRoute>} />
 
             {/* Settings & Support */}
-            <Route path="/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
-            <Route path="/support" element={<AdminRoute><SupportPage /></AdminRoute>} />
-            <Route path="/staff" element={<AdminRoute><StaffManagementPage /></AdminRoute>} />
-            <Route path="/notice-board" element={<AdminRoute><InternalNoticeBoard /></AdminRoute>} />
+            <Route path="/settings" element={<StaffRoute><SettingsPage /></StaffRoute>} />
+            <Route path="/support" element={<StaffRoute><SupportPage /></StaffRoute>} />
+            <Route path="/notice-board" element={<StaffRoute><InternalNoticeBoard /></StaffRoute>} />
 
-            {/* Patient Portal */}
+            {/* Patient Portal (protected) */}
             <Route path="/patient-portal" element={<PatientRoute><PatientDashboard /></PatientRoute>} />
             <Route path="/patient-portal/appointments" element={<PatientRoute><PatientAppointmentsPage /></PatientRoute>} />
             <Route path="/patient-portal/prescriptions" element={<PatientRoute><PatientPrescriptionsPage /></PatientRoute>} />
             <Route path="/patient-portal/records" element={<PatientRoute><PatientRecordsPage /></PatientRoute>} />
             <Route path="/patient-portal/profile" element={<PatientRoute><PatientProfilePage /></PatientRoute>} />
-            <Route path="/patient-portal/pay" element={<PatientRoute><OnlineBillPaymentPage /></PatientRoute>} />
+            <Route path="/patient-portal/billing" element={<PatientRoute><OnlineBillPaymentPage /></PatientRoute>} />
 
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

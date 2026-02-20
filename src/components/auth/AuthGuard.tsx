@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
+export type UserRole = "admin" | "doctor" | "nurse" | "pharmacist" | "lab_tech" | "finance" | "receptionist" | "patient";
+
 interface AuthGuardProps {
   children: React.ReactNode;
-  requiredRole?: "admin" | "doctor" | "patient";
+  requiredRole?: UserRole | UserRole[];
 }
 
 export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
@@ -24,30 +26,30 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
           return;
         }
 
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .single();
+
+        if (profileError || !profile) {
+          console.error("AuthGuard: Profile not found", profileError);
+          await supabase.auth.signOut();
+          if (mounted) navigate("/auth", { replace: true });
+          return;
+        }
+
         if (requiredRole) {
-          const { data: profile, error: profileError } = await supabase
-            .from("profiles")
-            .select("role")
-            .eq("user_id", session.user.id)
-            .single();
+          const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+          const hasAccess = roles.includes(profile.role as UserRole) || profile.role === 'admin';
 
-          if (profileError || !profile) {
-            // Profile not found - sign out to prevent loop
-            console.error("Profile not found for user:", session.user.id);
-            await supabase.auth.signOut();
-            if (mounted) navigate("/auth", { replace: true });
-            return;
-          }
-
-          if (profile.role !== requiredRole) {
+          if (!hasAccess) {
             if (mounted) {
+              // Redirect to their respective dashboard if they don't have access to this specific page
               if (profile.role === "patient") {
                 navigate("/patient-portal", { replace: true });
-              } else if (profile.role === "admin" || profile.role === "doctor") {
-                navigate("/dashboard", { replace: true });
               } else {
-                await supabase.auth.signOut();
-                navigate("/auth", { replace: true });
+                navigate("/dashboard", { replace: true });
               }
             }
             return;
