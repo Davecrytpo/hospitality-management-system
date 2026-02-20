@@ -11,9 +11,10 @@ import PublicLandingPage from "./pages/PublicLandingPage";
 import KioskCheckinPage from "./pages/KioskCheckinPage";
 import PublicVerificationPage from "./pages/PublicVerificationPage";
 import NotFound from "./pages/NotFound";
-
-// Admin Dashboard Base
 import Index from "./pages/Index";
+
+// Auth
+import AuthPage from "./pages/auth/AuthPage";
 
 // Patients
 import PatientsPage from "./pages/patients/PatientsPage";
@@ -59,6 +60,9 @@ import DispensePage from "./pages/pharmacy/DispensePage";
 import StockManagementPage from "./pages/pharmacy/StockManagementPage";
 import AddMedicinePage from "./pages/pharmacy/AddMedicinePage";
 import MedicineEditPage from "./pages/pharmacy/MedicineEditPage";
+import PharmacistQueuePage from "./pages/pharmacy/PharmacistQueuePage";
+import DrugInteractionCheckerPage from "./pages/pharmacy/DrugInteractionCheckerPage";
+import SupplierManagementPage from "./pages/pharmacy/SupplierManagementPage";
 
 // Laboratory
 import LabPage from "./pages/lab/LabPage";
@@ -66,6 +70,10 @@ import LabResultsPage from "./pages/lab/LabResultsPage";
 import LabReportsPage from "./pages/lab/LabReportsPage";
 import LabOrderPage from "./pages/lab/LabOrderPage";
 import LabResultEntryPage from "./pages/lab/LabResultEntryPage";
+import LabSampleTrackingPage from "./pages/lab/LabSampleTrackingPage";
+import LabEquipmentCalibrationPage from "./pages/lab/LabEquipmentCalibrationPage";
+import BloodBankPage from "./pages/lab/BloodBankPage";
+import DiagnosticImagingWorkspacePage from "./pages/lab/DiagnosticImagingWorkspacePage";
 
 // Diagnostics
 import ImagingPage from "./pages/diagnostics/ImagingPage";
@@ -81,6 +89,10 @@ import DepartmentsPage from "./pages/departments/DepartmentsPage";
 import EmergencyPage from "./pages/departments/EmergencyPage";
 import OPDPage from "./pages/departments/OPDPage";
 import IPDPage from "./pages/departments/IPDPage";
+import ERRealtimeBoardPage from "./pages/departments/ERRealtimeBoardPage";
+import AmbulanceTrackingPage from "./pages/departments/AmbulanceTrackingPage";
+import MortuaryManagementPage from "./pages/departments/MortuaryManagementPage";
+import TelemedicinePage from "./pages/departments/TelemedicinePage";
 
 // Billing
 import BillingPage from "./pages/billing/BillingPage";
@@ -90,6 +102,32 @@ import PaymentsPage from "./pages/billing/PaymentsPage";
 import InsurancePage from "./pages/billing/InsurancePage";
 import InsuranceClaimPage from "./pages/billing/InsuranceClaimPage";
 import PaymentReceiptPage from "./pages/billing/PaymentReceiptPage";
+
+// Doctor Portal
+import DoctorDashboardPage from "./pages/doctor/DoctorDashboardPage";
+import MyPatientListPage from "./pages/doctor/MyPatientListPage";
+import ConsultationRoomPage from "./pages/doctor/ConsultationRoomPage";
+import IPDRoundingPage from "./pages/doctor/IPDRoundingPage";
+import SurgerySchedulePage from "./pages/doctor/SurgerySchedulePage";
+import ClinicalAnalyticsPage from "./pages/doctor/ClinicalAnalyticsPage";
+
+// Nurse Portal
+import NurseStationPage from "./pages/nurse/NurseStationPage";
+import WardVitalsMonitorPage from "./pages/nurse/WardVitalsMonitorPage";
+import MARPage from "./pages/nurse/MARPage";
+import ShiftHandoverPage from "./pages/nurse/ShiftHandoverPage";
+import ConsumablesTrackerPage from "./pages/nurse/ConsumablesTrackerPage";
+import IncidentReportingPage from "./pages/nurse/IncidentReportingPage";
+
+// Front Office
+import ReceptionDeskPage from "./pages/frontoffice/ReceptionDeskPage";
+import QueueManagementPage from "./pages/frontoffice/QueueManagementPage";
+import FeedbackComplaintsPage from "./pages/frontoffice/FeedbackComplaintsPage";
+import RevenueDashboardPage from "./pages/frontoffice/RevenueDashboardPage";
+import ExpensesPayrollPage from "./pages/frontoffice/ExpensesPayrollPage";
+import TaxCompliancePage from "./pages/frontoffice/TaxCompliancePage";
+import VendorPortalPage from "./pages/frontoffice/VendorPortalPage";
+import MaintenanceHousekeepingPage from "./pages/frontoffice/MaintenanceHousekeepingPage";
 
 // Settings & Support
 import SettingsPage from "./pages/settings/SettingsPage";
@@ -105,9 +143,7 @@ import PatientAppointmentsPage from "./pages/patient-portal/PatientAppointmentsP
 import PatientPrescriptionsPage from "./pages/patient-portal/PatientPrescriptionsPage";
 import PatientRecordsPage from "./pages/patient-portal/PatientRecordsPage";
 import PatientProfilePage from "./pages/patient-portal/PatientProfilePage";
-
-// Auth
-import AuthPage from "./pages/auth/AuthPage";
+import OnlineBillPaymentPage from "./pages/patient-portal/OnlineBillPaymentPage";
 
 const queryClient = new QueryClient();
 
@@ -135,7 +171,7 @@ const App = () => (
             <Route path="/verify" element={<PublicVerificationPage />} />
             <Route path="/patient-portal/login" element={<PatientLoginPage />} />
 
-            {/* Admin protected routes */}
+            {/* Admin Core */}
             <Route path="/dashboard" element={<AdminRoute><Index /></AdminRoute>} />
 
             {/* Patients */}
@@ -182,6 +218,9 @@ const App = () => (
             <Route path="/pharmacy/:id/edit" element={<AdminRoute><MedicineEditPage /></AdminRoute>} />
             <Route path="/pharmacy/dispense" element={<AdminRoute><DispensePage /></AdminRoute>} />
             <Route path="/pharmacy/stock" element={<AdminRoute><StockManagementPage /></AdminRoute>} />
+            <Route path="/pharmacy/queue" element={<AdminRoute><PharmacistQueuePage /></AdminRoute>} />
+            <Route path="/pharmacy/interactions" element={<AdminRoute><DrugInteractionCheckerPage /></AdminRoute>} />
+            <Route path="/pharmacy/suppliers" element={<AdminRoute><SupplierManagementPage /></AdminRoute>} />
 
             {/* Laboratory */}
             <Route path="/lab" element={<AdminRoute><LabPage /></AdminRoute>} />
@@ -189,6 +228,10 @@ const App = () => (
             <Route path="/lab/results" element={<AdminRoute><LabResultsPage /></AdminRoute>} />
             <Route path="/lab/:id/entry" element={<AdminRoute><LabResultEntryPage /></AdminRoute>} />
             <Route path="/lab/reports" element={<AdminRoute><LabReportsPage /></AdminRoute>} />
+            <Route path="/lab/samples" element={<AdminRoute><LabSampleTrackingPage /></AdminRoute>} />
+            <Route path="/lab/calibration" element={<AdminRoute><LabEquipmentCalibrationPage /></AdminRoute>} />
+            <Route path="/lab/blood-bank" element={<AdminRoute><BloodBankPage /></AdminRoute>} />
+            <Route path="/lab/imaging-workspace" element={<AdminRoute><DiagnosticImagingWorkspacePage /></AdminRoute>} />
 
             {/* Diagnostics */}
             <Route path="/diagnostics/imaging" element={<AdminRoute><ImagingPage /></AdminRoute>} />
@@ -204,6 +247,10 @@ const App = () => (
             <Route path="/departments/emergency" element={<AdminRoute><EmergencyPage /></AdminRoute>} />
             <Route path="/departments/opd" element={<AdminRoute><OPDPage /></AdminRoute>} />
             <Route path="/departments/ipd" element={<AdminRoute><IPDPage /></AdminRoute>} />
+            <Route path="/departments/er-board" element={<AdminRoute><ERRealtimeBoardPage /></AdminRoute>} />
+            <Route path="/departments/ambulance" element={<AdminRoute><AmbulanceTrackingPage /></AdminRoute>} />
+            <Route path="/departments/mortuary" element={<AdminRoute><MortuaryManagementPage /></AdminRoute>} />
+            <Route path="/departments/telemedicine" element={<AdminRoute><TelemedicinePage /></AdminRoute>} />
 
             {/* Billing */}
             <Route path="/billing" element={<AdminRoute><BillingPage /></AdminRoute>} />
@@ -214,20 +261,46 @@ const App = () => (
             <Route path="/billing/insurance/new" element={<AdminRoute><InsuranceClaimPage /></AdminRoute>} />
             <Route path="/billing/receipt/:id" element={<AdminRoute><PaymentReceiptPage /></AdminRoute>} />
 
+            {/* Doctor Portal */}
+            <Route path="/doctor/dashboard" element={<AdminRoute><DoctorDashboardPage /></AdminRoute>} />
+            <Route path="/doctor/my-patients" element={<AdminRoute><MyPatientListPage /></AdminRoute>} />
+            <Route path="/doctor/consultation" element={<AdminRoute><ConsultationRoomPage /></AdminRoute>} />
+            <Route path="/doctor/ipd-rounding" element={<AdminRoute><IPDRoundingPage /></AdminRoute>} />
+            <Route path="/doctor/surgery" element={<AdminRoute><SurgerySchedulePage /></AdminRoute>} />
+            <Route path="/doctor/analytics" element={<AdminRoute><ClinicalAnalyticsPage /></AdminRoute>} />
+
+            {/* Nurse Portal */}
+            <Route path="/nurse/station" element={<AdminRoute><NurseStationPage /></AdminRoute>} />
+            <Route path="/nurse/vitals-monitor" element={<AdminRoute><WardVitalsMonitorPage /></AdminRoute>} />
+            <Route path="/nurse/mar" element={<AdminRoute><MARPage /></AdminRoute>} />
+            <Route path="/nurse/handover" element={<AdminRoute><ShiftHandoverPage /></AdminRoute>} />
+            <Route path="/nurse/consumables" element={<AdminRoute><ConsumablesTrackerPage /></AdminRoute>} />
+            <Route path="/nurse/incidents" element={<AdminRoute><IncidentReportingPage /></AdminRoute>} />
+
+            {/* Front Office */}
+            <Route path="/reception" element={<AdminRoute><ReceptionDeskPage /></AdminRoute>} />
+            <Route path="/queue" element={<AdminRoute><QueueManagementPage /></AdminRoute>} />
+            <Route path="/feedback" element={<AdminRoute><FeedbackComplaintsPage /></AdminRoute>} />
+            <Route path="/finance/revenue" element={<AdminRoute><RevenueDashboardPage /></AdminRoute>} />
+            <Route path="/finance/expenses" element={<AdminRoute><ExpensesPayrollPage /></AdminRoute>} />
+            <Route path="/finance/compliance" element={<AdminRoute><TaxCompliancePage /></AdminRoute>} />
+            <Route path="/finance/vendors" element={<AdminRoute><VendorPortalPage /></AdminRoute>} />
+            <Route path="/maintenance" element={<AdminRoute><MaintenanceHousekeepingPage /></AdminRoute>} />
+
             {/* Settings & Support */}
             <Route path="/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
             <Route path="/support" element={<AdminRoute><SupportPage /></AdminRoute>} />
             <Route path="/staff" element={<AdminRoute><StaffManagementPage /></AdminRoute>} />
             <Route path="/notice-board" element={<AdminRoute><InternalNoticeBoard /></AdminRoute>} />
 
-            {/* Patient Portal (protected) */}
+            {/* Patient Portal */}
             <Route path="/patient-portal" element={<PatientRoute><PatientDashboard /></PatientRoute>} />
             <Route path="/patient-portal/appointments" element={<PatientRoute><PatientAppointmentsPage /></PatientRoute>} />
             <Route path="/patient-portal/prescriptions" element={<PatientRoute><PatientPrescriptionsPage /></PatientRoute>} />
             <Route path="/patient-portal/records" element={<PatientRoute><PatientRecordsPage /></PatientRoute>} />
             <Route path="/patient-portal/profile" element={<PatientRoute><PatientProfilePage /></PatientRoute>} />
+            <Route path="/patient-portal/pay" element={<PatientRoute><OnlineBillPaymentPage /></PatientRoute>} />
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
