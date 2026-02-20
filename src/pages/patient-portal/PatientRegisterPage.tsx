@@ -85,7 +85,15 @@ export default function PatientRegisterPage() {
       });
 
       if (error) throw error;
-      if (data.error) throw new Error(data.error);
+      
+      if (data.error) {
+        if (data.error.includes("expired")) {
+          setError("Your secure verification code has expired (30-minute limit). For your protection, please contact MediCare Hospital administration to regenerate a new invitation link.");
+        } else {
+          setError(data.error);
+        }
+        return;
+      }
 
       setPatientData(data.patient);
       
