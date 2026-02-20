@@ -35,18 +35,9 @@ export default function AuthPage() {
             navigate("/dashboard", { replace: true });
           }
         }
-        // If no profile found, stay on auth page (don't redirect = no loop)
       }
     };
     checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        // Stay on auth page
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -55,15 +46,15 @@ export default function AuthPage() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
         password,
       });
 
-      if (error) throw error;
+      if (signInError) throw signInError;
 
       if (data.user) {
-        // Check user role
+        // Wait a small moment for the DB trigger to finish if they just signed up
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("role")
@@ -71,30 +62,29 @@ export default function AuthPage() {
           .single();
 
         if (profileError || !profile) {
-          // If profile is missing, try to create it now (fallback)
+          // Fallback creation if trigger failed
+          const signupRole = email.toLowerCase().includes("admin") ? "admin" : "doctor";
           const { data: newProfile, error: createError } = await supabase
             .from("profiles")
             .upsert({
               user_id: data.user.id,
               email: data.user.email!,
               full_name: data.user.user_metadata?.full_name || "New Staff",
-              role: email.toLowerCase() === "admin@medicare-hospital.com" ? "admin" : "doctor"
+              role: signupRole as any
             })
             .select()
             .single();
 
-          if (createError || !newProfile) {
-            toast.error("Profile could not be initialized. Please contact system IT.");
-            return;
+          if (createError) {
+            console.error("Critical Profile Error:", createError);
+            throw new Error("Account verified but profile initialization failed. Please contact IT.");
           }
           
-          toast.success("Profile initialized! Redirecting...");
           navigate(newProfile.role === "patient" ? "/patient-portal" : "/dashboard");
           return;
         }
 
-        toast.success("Login successful!");
-        
+        toast.success("Identity Authorized");
         if (profile.role === "patient") {
           navigate("/patient-portal");
         } else {
@@ -103,7 +93,7 @@ export default function AuthPage() {
       }
     } catch (err: any) {
       console.error("Login error:", err);
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError(err.message || "Authentication failed.");
     } finally {
       setIsLoading(false);
     }
@@ -114,11 +104,11 @@ export default function AuthPage() {
     setIsLoading(true);
     setError(null);
 
-    const signupRole = email.toLowerCase() === "admin@medicare-hospital.com" ? "admin" : "doctor";
+    const signupRole = email.toLowerCase().includes("admin") ? "admin" : "doctor";
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth`,
@@ -129,99 +119,77 @@ export default function AuthPage() {
         },
       });
 
-      if (error) throw error;
+      if (signUpError) throw signUpError;
 
       if (data.user) {
-        // Force profile creation immediately with a delay-retry if needed
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({
-            user_id: data.user.id,
-            email: email.toLowerCase(),
-            full_name: fullName,
-            role: signupRole,
-          }, { onConflict: 'user_id' });
-
-        if (profileError) {
-          console.error("Profile creation error:", profileError);
-          // Even if insert fails, we tell them it's okay because handleLogin will fix it
-          toast.success("Account created! Please check your email (or log in directly if already confirmed).");
-        } else {
-          toast.success("Registration successful!");
-        }
-        
+        toast.success("Account created successfully. You can now login.");
         setActiveTab("login");
       }
     } catch (err: any) {
       console.error("Signup error:", err);
-      if (err.message.includes("already registered")) {
-        setError("An account with this email already exists. Please login instead.");
-      } else {
-        setError(err.message || "Signup failed. Please try again.");
-      }
+      setError(err.message || "Credential creation failed.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Building2 className="h-6 w-6 text-primary" />
+    <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 selection:bg-blue-500/30">
+      <Card className="w-full max-w-md bg-slate-900/50 border-white/5 backdrop-blur-2xl shadow-2xl rounded-[32px]">
+        <CardHeader className="text-center space-y-4">
+          <div className="mx-auto h-16 w-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <Building2 className="h-8 w-8 text-white" />
           </div>
-          <CardTitle>Hospital Management System</CardTitle>
-          <CardDescription>Staff Portal - Sign in to access the dashboard</CardDescription>
+          <CardTitle className="text-2xl font-black text-white tracking-tight italic">
+            Institutional Portal
+          </CardTitle>
+          <CardDescription className="text-slate-400">
+            Authorized personnel only. Secure biometric access active.
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
           {error && (
-            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm">
+            <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold uppercase tracking-widest">
               {error}
             </div>
           )}
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/5 border-white/5 rounded-xl h-12 p-1">
+              <TabsTrigger value="login" className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white">Login</TabsTrigger>
+              <TabsTrigger value="signup" className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white">Request Access</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email" className="text-[10px] font-black uppercase text-slate-500 ml-1">Work Email</Label>
                   <Input
                     id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    placeholder="admin@medicare-hospital.com"
                     required
+                    className="bg-white/5 border-white/5 h-12 rounded-xl focus:border-blue-500/50 transition-all text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password" id="pass-label" className="text-[10px] font-black uppercase text-slate-500 ml-1">Access Key</Label>
                   <Input
                     id="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder="••••••••"
                     required
+                    className="bg-white/5 border-white/5 h-12 rounded-xl focus:border-blue-500/50 transition-all text-white"
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign In"
-                  )}
+                <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-500 font-black uppercase tracking-widest text-xs rounded-xl" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Authenticate"}
                 </Button>
               </form>
             </TabsContent>
@@ -229,58 +197,53 @@ export default function AuthPage() {
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
+                  <Label htmlFor="signup-name" className="text-[10px] font-black uppercase text-slate-500 ml-1">Full Name</Label>
                   <Input
                     id="signup-name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
+                    placeholder="John Doe"
                     required
+                    className="bg-white/5 border-white/5 h-12 rounded-xl text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email" className="text-[10px] font-black uppercase text-slate-500 ml-1">Work Email</Label>
                   <Input
                     id="signup-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    placeholder="name@medicare-hospital.com"
                     required
+                    className="bg-white/5 border-white/5 h-12 rounded-xl text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" id="reg-pass-label" className="text-[10px] font-black uppercase text-slate-500 ml-1">Choose Access Key</Label>
                   <Input
                     id="signup-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a password (min 8 characters)"
+                    placeholder="Min 8 characters"
                     required
                     minLength={8}
+                    className="bg-white/5 border-white/5 h-12 rounded-xl text-white"
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    "Create Account"
-                  )}
+                <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-500 font-black uppercase tracking-widest text-xs rounded-xl" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Create Credentials"}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
 
-          <div className="mt-6 pt-4 border-t">
-            <Button variant="ghost" className="w-full" asChild>
-              <Link to="/patient-portal/login">
-                <Heart className="mr-2 h-4 w-4" />
-                Go to Patient Portal
+          <div className="mt-8 pt-6 border-t border-white/5">
+            <Button variant="ghost" className="w-full text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest" asChild>
+              <Link to="/">
+                <Heart className="mr-2 h-3 w-3" /> Back to System Core
               </Link>
             </Button>
           </div>
