@@ -48,7 +48,17 @@ export default function AddDoctorPage() {
 
       if (error) throw error;
 
-      toast.success("Doctor added successfully!");
+      // Trigger staff onboarding email
+      await supabase.functions.invoke("send-staff-onboarding", {
+        body: {
+          email: email,
+          name: `${firstName} ${lastName}`,
+          role: "Doctor",
+          temporaryPassword: "Check with administrator"
+        }
+      });
+
+      toast.success("Doctor added and onboarding email sent!");
       navigate("/doctors");
     } catch (error: any) {
       console.error("Error adding doctor:", error);
