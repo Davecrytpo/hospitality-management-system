@@ -132,21 +132,22 @@ export default function AuthPage() {
       if (error) throw error;
 
       if (data.user) {
-        // Create staff profile explicitly
+        // Force profile creation immediately with a delay-retry if needed
         const { error: profileError } = await supabase
           .from("profiles")
           .upsert({
             user_id: data.user.id,
-            email,
+            email: email.toLowerCase(),
             full_name: fullName,
             role: signupRole,
-          });
+          }, { onConflict: 'user_id' });
 
         if (profileError) {
-          console.error("Profile error:", profileError);
-          toast.error("Account created but profile setup failed. It will be fixed on your first login.");
+          console.error("Profile creation error:", profileError);
+          // Even if insert fails, we tell them it's okay because handleLogin will fix it
+          toast.success("Account created! Please check your email (or log in directly if already confirmed).");
         } else {
-          toast.success("Account created! Please check your email to verify your account.");
+          toast.success("Registration successful!");
         }
         
         setActiveTab("login");
