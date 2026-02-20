@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ShieldCheck, AlertCircle, CheckCircle2, Upload, Fingerprint, Mail, Phone, Lock } from "lucide-react";
+import { Loader2, ShieldCheck, AlertCircle, CheckCircle2, Upload, Fingerprint, Mail, Phone, Lock, ChevronRight } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp";
 
 interface PatientData {
@@ -25,11 +25,11 @@ export default function PatientRegisterPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [invitationId, setInvitationId] = useState(searchParams.get("invitation") || "");
-  const codeFromUrl = searchParams.get("code");
+  const codeFromUrl = searchParams.get("code") || "";
 
   const [step, setStep] = useState<"invitation" | "verify" | "register" | "documents" | "2fa" | "success">("invitation");
   const [isLoading, setIsLoading] = useState(false);
-  const [verificationCode, setVerificationCode] = useState(codeFromUrl || "");
+  const [verificationCode, setVerificationCode] = useState(codeFromUrl);
   const [patientData, setPatientData] = useState<PatientData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,6 +60,7 @@ export default function PatientRegisterPage() {
 
   // Logic to determine initial step
   useEffect(() => {
+    console.log("PatientRegisterPage mounted. InvitationId:", invitationId, "Code:", codeFromUrl);
     if (invitationId && codeFromUrl) {
       setStep("verify");
     }
@@ -80,11 +81,12 @@ export default function PatientRegisterPage() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke("verify-patient-invitation", {
+      console.log("Invoking verify-patient-invitation...");
+      const { data, error: functionError } = await supabase.functions.invoke("verify-patient-invitation", {
         body: { invitationId, verificationCode },
       });
 
-      if (error) throw error;
+      if (functionError) throw functionError;
       
       if (data.error) {
         if (data.error.includes("expired")) {
@@ -95,6 +97,7 @@ export default function PatientRegisterPage() {
         return;
       }
 
+      console.log("Verification success:", data.patient);
       setPatientData(data.patient);
       
       // Pre-fill form with patient data
@@ -107,10 +110,10 @@ export default function PatientRegisterPage() {
       }
 
       setStep("register");
-      toast.success("Verification successful! Please complete your registration.");
+      toast.success("Verification successful!");
     } catch (err: any) {
-      console.error("Verification error:", err);
-      setError(err.message || "Verification failed. Please try again.");
+      console.error("Verification error detail:", err);
+      setError(err.message || "Connection failed. Please check your internet and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -258,23 +261,25 @@ export default function PatientRegisterPage() {
             <div className="space-y-6">
               <div className="flex flex-col items-center space-y-4">
                 <Label htmlFor="code">Verification Code</Label>
-                <InputOTP
-                  maxLength={6}
-                  value={verificationCode}
-                  onChange={(value) => setVerificationCode(value)}
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
+                <div className="flex justify-center">
+                  <InputOTP
+                    maxLength={6}
+                    value={verificationCode}
+                    onChange={(value) => setVerificationCode(value)}
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
