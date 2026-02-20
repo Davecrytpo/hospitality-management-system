@@ -133,13 +133,20 @@ export default function RegisterPatientPage() {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
+      if (!data.emailSent && deliveryMethod === "email") {
+        toast.warning("Patient record created, but email delivery failed. Please copy the link manually.", {
+          description: data.emailErrorMessage,
+          duration: 6000
+        });
+      } else {
+        toast.success(`Invitation ${deliveryMethod === "email" ? "email" : "SMS"} sent successfully!`);
+      }
+
       setInviteResult({
         link: data.registrationLink,
         code: data.verificationCode,
         expiresAt: data.expiresAt,
       });
-
-      toast.success(`Invitation ${deliveryMethod === "email" ? "email" : "SMS"} sent successfully!`);
     } catch (error: any) {
       console.error("Error sending invitation:", error);
       toast.error(error.message || "Failed to send invitation");

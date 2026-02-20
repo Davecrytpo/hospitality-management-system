@@ -55,14 +55,16 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (invitationError) throw invitationError;
 
-    // FIX: Use Origin from request or SITE_URL secret
-    const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://hospitality-management-system-six.vercel.app";
-    const registrationLink = `${origin}/patient-register?invitation=${invitation.id}&code=${verificationCode}`;
+    // FIX: Hardcode Production URL to avoid Vercel "Deployment Not Found" issues
+    const siteUrl = "https://hospitality-management-system-six.vercel.app";
+    const registrationLink = `${siteUrl}/patient-register?invitation=${invitation.id}&code=${verificationCode}`;
 
     let emailSent = false;
+    let emailErrorMessage = "";
+
     if (deliveryMethod === "email" && patientEmail) {
       if (!resendApiKey) {
-        console.error("ERROR: RESEND_API_KEY is not set in Supabase Secrets");
+        emailErrorMessage = "RESEND_API_KEY not set in Supabase";
       } else {
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -86,15 +88,31 @@ const handler = async (req: Request): Promise<Response> => {
             `
           })
         });
-        emailSent = res.ok;
+        
+        if (res.ok) {
+          emailSent = true;
+        } else {
+          const errorData = await res.json();
+          emailErrorMessage = errorData.message || "Unknown error from Resend";
+          console.error("Resend delivery failed:", errorData);
+        }
       }
     }
 
-    return new Response(JSON.stringify({ success: true, registrationLink, verificationCode, expiresAt, emailSent }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      registrationLink, 
+      verificationCode, 
+      expiresAt, 
+      emailSent,
+      emailErrorMessage 
+    }), {
       status: 200, headers: { "Content-Type": "application/json", ...corsHeaders }
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: error.message }), { 
+      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } 
+    });
   }
 };
 

@@ -49,16 +49,21 @@ export default function AddDoctorPage() {
       if (error) throw error;
 
       // Trigger staff onboarding email
-      await supabase.functions.invoke("send-staff-onboarding", {
-        body: {
-          email: email,
-          name: `${firstName} ${lastName}`,
-          role: "Doctor",
-          temporaryPassword: "Check with administrator"
-        }
-      });
+      try {
+        await supabase.functions.invoke("send-staff-onboarding", {
+          body: {
+            email: email,
+            name: `${firstName} ${lastName}`,
+            role: "Doctor",
+            temporaryPassword: "Check with administrator"
+          }
+        });
+        toast.success("Doctor added and onboarding email sent!");
+      } catch (emailErr) {
+        console.error("Email notification failed:", emailErr);
+        toast.warning("Doctor added, but welcome email could not be sent. Please notify them manually.");
+      }
 
-      toast.success("Doctor added and onboarding email sent!");
       navigate("/doctors");
     } catch (error: any) {
       console.error("Error adding doctor:", error);

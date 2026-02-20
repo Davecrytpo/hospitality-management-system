@@ -22,9 +22,7 @@ function generateCode(): string {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -32,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { action, userId, email, phone, deliveryMethod, code } = await req.json();
+    const { action, userId, email, deliveryMethod, code } = await req.json();
 
     if (action === "send") {
       const twoFactorCode = generateCode();
@@ -52,9 +50,11 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (insertError) throw insertError;
 
-      // Send via Resend if email
+      let emailSent = false;
+      let errorDetail = "";
+
       if ((deliveryMethod === "email" || !deliveryMethod) && email && resendApiKey) {
-        await fetch("https://api.resend.com/emails", {
+        const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -76,15 +76,21 @@ const handler = async (req: Request): Promise<Response> => {
             `,
           }),
         });
+        
+        if (res.ok) {
+          emailSent = true;
+        } else {
+          const errData = await res.json();
+          errorDetail = errData.message || "Resend configuration error";
+        }
       }
-
-      console.log(`2FA code for user ${userId}: ${twoFactorCode}`);
 
       return new Response(
         JSON.stringify({
           success: true,
-          message: `Verification code dispatched`,
-          devCode: twoFactorCode,
+          emailSent,
+          errorDetail,
+          devCode: twoFactorCode, // Still logging for debug
           expiresAt,
         }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
