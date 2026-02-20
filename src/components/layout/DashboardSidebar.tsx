@@ -25,7 +25,8 @@ import {
   HeartPulse,
   Syringe,
   Scan,
-  FolderOpen
+  FolderOpen,
+  Megaphone
 } from "lucide-react";
 
 interface SidebarProps {
@@ -41,7 +42,7 @@ interface NavItem {
 }
 
 const navigation: NavItem[] = [
-  { title: "Dashboard", icon: LayoutDashboard, href: "/" },
+  { title: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
   { 
     title: "Patients", 
     icon: Users,
@@ -77,7 +78,7 @@ const navigation: NavItem[] = [
     children: [
       { title: "Current Admissions", href: "/admissions" },
       { title: "New Admission", href: "/admissions/new" },
-      { title: "Discharge", href: "/admissions/discharge" },
+      { title: "Bed Assignment", href: "/admissions/assign" },
       { title: "Bed Management", href: "/admissions/beds" },
     ]
   },
@@ -118,18 +119,12 @@ const navigation: NavItem[] = [
     ]
   },
   { 
-    title: "Diagnostics", 
-    icon: Scan,
-    children: [
-      { title: "Imaging", href: "/diagnostics/imaging" },
-      { title: "Radiology", href: "/diagnostics/radiology" },
-      { title: "Reports", href: "/diagnostics/reports" },
-    ]
-  },
-  { 
     title: "Vitals", 
     icon: HeartPulse,
-    href: "/vitals"
+    children: [
+      { title: "Daily Vitals", href: "/vitals" },
+      { title: "Nursing Triage", href: "/vitals/triage" },
+    ]
   },
   { 
     title: "Departments", 
@@ -156,6 +151,11 @@ const navigation: NavItem[] = [
     icon: Users,
     href: "/staff"
   },
+  {
+    title: "Notice Board",
+    icon: Megaphone,
+    href: "/notice-board"
+  }
 ];
 
 const bottomNavigation: NavItem[] = [
@@ -197,7 +197,7 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
       )}>
         {/* Logo */}
         <div className="flex h-16 items-center justify-between border-b px-4">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/dashboard" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-medical-primary to-medical-secondary">
               <Hospital className="h-6 w-6 text-white" />
             </div>

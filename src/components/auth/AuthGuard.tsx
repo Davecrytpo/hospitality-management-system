@@ -44,7 +44,7 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
               if (profile.role === "patient") {
                 navigate("/patient-portal", { replace: true });
               } else if (profile.role === "admin" || profile.role === "doctor") {
-                navigate("/", { replace: true });
+                navigate("/dashboard", { replace: true });
               } else {
                 await supabase.auth.signOut();
                 navigate("/auth", { replace: true });

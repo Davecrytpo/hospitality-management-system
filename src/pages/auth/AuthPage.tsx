@@ -32,7 +32,7 @@ export default function AuthPage() {
           if (profile.role === "patient") {
             navigate("/patient-portal", { replace: true });
           } else if (profile.role === "admin" || profile.role === "doctor") {
-            navigate("/", { replace: true });
+            navigate("/dashboard", { replace: true });
           }
         }
         // If no profile found, stay on auth page (don't redirect = no loop)
@@ -81,7 +81,7 @@ export default function AuthPage() {
         if (profile.role === "patient") {
           navigate("/patient-portal");
         } else {
-          navigate("/");
+          navigate("/dashboard");
         }
       }
     } catch (err: any) {
