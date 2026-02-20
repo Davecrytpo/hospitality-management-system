@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { 
   ArrowLeft, 
   Stethoscope, 
@@ -17,11 +16,8 @@ import {
   Activity, 
   Pill, 
   FlaskConical, 
-  Save, 
   Plus, 
   Trash2,
-  Clock,
-  User,
   AlertCircle,
   CheckCircle2,
   Loader2
@@ -44,7 +40,7 @@ export default function ConsultationRoomPage() {
   const [notes, setNotes] = useState("");
   
   // Dynamic Prescription Items
-  const [prescriptions, setPrescriptions] = useState([{ medicine: "", dosage: "", duration: "" }]);
+  const [prescriptions, setPrescriptions] = useState([{ medication_name: "", dosage: "", frequency: "", duration: "" }]);
   
   // Lab Order Items
   const [labOrders, setLabOrders] = useState<string[]>([]);
@@ -72,7 +68,7 @@ export default function ConsultationRoomPage() {
     }
   };
 
-  const addPrescriptionRow = () => setPrescriptions([...prescriptions, { medicine: "", dosage: "", duration: "" }]);
+  const addPrescriptionRow = () => setPrescriptions([...prescriptions, { medication_name: "", dosage: "", frequency: "", duration: "" }]);
   
   const removePrescriptionRow = (index: number) => {
     if (prescriptions.length > 1) {
@@ -99,29 +95,31 @@ export default function ConsultationRoomPage() {
     setIsSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const { data: doctor } = await supabase.from("doctors").select("id").eq("user_id", user?.id).single();
+      const { data: doctor } = await supabase.from("doctors").select("id").eq("profile_id", (await supabase.from("profiles").select("id").eq("user_id", user?.id).single()).data?.id).single();
 
       // 1. Save Consultation Note
-      const { data: note, error: noteError } = await supabase.from("consultation_notes").insert({
+      const { error: noteError } = await supabase.from("consultation_notes").insert({
         patient_id: patientId,
         doctor_id: doctor?.id,
         chief_complaint: complaints,
         assessment: diagnosis,
         plan: notes,
-      }).select().single();
+      });
 
       if (noteError) throw noteError;
 
       // 2. Save Prescriptions
-      if (prescriptions.some(p => p.medicine)) {
+      if (prescriptions.some(p => p.medication_name)) {
         const rxData = prescriptions
-          .filter(p => p.medicine)
+          .filter(p => p.medication_name)
           .map(p => ({
             patient_id: patientId,
             doctor_id: doctor?.id,
-            medication: p.medicine,
+            medication_name: p.medication_name,
             dosage: p.dosage,
+            frequency: p.frequency || "1-0-1",
             duration: p.duration,
+            start_date: new Date().toISOString().split('T')[0],
             status: "active"
           }));
         await supabase.from("prescriptions").insert(rxData);
@@ -303,23 +301,31 @@ export default function ConsultationRoomPage() {
                       <div className="space-y-3">
                         {prescriptions.map((p, index) => (
                           <div key={index} className="grid grid-cols-12 gap-3 items-end p-4 border rounded-xl bg-muted/30">
-                            <div className="col-span-5 space-y-1.5">
+                            <div className="col-span-4 space-y-1.5">
                               <Label className="text-[10px] uppercase">Medicine Name</Label>
                               <Input 
                                 placeholder="Search medicine..." 
-                                value={p.medicine}
-                                onChange={(e) => handlePrescriptionChange(index, "medicine", e.target.value)}
+                                value={p.medication_name}
+                                onChange={(e) => handlePrescriptionChange(index, "medication_name", e.target.value)}
                               />
                             </div>
                             <div className="col-span-3 space-y-1.5">
                               <Label className="text-[10px] uppercase">Dosage</Label>
                               <Input 
-                                placeholder="1-0-1" 
+                                placeholder="500mg" 
                                 value={p.dosage}
-                                onChange={(handlePrescriptionChange.bind(null, index, "dosage")) as any}
+                                onChange={(e) => handlePrescriptionChange(index, "dosage", e.target.value)}
                               />
                             </div>
-                            <div className="col-span-3 space-y-1.5">
+                            <div className="col-span-2 space-y-1.5">
+                              <Label className="text-[10px] uppercase">Freq</Label>
+                              <Input 
+                                placeholder="1-0-1" 
+                                value={p.frequency}
+                                onChange={(e) => handlePrescriptionChange(index, "frequency", e.target.value)}
+                              />
+                            </div>
+                            <div className="col-span-2 space-y-1.5">
                               <Label className="text-[10px] uppercase">Duration</Label>
                               <Input 
                                 placeholder="5 days" 
