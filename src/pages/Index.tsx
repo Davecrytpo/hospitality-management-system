@@ -6,6 +6,7 @@ import { DepartmentStats } from "@/components/dashboard/DepartmentStats";
 import { PatientChart } from "@/components/dashboard/PatientChart";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { UpcomingAppointments } from "@/components/dashboard/UpcomingAppointments";
+import { Badge } from "@/components/ui/badge";
 import {
   Users,
   UserCheck,

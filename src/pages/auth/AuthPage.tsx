@@ -71,8 +71,25 @@ export default function AuthPage() {
           .single();
 
         if (profileError || !profile) {
-          toast.error("Profile not found. Please ensure your account is correctly set up.");
-          // Don't navigate if profile is missing
+          // If profile is missing, try to create it now (fallback)
+          const { data: newProfile, error: createError } = await supabase
+            .from("profiles")
+            .upsert({
+              user_id: data.user.id,
+              email: data.user.email!,
+              full_name: data.user.user_metadata?.full_name || "New Staff",
+              role: email.toLowerCase() === "admin@medicare-hospital.com" ? "admin" : "doctor"
+            })
+            .select()
+            .single();
+
+          if (createError || !newProfile) {
+            toast.error("Profile could not be initialized. Please contact system IT.");
+            return;
+          }
+          
+          toast.success("Profile initialized! Redirecting...");
+          navigate(newProfile.role === "patient" ? "/patient-portal" : "/dashboard");
           return;
         }
 
@@ -97,6 +114,8 @@ export default function AuthPage() {
     setIsLoading(true);
     setError(null);
 
+    const signupRole = email.toLowerCase() === "admin@medicare-hospital.com" ? "admin" : "doctor";
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -105,7 +124,7 @@ export default function AuthPage() {
           emailRedirectTo: `${window.location.origin}/auth`,
           data: {
             full_name: fullName,
-            role: "admin",
+            role: signupRole,
           },
         },
       });
@@ -113,19 +132,19 @@ export default function AuthPage() {
       if (error) throw error;
 
       if (data.user) {
-        // Create admin profile explicitly if trigger didn't handle it
+        // Create staff profile explicitly
         const { error: profileError } = await supabase
           .from("profiles")
           .upsert({
             user_id: data.user.id,
             email,
             full_name: fullName,
-            role: "admin",
+            role: signupRole,
           });
 
         if (profileError) {
           console.error("Profile error:", profileError);
-          toast.error("Account created but profile setup failed. Please contact support.");
+          toast.error("Account created but profile setup failed. It will be fixed on your first login.");
         } else {
           toast.success("Account created! Please check your email to verify your account.");
         }
