@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Plus, Search } from "lucide-react";
+import { ArrowLeft, Save, Plus, Search, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const testCategories = [
@@ -34,6 +35,27 @@ export default function LabOrderPage() {
   const navigate = useNavigate();
   const [selectedTests, setSelectedTests] = useState<string[]>([]);
   const [urgency, setUrgency] = useState("routine");
+  const [patients, setPatients] = useState<any[]>([]);
+  const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    fetchPatients();
+    fetchDoctors();
+  }, []);
+
+  const fetchPatients = async () => {
+    const { data } = await supabase.from("patients").select("id, first_name, last_name");
+    if (data) setPatients(data);
+  };
+
+  const fetchDoctors = async () => {
+    const { data } = await supabase.from("doctors").select("id, first_name, last_name");
+    if (data) setDoctors(data);
+  };
 
   const toggleTest = (test: string) => {
     setSelectedTests(prev => 
@@ -41,10 +63,43 @@ export default function LabOrderPage() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Lab order placed successfully");
-    navigate("/lab");
+    if (!selectedPatientId) {
+      toast.error("Please select a patient");
+      return;
+    }
+    if (selectedTests.length === 0) {
+      toast.error("Please select at least one test");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Create multiple lab test records
+      const orders = selectedTests.map(testName => ({
+        patient_id: selectedPatientId,
+        doctor_id: selectedDoctorId || null,
+        test_name: testName,
+        test_type: "Routine", // Simplified for now
+        priority: urgency,
+        status: "ordered",
+        notes: notes || null
+      }));
+
+      const { error } = await supabase.from("lab_tests").insert(orders);
+
+      if (error) throw error;
+
+      toast.success(`${selectedTests.length} Lab test orders placed successfully`);
+      navigate("/lab");
+    } catch (error: any) {
+      console.error("Error placing lab order:", error);
+      toast.error(error.message || "Failed to place lab order");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -69,17 +124,25 @@ export default function LabOrderPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Patient</Label>
-                  <Select>
+                  <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
                     <SelectTrigger><SelectValue placeholder="Select patient" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="p1">John Smith (PAT-001)</SelectItem>
-                      <SelectItem value="p2">Sarah Johnson (PAT-002)</SelectItem>
+                      {patients.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.first_name} {p.last_name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Ordering Physician</Label>
-                  <Input defaultValue="Dr. Sarah Johnson" disabled />
+                  <Select value={selectedDoctorId} onValueChange={setSelectedDoctorId}>
+                    <SelectTrigger><SelectValue placeholder="Select doctor" /></SelectTrigger>
+                    <SelectContent>
+                      {doctors.map(d => (
+                        <SelectItem key={d.id} value={d.id}>Dr. {d.first_name} {d.last_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Priority</Label>
@@ -105,6 +168,8 @@ export default function LabOrderPage() {
                 <Textarea 
                   placeholder="Reason for test, clinical indications..." 
                   className="min-h-[120px]"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                 />
               </CardContent>
             </Card>
@@ -155,9 +220,12 @@ export default function LabOrderPage() {
               <Button variant="outline" asChild>
                 <Link to="/lab">Cancel</Link>
               </Button>
-              <Button type="submit" disabled={selectedTests.length === 0}>
-                <Save className="mr-2 h-4 w-4" />
-                Place Order ({selectedTests.length})
+              <Button type="submit" disabled={isLoading || selectedTests.length === 0}>
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : 
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Place Order ({selectedTests.length})
+                </>}
               </Button>
             </div>
           </div>

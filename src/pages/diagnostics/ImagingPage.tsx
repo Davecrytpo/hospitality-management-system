@@ -22,9 +22,11 @@ export default function ImagingPage() {
             <h1 className="text-2xl font-bold">Imaging</h1>
             <p className="text-muted-foreground">Medical imaging and scans</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Order Imaging
+          <Button asChild>
+            <Link to="/diagnostics/imaging/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Order Imaging
+            </Link>
           </Button>
         </div>
 

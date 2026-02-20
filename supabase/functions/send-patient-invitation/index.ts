@@ -39,6 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Verify admin authorization
@@ -61,8 +62,8 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("user_id", user.id)
       .single();
 
-    if (!profile || profile.role !== "admin") {
-      throw new Error("Only admins can send invitations");
+    if (!profile || (profile.role !== "admin" && profile.role !== "doctor")) {
+      throw new Error("Only staff can send invitations");
     }
 
     const body: InvitationRequest = await req.json();
@@ -72,14 +73,6 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Missing required fields");
     }
 
-    if (deliveryMethod === "email" && !patientEmail) {
-      throw new Error("Email is required for email delivery");
-    }
-
-    if (deliveryMethod === "sms" && !patientPhone) {
-      throw new Error("Phone number is required for SMS delivery");
-    }
-
     // Generate verification code and hash it
     const verificationCode = generateVerificationCode();
     const hashedCode = await hashCode(verificationCode);
@@ -87,8 +80,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Set expiration to 30 minutes from now
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
 
-    // Get admin profile ID
-    const { data: adminProfile } = await supabase
+    // Get staff profile ID
+    const { data: staffProfile } = await supabase
       .from("profiles")
       .select("id")
       .eq("user_id", user.id)
@@ -104,7 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
         verification_code: hashedCode,
         delivery_method: deliveryMethod,
         expires_at: expiresAt,
-        created_by: adminProfile?.id,
+        created_by: staffProfile?.id,
       })
       .select()
       .single();
@@ -115,32 +108,62 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Generate registration link
-    const baseUrl = Deno.env.get("SITE_URL") || supabaseUrl.replace(".supabase.co", ".lovable.app");
-    const registrationLink = `${baseUrl}/patient-register?invitation=${invitation.id}&code=${verificationCode}`;
+    // Default to the current origin if possible, otherwise use a fallback
+    const siteUrl = Deno.env.get("SITE_URL") || "https://hospitality-management-system.lovable.app";
+    const registrationLink = `${siteUrl}/patient-register?invitation=${invitation.id}&code=${verificationCode}`;
+
+    let emailSent = false;
+    let smsSent = false;
 
     // Send via selected delivery method
-    if (deliveryMethod === "email") {
-      // For now, return the link - email integration to be added
-      console.log(`Email invitation to ${patientEmail}:`, registrationLink);
-      
-      // TODO: Integrate with SendGrid when API key is provided
-      // const sendgridKey = Deno.env.get("SENDGRID_API_KEY");
-    } else if (deliveryMethod === "sms") {
-      // For now, return the link - SMS integration to be added
+    if (deliveryMethod === "email" && patientEmail) {
+      if (resendApiKey) {
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: "Hospitality Management System <onboarding@resend.dev>",
+            to: [patientEmail],
+            subject: "Complete Your Hospital Registration",
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 8px;">
+                <h2 style="color: #0f172a;">Welcome to MediCare Hospital</h2>
+                <p>Hello ${firstName},</p>
+                <p>You have been registered at our hospital. To access your Patient Portal and complete your registration, please use the verification code below:</p>
+                <div style="background-color: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
+                  <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2563eb;">${verificationCode}</span>
+                </div>
+                <p>Or click the button below to continue directly:</p>
+                <a href="${registrationLink}" style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Complete Registration</a>
+                <p style="font-size: 12px; color: #64748b; margin-top: 30px;">
+                  This link and code will expire in 30 minutes. If you did not expect this email, please ignore it.
+                </p>
+              </div>
+            `,
+          }),
+        });
+        
+        if (res.ok) emailSent = true;
+        else console.error("Resend error:", await res.text());
+      } else {
+        console.log("RESEND_API_KEY not found, email logged:", registrationLink);
+      }
+    } else if (deliveryMethod === "sms" && patientPhone) {
+      // SMS integration would go here (e.g. Twilio)
       console.log(`SMS invitation to ${patientPhone}:`, registrationLink);
-      
-      // TODO: Integrate with Twilio when credentials are provided
-      // const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+      smsSent = true; // Mocking for now
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Invitation ${deliveryMethod === "email" ? "email" : "SMS"} would be sent to ${deliveryMethod === "email" ? patientEmail : patientPhone}`,
+        message: emailSent ? "Invitation email sent" : "Invitation created (check console for link)",
         invitationId: invitation.id,
-        // Include link for testing - remove in production
         registrationLink,
-        verificationCode, // Include for testing - remove in production
+        verificationCode,
         expiresAt,
       }),
       {

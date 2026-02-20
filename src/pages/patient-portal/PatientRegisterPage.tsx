@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ShieldCheck, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, ShieldCheck, AlertCircle, CheckCircle2, Upload, Fingerprint, Mail, Phone, Lock } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp";
 
 interface PatientData {
@@ -23,10 +24,10 @@ interface PatientData {
 export default function PatientRegisterPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const invitationId = searchParams.get("invitation");
+  const [invitationId, setInvitationId] = useState(searchParams.get("invitation") || "");
   const codeFromUrl = searchParams.get("code");
 
-  const [step, setStep] = useState<"verify" | "register" | "success">("verify");
+  const [step, setStep] = useState<"invitation" | "verify" | "register" | "documents" | "2fa" | "success">("invitation");
   const [isLoading, setIsLoading] = useState(false);
   const [verificationCode, setVerificationCode] = useState(codeFromUrl || "");
   const [patientData, setPatientData] = useState<PatientData | null>(null);
@@ -48,17 +49,25 @@ export default function PatientRegisterPage() {
   const [bloodType, setBloodType] = useState("");
   const [allergies, setAllergies] = useState("");
   const [existingConditions, setExistingConditions] = useState("");
+  
+  // 2FA state
+  const [enable2FA, setEnable2FA] = useState(true);
+  const [twoFaMethod, setTwoFaMethod] = useState<"email" | "phone">("email");
 
-  // Auto-verify if code is in URL
+  // Identification verification
+  const [verifyDOB, setVerifyDOB] = useState("");
+  const [verifyPhone, setVerifyPhone] = useState("");
+
+  // Logic to determine initial step
   useEffect(() => {
-    if (invitationId && codeFromUrl && codeFromUrl.length === 6) {
-      handleVerify();
+    if (invitationId && codeFromUrl) {
+      setStep("verify");
     }
   }, [invitationId, codeFromUrl]);
 
   const handleVerify = async () => {
     if (!invitationId) {
-      setError("Invalid invitation link. Please contact the hospital administration.");
+      setError("Please enter your Invitation ID.");
       return;
     }
 
@@ -112,6 +121,19 @@ export default function PatientRegisterPage() {
       return;
     }
 
+    setStep("documents");
+  };
+
+  const handleDocumentUpload = () => {
+    setIsLoading(true);
+    // Simulate upload
+    setTimeout(() => {
+      setIsLoading(false);
+      setStep("2fa");
+    }, 1500);
+  };
+
+  const handleCompleteRegistration = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -134,6 +156,8 @@ export default function PatientRegisterPage() {
           bloodType,
           allergies,
           existingConditions,
+          enable2FA,
+          twoFaMethod
         },
       });
 
@@ -149,22 +173,6 @@ export default function PatientRegisterPage() {
       setIsLoading(false);
     }
   };
-
-  if (!invitationId) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <CardTitle>Invalid Invitation</CardTitle>
-            <CardDescription>
-              This registration link is invalid or has expired. Please contact the hospital administration to request a new invitation.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
 
   if (step === "success") {
     return (
@@ -188,30 +196,57 @@ export default function PatientRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl shadow-xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <ShieldCheck className="h-6 w-6 text-primary" />
+            {step === "invitation" || step === "verify" ? <ShieldCheck className="h-6 w-6 text-primary" /> : 
+             step === "documents" ? <Upload className="h-6 w-6 text-primary" /> :
+             step === "2fa" ? <Lock className="h-6 w-6 text-primary" /> :
+             <Fingerprint className="h-6 w-6 text-primary" />}
           </div>
           <CardTitle>
-            {step === "verify" ? "Verify Your Identity" : "Complete Registration"}
+            {step === "invitation" && "Welcome to MediCare"}
+            {step === "verify" && "Verify Your Identity"}
+            {step === "register" && "Patient Registration"}
+            {step === "documents" && "Upload Identification"}
+            {step === "2fa" && "Secure Your Account"}
           </CardTitle>
           <CardDescription>
-            {step === "verify"
-              ? "Enter the 6-digit verification code sent to you by the hospital"
-              : "Please provide your information to complete the registration"}
+            {step === "invitation" && "Please enter your invitation details to begin"}
+            {step === "verify" && "Enter the 6-digit code from your email or SMS"}
+            {step === "register" && "Complete your profile and set your password"}
+            {step === "documents" && "Please upload a valid ID for identity verification"}
+            {step === "2fa" && "Set up Two-Factor Authentication for enhanced security"}
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           {error && (
-            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm">
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
               {error}
             </div>
           )}
 
-          {step === "verify" ? (
+          {step === "invitation" && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="invitationId">Invitation ID</Label>
+                <Input 
+                  id="invitationId" 
+                  placeholder="Enter the ID from your invitation" 
+                  value={invitationId}
+                  onChange={(e) => setInvitationId(e.target.value)}
+                />
+              </div>
+              <Button className="w-full" onClick={() => setStep("verify")} disabled={!invitationId}>
+                Continue <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          {step === "verify" && (
             <div className="space-y-6">
               <div className="flex flex-col items-center space-y-4">
                 <Label htmlFor="code">Verification Code</Label>
@@ -232,9 +267,17 @@ export default function PatientRegisterPage() {
                     <InputOTPSlot index={5} />
                   </InputOTPGroup>
                 </InputOTP>
-                <p className="text-xs text-muted-foreground">
-                  This code expires in 30 minutes
-                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Date of Birth</Label>
+                  <Input type="date" value={verifyDOB} onChange={(e) => setVerifyDOB(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phone Number</Label>
+                  <Input placeholder="Last 4 digits" maxLength={4} value={verifyPhone} onChange={(e) => setVerifyPhone(e.target.value)} />
+                </div>
               </div>
 
               <Button
@@ -242,231 +285,97 @@ export default function PatientRegisterPage() {
                 onClick={handleVerify}
                 disabled={isLoading || verificationCode.length !== 6}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  "Verify Code"
-                )}
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Verifying...</> : "Verify Identity"}
+              </Button>
+              <Button variant="ghost" className="w-full" onClick={() => setStep("invitation")}>Back</Button>
+            </div>
+          )}
+
+          {step === "register" && (
+            <form onSubmit={handleRegister} className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Create Password</Label>
+                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm">Confirm Password</Label>
+                  <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                </div>
+              </div>
+              <Button type="submit" className="w-full">Continue to Documents</Button>
+            </form>
+          )}
+
+          {step === "documents" && (
+            <div className="space-y-6">
+              <div className="border-2 border-dashed rounded-xl p-12 text-center space-y-4">
+                <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                  <Upload className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-medium">Upload Government Issued ID</p>
+                  <p className="text-xs text-muted-foreground">Passport, Driver's License or National ID (PDF, JPG, PNG)</p>
+                </div>
+                <Button variant="outline" size="sm">Select File</Button>
+              </div>
+              <Button className="w-full" onClick={handleDocumentUpload} disabled={isLoading}>
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : "Upload & Continue"}
               </Button>
             </div>
-          ) : (
-            <form onSubmit={handleRegister} className="space-y-6">
-              {/* Account Information */}
-              <div className="space-y-4">
-                <h3 className="font-medium text-lg">Account Information</h3>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
+          )}
+
+          {step === "2fa" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Enable Two-Factor Auth</Label>
+                  <p className="text-xs text-muted-foreground">Highly recommended for medical record security</p>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password *</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={8}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
+                <Switch checked={enable2FA} onCheckedChange={setEnable2FA} />
               </div>
 
-              {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="font-medium text-lg">Personal Information</h3>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name *</Label>
-                    <Input
-                      id="firstName"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name *</Label>
-                    <Input
-                      id="lastName"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      required
-                    />
-                  </div>
+              {enable2FA && (
+                <div className="grid gap-3">
+                  <Button
+                    variant={twoFaMethod === "email" ? "default" : "outline"}
+                    className="w-full justify-start h-16 px-4"
+                    onClick={() => setTwoFaMethod("email")}
+                  >
+                    <Mail className="mr-3 h-5 w-5" />
+                    <div className="text-left">
+                      <div className="font-bold">Email Code</div>
+                      <div className="text-xs opacity-80">Send 6-digit code to {email}</div>
+                    </div>
+                  </Button>
+                  <Button
+                    variant={twoFaMethod === "phone" ? "default" : "outline"}
+                    className="w-full justify-start h-16 px-4"
+                    onClick={() => setTwoFaMethod("phone")}
+                  >
+                    <Phone className="mr-3 h-5 w-5" />
+                    <div className="text-left">
+                      <div className="font-bold">SMS Code</div>
+                      <div className="text-xs opacity-80">Send 6-digit code to {phone}</div>
+                    </div>
+                  </Button>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-                    <Input
-                      id="dateOfBirth"
-                      type="date"
-                      value={dateOfBirth}
-                      onChange={(e) => setDateOfBirth(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="gender">Gender</Label>
-                    <Select value={gender} onValueChange={setGender}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Textarea
-                    id="address"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Enter your full address"
-                  />
-                </div>
-              </div>
+              )}
 
-              {/* Emergency Contact */}
-              <div className="space-y-4">
-                <h3 className="font-medium text-lg">Emergency Contact</h3>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="emergencyContactName">Contact Name</Label>
-                    <Input
-                      id="emergencyContactName"
-                      value={emergencyContactName}
-                      onChange={(e) => setEmergencyContactName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="emergencyContactPhone">Contact Phone</Label>
-                    <Input
-                      id="emergencyContactPhone"
-                      value={emergencyContactPhone}
-                      onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="emergencyContactRelationship">Relationship</Label>
-                    <Select value={emergencyContactRelationship} onValueChange={setEmergencyContactRelationship}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="spouse">Spouse</SelectItem>
-                        <SelectItem value="parent">Parent</SelectItem>
-                        <SelectItem value="sibling">Sibling</SelectItem>
-                        <SelectItem value="child">Child</SelectItem>
-                        <SelectItem value="friend">Friend</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Medical Information */}
-              <div className="space-y-4">
-                <h3 className="font-medium text-lg">Medical Information</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="bloodType">Blood Type</Label>
-                  <Select value={bloodType} onValueChange={setBloodType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select blood type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="A+">A+</SelectItem>
-                      <SelectItem value="A-">A-</SelectItem>
-                      <SelectItem value="B+">B+</SelectItem>
-                      <SelectItem value="B-">B-</SelectItem>
-                      <SelectItem value="AB+">AB+</SelectItem>
-                      <SelectItem value="AB-">AB-</SelectItem>
-                      <SelectItem value="O+">O+</SelectItem>
-                      <SelectItem value="O-">O-</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="allergies">Known Allergies</Label>
-                  <Textarea
-                    id="allergies"
-                    value={allergies}
-                    onChange={(e) => setAllergies(e.target.value)}
-                    placeholder="List any known allergies"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="existingConditions">Existing Medical Conditions</Label>
-                  <Textarea
-                    id="existingConditions"
-                    value={existingConditions}
-                    onChange={(e) => setExistingConditions(e.target.value)}
-                    placeholder="List any existing medical conditions"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setStep("verify")}
-                >
-                  Back
-                </Button>
-                <Button type="submit" className="flex-1" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Registering...
-                    </>
-                  ) : (
-                    "Complete Registration"
-                  )}
-                </Button>
-              </div>
-
-              <p className="text-xs text-center text-muted-foreground">
-                By registering, you agree to our Terms of Service and Privacy Policy.
-                All your data is encrypted and stored securely.
-              </p>
-            </form>
+              <Button className="w-full" onClick={handleCompleteRegistration} disabled={isLoading}>
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving Account...</> : "Finish Registration"}
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

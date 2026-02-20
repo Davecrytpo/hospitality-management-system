@@ -79,6 +79,7 @@ import DiagnosticImagingWorkspacePage from "./pages/lab/DiagnosticImagingWorkspa
 import ImagingPage from "./pages/diagnostics/ImagingPage";
 import RadiologyPage from "./pages/diagnostics/RadiologyPage";
 import DiagnosticReportsPage from "./pages/diagnostics/DiagnosticReportsPage";
+import ImagingOrderPage from "./pages/diagnostics/ImagingOrderPage";
 
 // Vitals
 import VitalsPage from "./pages/vitals/VitalsPage";
@@ -235,6 +236,7 @@ const App = () => (
 
             {/* Diagnostics */}
             <Route path="/diagnostics/imaging" element={<AdminRoute><ImagingPage /></AdminRoute>} />
+            <Route path="/diagnostics/imaging/new" element={<AdminRoute><ImagingOrderPage /></AdminRoute>} />
             <Route path="/diagnostics/radiology" element={<AdminRoute><RadiologyPage /></AdminRoute>} />
             <Route path="/diagnostics/reports" element={<AdminRoute><DiagnosticReportsPage /></AdminRoute>} />
 

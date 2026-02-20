@@ -1,66 +1,233 @@
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Plus, DollarSign, CreditCard, Wallet } from "lucide-react";
-
-const mockPayments = [
-  { id: "PAY001", invoice: "INV001", patient: "John Smith", amount: 1250.00, date: "2024-01-15", method: "Card", status: "Completed" },
-  { id: "PAY002", invoice: "INV004", patient: "Sarah Johnson", amount: 2100.00, date: "2024-01-14", method: "Cash", status: "Completed" },
-  { id: "PAY003", invoice: "INV002", patient: "Emily Davis", amount: 500.00, date: "2024-01-13", method: "Insurance", status: "Partial" },
-];
+import { Search, Filter, Plus, DollarSign, CreditCard, Receipt, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export default function PaymentsPage() {
+  const navigate = useNavigate();
+  const [payments, setPayments] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+
+  // Form state
+  const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState("cash");
+  const [reference, setReference] = useState("");
+  const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    fetchPayments();
+    fetchPatients();
+  }, []);
+
+  useEffect(() => {
+    if (selectedPatientId) {
+      fetchPatientInvoices(selectedPatientId);
+    }
+  }, [selectedPatientId]);
+
+  const fetchPayments = async () => {
+    setIsLoading(true);
+    const { data } = await supabase
+      .from("payments")
+      .select("*, patients(first_name, last_name)")
+      .order("created_at", { ascending: false });
+    if (data) setPayments(data);
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 500);
+  };
+
+  const fetchPatients = async () => {
+    const { data } = await supabase.from("patients").select("id, first_name, last_name");
+    if (data) setPatients(data);
+  };
+
+  const fetchPatientInvoices = async (patientId: string) => {
+    const { data } = await supabase
+      .from("invoices")
+      .select("id, invoice_number, total_amount, paid_amount, status")
+      .eq("patient_id", patientId)
+      .neq("status", "paid");
+    if (data) setInvoices(data);
+  };
+
+  const handleRecordPayment = async () => {
+    if (!selectedPatientId || !amount) {
+      toast.error("Please fill in required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { data: payment, error } = await supabase.from("payments").insert({
+        patient_id: selectedPatientId,
+        invoice_id: selectedInvoiceId || null,
+        amount: parseFloat(amount),
+        payment_method: method,
+        reference_number: reference || null,
+        notes: notes || null,
+        received_by: user?.id,
+        status: 'completed'
+      }).select().single();
+
+      if (error) throw error;
+
+      // If associated with an invoice, update it
+      if (selectedInvoiceId) {
+        // This would ideally be a trigger in DB, but for now:
+        const { data: inv } = await supabase.from("invoices").select("paid_amount, total_amount").eq("id", selectedInvoiceId).single();
+        if (inv) {
+          const newPaidAmount = (Number(inv.paid_amount) || 0) + parseFloat(amount);
+          const newStatus = newPaidAmount >= inv.total_amount ? 'paid' : 'partial';
+          await supabase.from("invoices").update({ 
+            paid_amount: newPaidAmount,
+            status: newStatus
+          }).eq("id", selectedInvoiceId);
+        }
+      }
+
+      toast.success("Payment recorded successfully");
+      setShowAddDialog(false);
+      fetchPayments();
+      // Redirect to receipt
+      navigate(`/billing/receipt/${payment.id}`);
+    } catch (error: any) {
+      console.error("Error recording payment:", error);
+      toast.error(error.message || "Failed to record payment");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Payments</h1>
-            <p className="text-muted-foreground">Track and record payments</p>
+            <p className="text-muted-foreground">Monitor and record patient transactions</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Record Payment
-          </Button>
+          
+          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Record Payment
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Record New Payment</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Patient</Label>
+                  <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+                    <SelectTrigger><SelectValue placeholder="Select patient" /></SelectTrigger>
+                    <SelectContent>
+                      {patients.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.first_name} {p.last_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {invoices.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Associated Invoice (Optional)</Label>
+                    <Select value={selectedInvoiceId} onValueChange={setSelectedInvoiceId}>
+                      <SelectTrigger><SelectValue placeholder="Select invoice" /></SelectTrigger>
+                      <SelectContent>
+                        {invoices.map(inv => (
+                          <SelectItem key={inv.id} value={inv.id}>
+                            {inv.invoice_number} (Due: ${inv.total_amount - (inv.paid_amount || 0)})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Amount ($)</Label>
+                    <Input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Payment Method</Label>
+                    <Select value={method} onValueChange={setMethod}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cash">Cash</SelectItem>
+                        <SelectItem value="card">Credit/Debit Card</SelectItem>
+                        <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                        <SelectItem value="insurance">Insurance Direct</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Reference Number (Tx ID)</Label>
+                  <Input placeholder="e.g. CARD-1234 or Bank Ref" value={reference} onChange={(e) => setReference(e.target.value)} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Input placeholder="Any additional details" value={notes} onChange={(e) => setNotes(e.target.value)} />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+                <Button onClick={handleRecordPayment} disabled={isSubmitting}>
+                  {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Recording...</> : "Record Payment"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Today's Collection</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Daily Collection</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$12,450</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Card Payments</CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$8,200</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Cash</CardTitle>
-              <Wallet className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$2,100</div>
+              <div className="text-2xl font-bold">$12,450.00</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Insurance</CardTitle>
+              <CardTitle className="text-sm font-medium">Card Payments</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$2,150</div>
+              <div className="text-2xl font-bold">$8,240.00</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Cash Payments</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">$4,210.00</div>
             </CardContent>
           </Card>
         </div>
@@ -68,7 +235,7 @@ export default function PaymentsPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Payment History</CardTitle>
+              <CardTitle>Recent Transactions</CardTitle>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -84,31 +251,45 @@ export default function PaymentsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Payment ID</TableHead>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead>Patient</TableHead>
-                  <TableHead>Amount</TableHead>
                   <TableHead>Date</TableHead>
+                  <TableHead>Patient</TableHead>
                   <TableHead>Method</TableHead>
+                  <TableHead>Reference</TableHead>
+                  <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockPayments.map((payment) => (
+                {payments.map((payment) => (
                   <TableRow key={payment.id}>
-                    <TableCell className="font-medium">{payment.id}</TableCell>
-                    <TableCell>{payment.invoice}</TableCell>
-                    <TableCell>{payment.patient}</TableCell>
-                    <TableCell>${payment.amount.toFixed(2)}</TableCell>
-                    <TableCell>{payment.date}</TableCell>
-                    <TableCell><Badge variant="outline">{payment.method}</Badge></TableCell>
+                    <TableCell>{new Date(payment.payment_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{payment.patients?.first_name} {payment.patients?.last_name}</TableCell>
                     <TableCell>
-                      <Badge variant={payment.status === "Completed" ? "default" : "secondary"}>
-                        {payment.status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {payment.payment_method === 'card' ? <CreditCard className="h-3 w-3" /> : <DollarSign className="h-3 w-3" />}
+                        <span className="capitalize">{payment.payment_method.replace('_', ' ')}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{payment.reference_number || '-'}</TableCell>
+                    <TableCell className="font-bold">${Number(payment.amount).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Badge className="bg-medical-success">Completed</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" onClick={() => navigate(`/billing/receipt/${payment.id}`)}>
+                        <Receipt className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
+                {payments.length === 0 && !isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      No payments found
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
