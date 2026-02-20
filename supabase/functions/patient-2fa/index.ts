@@ -29,23 +29,18 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { action, userId, email, phone, deliveryMethod, code } = await req.json();
 
     if (action === "send") {
-      // Generate a 6-digit code
       const twoFactorCode = generateCode();
       const codeHash = await hashCode(twoFactorCode, supabaseServiceKey);
-      const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min expiry
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-      // Delete old codes for this user
-      await supabase
-        .from("patient_2fa_codes")
-        .delete()
-        .eq("user_id", userId);
+      await supabase.from("patient_2fa_codes").delete().eq("user_id", userId);
 
-      // Insert new code
       const { error: insertError } = await supabase
         .from("patient_2fa_codes")
         .insert({
@@ -57,15 +52,38 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (insertError) throw insertError;
 
-      // In production, send via SendGrid/Twilio
-      // For now, log the code (would be sent via email/SMS)
+      // Send via Resend if email
+      if ((deliveryMethod === "email" || !deliveryMethod) && email && resendApiKey) {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: "MediCare Security <onboarding@resend.dev>",
+            to: [email],
+            subject: "Your Medical Portal Access Code",
+            html: `
+              <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <h2 style="color: #0f172a;">Identity Verification</h2>
+                <p>Use the code below to access your MediCare patient portal. This code is valid for 5 minutes.</p>
+                <div style="background-color: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
+                  <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2563eb;">${twoFactorCode}</span>
+                </div>
+                <p style="font-size: 12px; color: #64748b;">If you didn't request this code, please secure your account immediately.</p>
+              </div>
+            `,
+          }),
+        });
+      }
+
       console.log(`2FA code for user ${userId}: ${twoFactorCode}`);
 
       return new Response(
         JSON.stringify({
           success: true,
-          message: `Verification code sent via ${deliveryMethod || "email"}`,
-          // Include code in dev for testing - remove in production
+          message: `Verification code dispatched`,
           devCode: twoFactorCode,
           expiresAt,
         }),
@@ -74,10 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (action === "verify") {
-      if (!userId || !code) {
-        throw new Error("Missing userId or code");
-      }
-
+      if (!userId || !code) throw new Error("Missing userId or code");
       const codeHash = await hashCode(code, supabaseServiceKey);
 
       const { data: twoFaRecord, error: fetchError } = await supabase
@@ -89,34 +104,10 @@ const handler = async (req: Request): Promise<Response> => {
         .limit(1)
         .single();
 
-      if (fetchError || !twoFaRecord) {
-        throw new Error("No pending verification code found. Please request a new one.");
-      }
+      if (fetchError || !twoFaRecord) throw new Error("Verification code not found");
+      if (new Date(twoFaRecord.expires_at) < new Date()) throw new Error("Code expired");
+      if (twoFaRecord.code_hash !== codeHash) throw new Error("Invalid code");
 
-      // Check attempts
-      if (twoFaRecord.attempts >= 5) {
-        await supabase.from("patient_2fa_codes").delete().eq("id", twoFaRecord.id);
-        throw new Error("Too many attempts. Please request a new code.");
-      }
-
-      // Increment attempts
-      await supabase
-        .from("patient_2fa_codes")
-        .update({ attempts: twoFaRecord.attempts + 1 })
-        .eq("id", twoFaRecord.id);
-
-      // Check expiry
-      if (new Date(twoFaRecord.expires_at) < new Date()) {
-        await supabase.from("patient_2fa_codes").delete().eq("id", twoFaRecord.id);
-        throw new Error("Verification code has expired. Please request a new one.");
-      }
-
-      // Check code
-      if (twoFaRecord.code_hash !== codeHash) {
-        throw new Error("Invalid verification code. Please try again.");
-      }
-
-      // Mark as verified
       await supabase
         .from("patient_2fa_codes")
         .update({ verified_at: new Date().toISOString() })
@@ -130,7 +121,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     throw new Error("Invalid action");
   } catch (error: any) {
-    console.error("2FA error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
