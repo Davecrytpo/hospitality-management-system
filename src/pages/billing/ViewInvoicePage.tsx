@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,7 @@ export default function ViewInvoicePage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => toast.success("Invoice sent to email")}>
+            <Button variant="outline" onClick={() => alert("Invoice sent to email")}>
               <Mail className="mr-2 h-4 w-4" />
               Email
             </Button>
