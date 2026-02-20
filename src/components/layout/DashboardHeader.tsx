@@ -7,7 +7,12 @@ import {
   Settings,
   LogOut,
   Search,
-  Heart
+  LayoutGrid,
+  Stethoscope,
+  Heart,
+  Pill,
+  FlaskConical,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +30,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
 
 interface DashboardHeaderProps {
   onMenuToggle: () => void;
@@ -33,6 +39,22 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHeaderProps) {
   const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single();
+        setUserProfile(data);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -40,9 +62,20 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
     navigate("/auth");
   };
 
+  const getDepartmentLink = () => {
+    if (!userProfile) return "/dashboard";
+    switch (userProfile.role) {
+      case 'admin': return "/dashboard";
+      case 'doctor': return "/doctor/dashboard";
+      case 'nurse': return "/nurse/station";
+      case 'pharmacist': return "/pharmacy/queue";
+      case 'lab_tech': return "/lab";
+      default: return "/dashboard";
+    }
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-card px-4 lg:px-6">
-      {/* Left side */}
       <div className="flex items-center gap-4">
         <Button 
           variant="ghost" 
@@ -53,142 +86,74 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
           <Menu className="h-5 w-5" />
         </Button>
         
-        {/* Search - Desktop */}
         <div className="hidden md:block">
           <GlobalSearch />
         </div>
       </div>
 
-      {/* Right side */}
       <div className="flex items-center gap-2">
-        {/* Mobile Search */}
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Search className="h-5 w-5" />
-        </Button>
-        
-        {/* Patient Portal Link */}
-        <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-          <Link to="/patient-portal/login">
-            <Heart className="mr-2 h-4 w-4" />
-            Patient Portal
-          </Link>
-        </Button>
-        
-        {/* Theme Toggle */}
+        {/* Quick Dept Switcher for Admin/Multi-role */}
+        {userProfile?.role === 'admin' && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
+                <LayoutGrid className="h-4 w-4" />
+                Units
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Hospital Units</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/doctor/dashboard")}>
+                <Stethoscope className="mr-2 h-4 w-4" /> Doctor Portal
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/nurse/station")}>
+                <Heart className="mr-2 h-4 w-4" /> Nurse Station
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/pharmacy/queue")}>
+                <Pill className="mr-2 h-4 w-4" /> Pharmacy
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/lab")}>
+                <FlaskConical className="mr-2 h-4 w-4" /> Laboratory
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                <Building2 className="mr-2 h-4 w-4" /> Admin Center
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
         <ThemeToggle />
 
-        {/* Messages */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <MessageSquare className="h-5 w-5" />
-              <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-medical-accent">
-                3
-              </Badge>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Messages</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Dr. Sarah Williams</span>
-                <span className="text-xs text-muted-foreground">2m ago</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Patient lab results are ready for review</p>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Lab Department</span>
-                <span className="text-xs text-muted-foreground">15m ago</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Urgent: Critical lab values detected</p>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="text-center text-medical-primary cursor-pointer"
-              onClick={() => navigate("/support")}
-            >
-              View All Messages
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Notifications */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-medical-danger">
-                5
-              </Badge>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="flex flex-col items-start gap-1 p-3 cursor-pointer"
-              onClick={() => navigate("/patients")}
-            >
-              <span className="font-medium">New Patient Registration</span>
-              <p className="text-sm text-muted-foreground">Sarah Johnson has been registered</p>
-              <span className="text-xs text-muted-foreground">5 minutes ago</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex flex-col items-start gap-1 p-3 cursor-pointer"
-              onClick={() => navigate("/departments/emergency")}
-            >
-              <span className="font-medium">Emergency Alert</span>
-              <p className="text-sm text-muted-foreground">Trauma case incoming to ER</p>
-              <span className="text-xs text-muted-foreground">12 minutes ago</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="text-center text-medical-primary cursor-pointer"
-              onClick={() => navigate("/support")}
-            >
-              View All Notifications
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop" />
-                <AvatarFallback>AD</AvatarFallback>
+              <Avatar className="h-8 w-8 border">
+                <AvatarFallback className="bg-medical-primary/10 text-medical-primary font-bold">
+                  {userProfile?.full_name?.substring(0, 2).toUpperCase() || "ST"}
+                </AvatarFallback>
               </Avatar>
               <div className="hidden flex-col items-start lg:flex">
-                <span className="text-sm font-medium">Admin User</span>
-                <span className="text-xs text-muted-foreground">Administrator</span>
+                <span className="text-sm font-medium">{userProfile?.full_name || "Staff Member"}</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-tighter">
+                  {userProfile?.role || "Hospital Staff"}
+                </span>
               </div>
               <ChevronDown className="hidden h-4 w-4 lg:block" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="cursor-pointer"
-              onClick={() => navigate("/settings")}
-            >
-              <User className="mr-2 h-4 w-4" />
-              Profile
+            <DropdownMenuItem onClick={() => navigate("/settings")}>
+              <User className="mr-2 h-4 w-4" /> Profile
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="cursor-pointer"
-              onClick={() => navigate("/settings")}
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
+            <DropdownMenuItem onClick={() => navigate("/settings")}>
+              <Settings className="mr-2 h-4 w-4" /> Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive cursor-pointer" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
+              <LogOut className="mr-2 h-4 w-4" /> Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

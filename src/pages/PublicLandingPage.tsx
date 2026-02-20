@@ -1,249 +1,279 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Building2, 
   ShieldCheck, 
   Activity, 
   ChevronRight, 
-  Phone, 
-  Mail, 
-  MapPin,
+  Lock, 
+  Globe, 
   Heart,
   Stethoscope,
-  FlaskConical,
-  Ambulance,
-  Lock,
-  Globe,
-  Award,
-  Users
+  Microscope,
+  Cpu,
+  Database,
+  Zap
 } from "lucide-react";
+import { useState, useEffect } from "react";
+
+const EKGLine = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
+      <svg className="w-full h-full" viewBox="0 0 1000 100">
+        <motion.path
+          d="M 0 50 L 100 50 L 110 30 L 120 70 L 130 50 L 250 50 L 260 10 L 270 90 L 280 50 L 400 50 L 410 40 L 420 60 L 430 50 L 600 50 L 610 20 L 620 80 L 630 50 L 1000 50"
+          fill="none"
+          stroke="#3b82f6"
+          strokeWidth="2"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ 
+            pathLength: [0, 1],
+            opacity: [0, 1, 0],
+            translateX: [0, 1000]
+          }}
+          transition={{ 
+            duration: 4, 
+            repeat: Infinity, 
+            ease: "linear" 
+          }}
+        />
+      </svg>
+    </div>
+  );
+};
 
 export default function PublicLandingPage() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <div className="min-h-screen bg-[#020617] text-slate-50 selection:bg-blue-500/30 overflow-x-hidden font-sans">
-      {/* Cinematic Background Elements */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] translate-y-1/3 -translate-x-1/4" />
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
+      {/* Background HUD Layer */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#1e293b_0%,#020617_100%)]" />
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+        
+        {/* Animated Grid */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `linear-gradient(#1e40af 1px, transparent 1px), linear-gradient(90deg, #1e40af 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
+        
+        <EKGLine />
       </div>
 
-      {/* Modern Glass Navbar */}
-      <nav className="border-b border-white/5 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="h-12 w-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
-              <Building2 className="h-7 w-7 text-white" />
+      {/* Futuristic Navbar */}
+      <nav className="relative z-50 border-b border-white/5 bg-slate-950/40 backdrop-blur-2xl">
+        <div className="container mx-auto px-6 h-24 flex items-center justify-between">
+          <motion.div 
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="flex items-center gap-4"
+          >
+            <div className="h-14 w-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(37,99,235,0.3)]">
+              <Building2 className="h-8 w-8 text-white" />
             </div>
             <div>
-              <span className="text-xl font-black tracking-tighter text-white block leading-none">MEDICARE</span>
-              <span className="text-[10px] font-bold text-blue-400 tracking-[0.2em] uppercase">Enterprise HMS</span>
+              <span className="text-2xl font-black tracking-tighter text-white block leading-none">MEDICARE</span>
+              <span className="text-[10px] font-bold text-blue-400 tracking-[0.3em] uppercase">Enterprise Core</span>
             </div>
-          </div>
+          </motion.div>
           
-          <div className="hidden lg:flex items-center gap-10 text-xs font-bold tracking-widest text-slate-400 uppercase">
-            <a href="#medical-tech" className="hover:text-white transition-colors">Technology</a>
-            <a href="#specialties" className="hover:text-white transition-colors">Specialties</a>
-            <a href="#about" className="hover:text-white transition-colors">Global Network</a>
-            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+          <div className="hidden lg:flex items-center gap-12">
+            {["Technology", "Specialties", "Network", "Security"].map((item, i) => (
+              <motion.a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 * i }}
+                className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase hover:text-white transition-colors"
+              >
+                {item}
+              </motion.a>
+            ))}
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="h-8 w-[1px] bg-white/10 hidden sm:block" />
-            <Button variant="ghost" asChild className="text-xs font-bold tracking-widest uppercase hover:bg-white/5 text-slate-300">
+          <motion.div 
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="flex items-center gap-6"
+          >
+            <Button variant="ghost" asChild className="text-[10px] font-black tracking-[0.2em] uppercase hover:bg-white/5 text-blue-400">
               <Link to="/auth">
-                <Lock className="mr-2 h-3 w-3" /> Staff Access
+                <Lock className="mr-2 h-3 w-3" /> Institutional Login
               </Link>
             </Button>
-          </div>
+          </motion.div>
         </div>
       </nav>
 
-      {/* Hero Section: High-Tech Arrival */}
-      <section className="relative pt-24 pb-32 lg:pt-40 lg:pb-48">
-        <div className="container mx-auto px-6 text-center lg:text-left">
-          <div className="flex flex-col lg:flex-row items-center gap-20">
-            <div className="flex-1 space-y-10 max-w-3xl">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-black tracking-widest uppercase animate-in fade-in slide-in-from-left-10 duration-700">
-                <Globe className="h-4 w-4 animate-spin-slow" /> 
-                World-Class Medical Excellence
-              </div>
+      {/* Hero: The "WOW" Section */}
+      <section className="relative z-10 pt-20 pb-32 lg:pt-32 lg:pb-40">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="flex-1 text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black tracking-widest uppercase mb-8"
+              >
+                <Zap className="h-3 w-3 animate-pulse" /> Precision Healthcare Infrastructure
+              </motion.div>
               
-              <h1 className="text-5xl lg:text-8xl font-black tracking-tight leading-[0.9] text-white animate-in fade-in slide-in-from-bottom-10 duration-700 delay-150">
-                Precision Medicine <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
-                  Driven by Data.
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-6xl lg:text-[100px] font-black tracking-tighter leading-[0.85] text-white mb-10"
+              >
+                Data-First <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-400">
+                  Medical Logic.
                 </span>
-              </h1>
+              </motion.h1>
               
-              <p className="text-lg lg:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
-                Welcome to the next generation of healthcare. MediCare Enterprise provides a seamless, high-security ecosystem for elite medical institutions and their patients.
-              </p>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-12 font-medium"
+              >
+                A high-fidelity management ecosystem for modern medical institutions. Synchronized biometrics, real-time clinical queues, and encrypted patient data.
+              </motion.p>
               
-              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
-                <Button size="lg" className="h-16 px-10 text-sm font-black tracking-widest uppercase rounded-2xl bg-blue-600 hover:bg-blue-500 shadow-xl shadow-blue-600/20 transition-all hover:scale-105" asChild>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start"
+              >
+                <Button size="lg" className="h-16 px-10 text-xs font-black tracking-[0.2em] uppercase rounded-2xl bg-blue-600 hover:bg-blue-500 shadow-[0_0_40px_rgba(37,99,235,0.4)] transition-all hover:scale-105" asChild>
                   <a href="#medical-tech">
-                    Explore Ecosystem <ChevronRight className="ml-2 h-5 w-5" />
+                    View Network Status <ChevronRight className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
-                <div className="flex items-center gap-4 px-6 border-l border-white/10 ml-2 hidden md:flex">
-                  <div className="text-left">
-                    <div className="text-2xl font-black text-white">24/7</div>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Emergency Core</div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
             </div>
 
-            <div className="flex-1 relative animate-in fade-in zoom-in duration-1000">
-              <div className="relative z-10 rounded-[40px] border border-white/10 bg-slate-900/50 p-4 backdrop-blur-2xl shadow-2xl">
-                <div className="absolute -top-10 -right-10 h-32 w-32 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute -bottom-10 -left-10 h-32 w-32 bg-indigo-500/20 rounded-full blur-3xl" />
-                <img 
-                  src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop" 
-                  alt="Future Hospital" 
-                  className="rounded-[32px] w-full aspect-[4/3] object-cover border border-white/5 grayscale-[0.2] contrast-125"
-                />
+            {/* Visual HUD Mockup */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1 }}
+              className="flex-1 relative"
+            >
+              <div className="relative rounded-[40px] border border-white/10 bg-slate-900/40 p-2 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none" />
                 
-                {/* HUD Elements */}
-                <div className="absolute top-12 left-12 p-4 bg-black/60 backdrop-blur-md rounded-2xl border border-white/10 space-y-2 hidden xl:block">
-                  <div className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black text-white uppercase">Neural Link Active</span>
-                  </div>
-                  <div className="h-1 w-24 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 w-[70%]" />
-                  </div>
+                {/* Animated Scanner Line */}
+                <motion.div 
+                  animate={{ top: ["0%", "100%", "0%"] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  className="absolute left-0 right-0 h-[2px] bg-blue-400/50 blur-[2px] z-20 shadow-[0_0_15px_#3b82f6]"
+                />
+
+                <img 
+                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" 
+                  alt="Medical Tech" 
+                  className="rounded-[32px] w-full aspect-square object-cover opacity-60 grayscale brightness-125"
+                />
+
+                {/* Floating Data Points */}
+                <div className="absolute top-10 left-10 space-y-4">
+                  {[1, 2].map((i) => (
+                    <motion.div 
+                      key={i}
+                      animate={{ x: [0, 10, 0] }}
+                      transition={{ duration: 3, delay: i * 0.5, repeat: Infinity }}
+                      className="p-4 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/10 min-w-[180px]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Biometric_Feed_{i}</span>
+                      </div>
+                      <div className="mt-2 text-xl font-black text-white font-mono">
+                        {i === 1 ? "120/80" : "98.2°F"}
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Tech Section */}
-      <section id="medical-tech" className="py-32 bg-slate-950/50 relative">
+      {/* Core Infrastructure */}
+      <section id="technology" className="relative z-10 py-32 border-y border-white/5 bg-slate-950/20">
         <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-10 bg-white/5 border-white/5 rounded-[32px] hover:bg-white/10 transition-all duration-500 group">
-              <div className="h-16 w-16 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-400 mb-8 group-hover:scale-110 transition-transform">
-                <Activity className="h-8 w-8" />
-              </div>
-              <h3 className="text-2xl font-black mb-4 text-white">Biometric Integration</h3>
-              <p className="text-slate-400 leading-relaxed">Real-time monitoring of patient vitals across all specialized departments with zero latency.</p>
-            </Card>
-            
-            <Card className="p-10 bg-white/5 border-white/5 rounded-[32px] hover:bg-white/10 transition-all duration-500 group">
-              <div className="h-16 w-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center text-indigo-400 mb-8 group-hover:scale-110 transition-transform">
-                <FlaskConical className="h-8 w-8" />
-              </div>
-              <h3 className="text-2xl font-black mb-4 text-white">Molecular Laboratory</h3>
-              <p className="text-slate-400 leading-relaxed">High-precision diagnostic tools powered by advanced AI for rapid and accurate test results.</p>
-            </Card>
-
-            <Card className="p-10 bg-white/5 border-white/5 rounded-[32px] hover:bg-white/10 transition-all duration-500 group">
-              <div className="h-16 w-16 bg-emerald-600/20 rounded-2xl flex items-center justify-center text-emerald-400 mb-8 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="h-8 w-8" />
-              </div>
-              <h3 className="text-2xl font-black mb-4 text-white">Encrypted Core</h3>
-              <p className="text-slate-400 leading-relaxed">Enterprise-grade security protocols ensuring absolute confidentiality of all medical records.</p>
-            </Card>
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              { title: "Neural Diagnostics", icon: Microscope, color: "text-blue-400", desc: "Automated analysis of lab results using institutional AI models for 99.9% accuracy." },
+              { title: "Real-time MAR", icon: Database, color: "text-indigo-400", desc: "Digital Medication Administration Records synchronized across all nursing stations." },
+              { title: "Encrypted Core", icon: ShieldCheck, color: "text-emerald-400", desc: "Military-grade encryption for all medical records and financial transactions." }
+            ].map((tech, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ y: -10 }}
+                className="p-10 rounded-[32px] bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all duration-500 group"
+              >
+                <div className={`h-16 w-16 rounded-2xl bg-white/5 flex items-center justify-center ${tech.color} mb-8 shadow-inner`}>
+                  <tech.icon className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-black mb-4 text-white tracking-tight">{tech.title}</h3>
+                <p className="text-slate-400 leading-relaxed font-medium">{tech.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Global Presence */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="container mx-auto px-6 text-center">
-          <div className="max-w-4xl mx-auto space-y-12">
-            <h2 className="text-4xl lg:text-6xl font-black text-white tracking-tight">The Trusted Standard in Global Healthcare</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 pt-10">
-              <div className="space-y-2">
-                <div className="text-5xl font-black text-blue-500">150+</div>
-                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Facilities</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-5xl font-black text-indigo-500">4.2k</div>
-                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Specialists</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-5xl font-black text-blue-500">99.9%</div>
-                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Uptime</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-5xl font-black text-indigo-500">12M+</div>
-                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Patients Yearly</div>
-              </div>
-            </div>
+      {/* Bottom CTA */}
+      <section className="relative z-10 py-40 overflow-hidden text-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="container mx-auto px-6 relative">
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            className="text-5xl lg:text-7xl font-black text-white tracking-tighter mb-12"
+          >
+            The Future of Hospital <br />Management is Here.
+          </motion.h2>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Button size="lg" variant="outline" className="h-16 px-12 border-white/10 hover:bg-white/5 text-xs font-black uppercase tracking-[0.2em] rounded-2xl" asChild>
+              <Link to="/auth">Access Staff Portal</Link>
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Institutional Footer */}
-      <footer id="contact" className="bg-slate-950 pt-32 pb-16 border-t border-white/5">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-4 gap-20 mb-20">
-            <div className="col-span-2 space-y-8">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-xl font-black tracking-tighter text-white uppercase">Medicare</span>
+      <footer className="relative z-10 bg-slate-950 pt-20 pb-10 border-t border-white/5">
+        <div className="container mx-auto px-6 text-center">
+          <div className="flex flex-col items-center gap-8">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                <Building2 className="h-6 w-6 text-white" />
               </div>
-              <p className="text-slate-500 max-w-md leading-relaxed font-medium">
-                Established in 1998, MediCare Enterprise has grown into a world-leader in healthcare innovation and management systems.
-              </p>
-              <div className="flex gap-6">
-                <div className="h-12 w-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors cursor-pointer">
-                  <Globe className="h-5 w-5 text-slate-400" />
-                </div>
-                <div className="h-12 w-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors cursor-pointer">
-                  <Award className="h-5 w-5 text-slate-400" />
-                </div>
-                <div className="h-12 w-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors cursor-pointer">
-                  <Users className="h-5 w-5 text-slate-400" />
-                </div>
-              </div>
+              <span className="text-xl font-black tracking-tighter text-white uppercase">MEDICARE</span>
             </div>
-            
-            <div className="space-y-8">
-              <h4 className="text-xs font-black text-white uppercase tracking-widest">Headquarters</h4>
-              <ul className="space-y-4 text-sm text-slate-500 font-medium">
-                <li className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-blue-500 shrink-0" />
-                  123 Healthcare Avenue <br />Medical District, IL 60601
-                </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-blue-500 shrink-0" />
-                  +1 (800) MEDICARE
-                </li>
-                <li className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-blue-500 shrink-0" />
-                  global@medicare-enterprise.com
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-8">
-              <h4 className="text-xs font-black text-white uppercase tracking-widest">Global Support</h4>
-              <div className="p-6 rounded-[24px] bg-white/5 border border-white/5 space-y-4">
-                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Institutional Hotline</p>
-                <p className="text-2xl font-black text-white tracking-tighter leading-none">1-800-CORE-HMS</p>
-                <p className="text-[10px] text-slate-500 font-bold">Standard rates apply. Available 24/7/365.</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
-              © 2026 MEDICARE ENTERPRISE HMS. ALL RIGHTS RESERVED.
+            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">
+              Institutional Infrastructure • Secure Medical Logic • Global Excellence
             </p>
-            <div className="flex gap-8 text-[10px] font-black text-slate-600 uppercase tracking-widest">
-              <a href="#" className="hover:text-blue-500">Security Policy</a>
-              <a href="#" className="hover:text-blue-500">Terms of Operation</a>
-              <a href="#" className="hover:text-blue-500">Privacy Core</a>
-            </div>
+            <div className="h-[1px] w-20 bg-white/10" />
+            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">
+              © 2026 MediCare Enterprise HMS. All Rights Reserved.
+            </p>
           </div>
         </div>
       </footer>
