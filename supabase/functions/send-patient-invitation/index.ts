@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface InvitationRequest {
@@ -55,8 +55,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (invitationError) throw invitationError;
 
-    // FIX: Hardcode Production URL to avoid Vercel "Deployment Not Found" issues
-    const siteUrl = "https://hospitality-management-system-six.vercel.app";
+    // Use SITE_URL or fallback to Supabase URL-derived frontend
+    const siteUrl = Deno.env.get("SITE_URL") || `${supabaseUrl.replace('.supabase.co', '')}`; 
     const registrationLink = `${siteUrl}/patient-register?invitation=${invitation.id}&code=${verificationCode}`;
 
     let emailSent = false;
@@ -64,39 +64,64 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (deliveryMethod === "email" && patientEmail) {
       if (!resendApiKey) {
-        emailErrorMessage = "RESEND_API_KEY not set in Supabase";
+        emailErrorMessage = "RESEND_API_KEY not set";
       } else {
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendApiKey}` },
-          body: JSON.stringify({
-            from: "MediCare Hospital <onboarding@resend.dev>",
-            to: [patientEmail],
-            subject: "Action Required: Complete Your Hospital Registration",
-            html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
-                <h2 style="color: #2563eb;">Welcome to MediCare Hospital</h2>
-                <p>Hello ${firstName},</p>
-                <p>A patient account has been created for you. Please use the secure code below to complete your registration and access the Patient Portal:</p>
-                <div style="background: #f1f5f9; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2563eb; border-radius: 8px; margin: 20px 0;">
-                  ${verificationCode}
+        try {
+          const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendApiKey}` },
+            body: JSON.stringify({
+              from: "Hospitality Management System <onboarding@resend.dev>",
+              to: [patientEmail],
+              subject: "Action Required: Complete Your Hospital Registration",
+              html: `
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
+                  <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 32px 40px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 24px;">Hospitality Management System</h1>
+                    <p style="color: #bfdbfe; margin: 8px 0 0 0; font-size: 13px;">Secure Patient Registration Portal</p>
+                  </div>
+                  <div style="padding: 40px;">
+                    <p style="font-size: 16px; color: #334155;">Hello <strong>${firstName}</strong>,</p>
+                    <p style="color: #475569; line-height: 1.6;">A patient account has been created for you at our hospital. Please use the secure verification code below to complete your registration and access your Patient Portal.</p>
+                    <div style="background: #f1f5f9; padding: 24px; text-align: center; font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #1e40af; border-radius: 12px; margin: 24px 0; border: 2px dashed #93c5fd;">
+                      ${verificationCode}
+                    </div>
+                    <p style="color: #475569; text-align: center;">Or click the button below to go directly:</p>
+                    <div style="text-align: center; margin: 24px 0;">
+                      <a href="${registrationLink}" style="display: inline-block; background: #1e40af; color: white; padding: 16px 40px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px;">Complete Registration →</a>
+                    </div>
+                    <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b; margin-top: 24px;">
+                      <p style="margin: 0; font-size: 13px; color: #92400e;">⏰ <strong>Important:</strong> This verification code expires in <strong>30 minutes</strong>. If it expires, please contact the hospital to generate a new invitation.</p>
+                    </div>
+                    <p style="font-size: 12px; color: #94a3b8; margin-top: 32px; text-align: center;">If you did not expect this email, please ignore it. No account will be created.</p>
+                  </div>
+                  <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 Hospitality Management System. All rights reserved.</p>
+                  </div>
                 </div>
-                <p>Or click the button below to continue:</p>
-                <a href="${registrationLink}" style="display: block; background: #2563eb; color: white; padding: 15px; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold;">Complete Registration</a>
-                <p style="font-size: 12px; color: #666; margin-top: 30px;">This link expires in 30 minutes. If you did not expect this, please ignore this email.</p>
-              </div>
-            `
-          })
-        });
-        
-        if (res.ok) {
-          emailSent = true;
-        } else {
-          const errorData = await res.json();
-          emailErrorMessage = errorData.message || "Unknown error from Resend";
-          console.error("Resend delivery failed:", errorData);
+              `
+            })
+          });
+          
+          if (res.ok) {
+            emailSent = true;
+            console.log("Email sent successfully to:", patientEmail);
+          } else {
+            const errorData = await res.json();
+            emailErrorMessage = errorData.message || "Unknown error from email service";
+            console.error("Email delivery failed:", errorData);
+          }
+        } catch (emailErr) {
+          emailErrorMessage = `Email sending error: ${emailErr.message}`;
+          console.error("Email send exception:", emailErr);
         }
       }
+    }
+
+    // SMS handling placeholder
+    if (deliveryMethod === "sms" && patientPhone) {
+      console.log(`SMS would be sent to ${patientPhone} with code ${verificationCode}`);
+      // TODO: Integrate Twilio for SMS delivery
     }
 
     return new Response(JSON.stringify({ 
@@ -110,6 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
       status: 200, headers: { "Content-Type": "application/json", ...corsHeaders }
     });
   } catch (error: any) {
+    console.error("send-patient-invitation error:", error);
     return new Response(JSON.stringify({ error: error.message }), { 
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } 
     });

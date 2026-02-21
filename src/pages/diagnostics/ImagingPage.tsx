@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Scan, Search, Filter, Eye, Download, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const mockImaging = [
   { id: "IMG001", patient: "John Smith", type: "X-Ray", area: "Chest", date: "2024-01-15", status: "Completed" },

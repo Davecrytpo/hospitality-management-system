@@ -11,6 +11,7 @@ interface StatsCardProps {
   iconColor?: string;
   description?: string;
   href?: string;
+  className?: string;
 }
 
 export function StatsCard({
@@ -21,7 +22,8 @@ export function StatsCard({
   icon: Icon,
   iconColor = "bg-medical-primary/10 text-medical-primary",
   description,
-  href
+  href,
+  className
 }: StatsCardProps) {
   const navigate = useNavigate();
 
@@ -36,7 +38,8 @@ export function StatsCard({
       onClick={handleClick}
       className={cn(
         "rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md",
-        href && "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+        href && "cursor-pointer hover:scale-[1.02] active:scale-[0.98]",
+        className
       )}
     >
       <div className="flex items-start justify-between">

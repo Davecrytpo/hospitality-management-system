@@ -1472,10 +1472,23 @@ export type Database = {
       get_my_profile_id: { Args: never; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       is_doctor: { Args: never; Returns: boolean }
+      is_finance: { Args: never; Returns: boolean }
+      is_lab_tech: { Args: never; Returns: boolean }
+      is_nurse: { Args: never; Returns: boolean }
       is_patient: { Args: never; Returns: boolean }
+      is_pharmacist: { Args: never; Returns: boolean }
+      is_receptionist: { Args: never; Returns: boolean }
     }
     Enums: {
-      user_role: "admin" | "patient" | "doctor"
+      user_role:
+        | "admin"
+        | "patient"
+        | "doctor"
+        | "nurse"
+        | "pharmacist"
+        | "lab_tech"
+        | "finance"
+        | "receptionist"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1603,7 +1616,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      user_role: ["admin", "patient", "doctor"],
+      user_role: [
+        "admin",
+        "patient",
+        "doctor",
+        "nurse",
+        "pharmacist",
+        "lab_tech",
+        "finance",
+        "receptionist",
+      ],
     },
   },
 } as const
