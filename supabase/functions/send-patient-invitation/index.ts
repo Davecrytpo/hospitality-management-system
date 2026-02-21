@@ -32,7 +32,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Get the sender's profile ID
     const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
-    if (userError || !user) throw new Error("Unauthorized");
+    if (userError || !user) {
+      console.error("Auth error:", userError);
+      throw new Error("Unauthorized: " + (userError?.message || "User not found"));
+    }
 
     const { data: senderProfile, error: profileError } = await supabase
       .from("profiles")
@@ -40,7 +43,10 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("user_id", user.id)
       .single();
     
-    if (profileError || !senderProfile) throw new Error("Sender profile not found");
+    if (profileError || !senderProfile) {
+      console.error("Profile fetch error:", profileError);
+      throw new Error("Sender profile not found. Please ensure your staff profile is correctly set up.");
+    }
 
     // Generate code and expiration
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -50,6 +56,8 @@ const handler = async (req: Request): Promise<Response> => {
     const hashedCode = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
     
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+
+    console.log(`Creating invitation for patient ${patientId} by staff ${senderProfile.id}`);
 
     // Create record
     const { data: invitation, error: invitationError } = await supabase
@@ -65,11 +73,20 @@ const handler = async (req: Request): Promise<Response> => {
       })
       .select().single();
 
-    if (invitationError) throw invitationError;
+    if (invitationError) {
+      console.error("Invitation insert error:", invitationError);
+      throw new Error("Failed to create invitation record: " + invitationError.message);
+    }
 
-    // Use SITE_URL or fallback to Supabase URL-derived frontend
-    const siteUrl = Deno.env.get("SITE_URL") || `${supabaseUrl.replace('.supabase.co', '')}`; 
-    const registrationLink = `${siteUrl}/patient-register?invitation=${invitation.id}&code=${verificationCode}`;
+    // Use SITE_URL or fallback to a sensible default
+    let siteUrl = Deno.env.get("SITE_URL");
+    if (!siteUrl) {
+      // Fallback: if we're in Supabase, we can sometimes guess, but better to use a known default or the request origin
+      siteUrl = "https://hospitality-management-system-six.vercel.app";
+      console.warn("SITE_URL not set, falling back to:", siteUrl);
+    }
+    
+    const registrationLink = `${siteUrl.replace(/\/$/, '')}/patient-register?invitation=${invitation.id}&code=${verificationCode}`;
 
     let emailSent = false;
     let emailErrorMessage = "";

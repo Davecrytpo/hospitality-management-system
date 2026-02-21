@@ -104,14 +104,15 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (authError) {
-      console.error("Auth error:", authError);
+      console.error("Auth creation error:", authError);
       if (authError.message.includes("already registered")) {
         throw new Error("An account with this email already exists. Please login instead.");
       }
-      throw new Error("Failed to create account: " + authError.message);
+      throw new Error("Failed to create user account: " + authError.message);
     }
 
     const userId = authData.user.id;
+    console.log(`User created with ID: ${userId}`);
 
     // Create or update the profile
     const { data: profile, error: profileError } = await supabase
@@ -127,11 +128,13 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (profileError) {
-      console.error("Profile error:", profileError);
+      console.error("Profile upsert error:", profileError);
       // Cleanup: delete the auth user if profile creation/update fails
       await supabase.auth.admin.deleteUser(userId);
       throw new Error("Failed to finalize profile record: " + profileError.message);
     }
+
+    console.log(`Profile upserted with ID: ${profile.id}`);
 
     // Update the patient record with profile link and additional info
     const { error: patientError } = await supabase
@@ -156,8 +159,9 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("id", invitation.patient_id);
 
     if (patientError) {
-      console.error("Patient update error:", patientError);
-      // Don't fail completely - the account was created
+      console.error("Patient record update error:", patientError);
+      // We don't throw here to avoid failing the whole process if just the patient update fails
+      // as the auth account and profile are already created.
     }
 
     // Mark the invitation as used

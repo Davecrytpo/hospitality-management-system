@@ -51,8 +51,13 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("id", invitationId)
       .single();
 
-    if (invitationError || !invitation) {
-      throw new Error("Invalid invitation");
+    if (invitationError) {
+      console.error("Invitation fetch error:", invitationError);
+      throw new Error("Invalid or expired invitation link: " + invitationError.message);
+    }
+
+    if (!invitation) {
+      throw new Error("Invitation not found");
     }
 
     // Check if already used
