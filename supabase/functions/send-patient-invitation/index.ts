@@ -57,15 +57,27 @@ const handler = async (req: Request): Promise<Response> => {
     
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
 
-    console.log(`Creating invitation for patient ${patientId} by staff ${senderProfile.id}`);
+    console.log(`Verifying patient existence for ID: ${patientId}`);
+    const { data: patient, error: patientFetchError } = await supabase
+      .from("patients")
+      .select("id")
+      .eq("id", patientId)
+      .single();
+
+    if (patientFetchError || !patient) {
+      console.error("Patient check failed:", patientFetchError);
+      throw new Error(`Patient record with ID ${patientId} not found. Please ensure the patient is registered first.`);
+    }
+
+    console.log(`Creating invitation record for patient ${patientId} by staff ${senderProfile.id}`);
 
     // Create record
     const { data: invitation, error: invitationError } = await supabase
       .from("patient_invitations")
       .insert({
         patient_id: patientId,
-        patient_email: patientEmail,
-        patient_phone: patientPhone,
+        patient_email: patientEmail || null,
+        patient_phone: patientPhone || null,
         verification_code: hashedCode,
         delivery_method: deliveryMethod,
         expires_at: expiresAt,
@@ -75,8 +87,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (invitationError) {
       console.error("Invitation insert error:", invitationError);
-      throw new Error("Failed to create invitation record: " + invitationError.message);
+      throw new Error(`Database error creating invitation: ${invitationError.message} (Detail: ${invitationError.details || 'none'})`);
     }
+
+    console.log(`Invitation created successfully with ID: ${invitation.id}`);
 
     // Use SITE_URL or fallback to a sensible default
     let siteUrl = Deno.env.get("SITE_URL");
