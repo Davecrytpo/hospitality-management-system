@@ -30,6 +30,18 @@ const handler = async (req: Request): Promise<Response> => {
     const body: InvitationRequest = await req.json();
     const { patientId, patientEmail, patientPhone, deliveryMethod, firstName } = body;
 
+    // Get the sender's profile ID
+    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (userError || !user) throw new Error("Unauthorized");
+
+    const { data: senderProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("user_id", user.id)
+      .single();
+    
+    if (profileError || !senderProfile) throw new Error("Sender profile not found");
+
     // Generate code and expiration
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const encoder = new TextEncoder();
@@ -49,7 +61,7 @@ const handler = async (req: Request): Promise<Response> => {
         verification_code: hashedCode,
         delivery_method: deliveryMethod,
         expires_at: expiresAt,
-        created_by: (await supabase.auth.getUser(authHeader.replace("Bearer ", ""))).data.user?.id
+        created_by: senderProfile.id
       })
       .select().single();
 

@@ -113,24 +113,24 @@ const handler = async (req: Request): Promise<Response> => {
 
     const userId = authData.user.id;
 
-    // Create the profile
+    // Create or update the profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .insert({
+      .upsert({
         user_id: userId,
         email,
         phone,
         full_name: `${firstName} ${lastName}`,
         role: "patient",
-      })
+      }, { onConflict: 'user_id' })
       .select()
       .single();
 
     if (profileError) {
       console.error("Profile error:", profileError);
-      // Cleanup: delete the auth user if profile creation fails
+      // Cleanup: delete the auth user if profile creation/update fails
       await supabase.auth.admin.deleteUser(userId);
-      throw new Error("Failed to create profile");
+      throw new Error("Failed to finalize profile record: " + profileError.message);
     }
 
     // Update the patient record with profile link and additional info
