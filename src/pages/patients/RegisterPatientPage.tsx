@@ -90,9 +90,10 @@ export default function RegisterPatientPage() {
       setPatientId(patient.id);
       toast.success("Patient record created! Now send the registration invitation.");
       setShowInviteDialog(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error creating patient:", error);
-      toast.error(error.message || "Failed to create patient record");
+      toast.error(message || "Failed to create patient record");
     } finally {
       setIsLoading(false);
     }
@@ -154,9 +155,10 @@ export default function RegisterPatientPage() {
         code: data.verificationCode,
         expiresAt: data.expiresAt,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error sending invitation:", error);
-      toast.error(error.message || "Failed to send invitation");
+      toast.error(message || "Failed to send invitation");
     } finally {
       setIsSendingInvite(false);
     }

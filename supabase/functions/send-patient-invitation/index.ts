@@ -101,7 +101,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Use SITE_URL or fallback to a sensible default
     let siteUrl = Deno.env.get("SITE_URL");
     if (!siteUrl) {
-      siteUrl = "https://hospitality-management-system-six.vercel.app";
+      siteUrl = "https://hospitality-management-system-nine.vercel.app";
       console.warn("SITE_URL not set, falling back to:", siteUrl);
     }
     
@@ -165,7 +165,8 @@ const handler = async (req: Request): Promise<Response> => {
             console.error("Email delivery failed:", errorData || res.statusText);
           }
         } catch (emailErr) {
-          emailErrorMessage = `Email sending error: ${emailErr.message}`;
+          const message = emailErr instanceof Error ? emailErr.message : String(emailErr);
+          emailErrorMessage = `Email sending error: ${message}`;
           console.error("Email send exception:", emailErr);
         }
       }
@@ -187,9 +188,10 @@ const handler = async (req: Request): Promise<Response> => {
     }), {
       status: 200, headers: { "Content-Type": "application/json", ...corsHeaders }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("send-patient-invitation error:", error);
-    return new Response(JSON.stringify({ error: error.message }), { 
+    return new Response(JSON.stringify({ error: message }), { 
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } 
     });
   }

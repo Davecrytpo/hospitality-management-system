@@ -140,9 +140,10 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     throw new Error("Invalid action");
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }

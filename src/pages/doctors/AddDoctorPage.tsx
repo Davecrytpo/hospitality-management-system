@@ -74,9 +74,10 @@ export default function AddDoctorPage() {
       }
 
       navigate("/doctors");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error adding doctor:", error);
-      toast.error(error.message || "Failed to add doctor");
+      toast.error(message || "Failed to add doctor");
     } finally {
       setIsLoading(false);
     }

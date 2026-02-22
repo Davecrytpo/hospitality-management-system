@@ -27,7 +27,7 @@ serve(async (req) => {
       });
     }
 
-    const siteUrl = Deno.env.get("SITE_URL") || "https://hospitality-management-system-six.vercel.app";
+    const siteUrl = Deno.env.get("SITE_URL") || "https://hospitality-management-system-nine.vercel.app";
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -76,9 +76,10 @@ serve(async (req) => {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("send-staff-onboarding error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: message }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
   }
