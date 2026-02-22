@@ -25,9 +25,14 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const resendFrom = Deno.env.get("RESEND_FROM") || "MediCare Security <onboarding@resend.dev>";
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Server configuration error: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+    }
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { action, userId, email, deliveryMethod, code } = await req.json();
@@ -53,7 +58,10 @@ const handler = async (req: Request): Promise<Response> => {
       let emailSent = false;
       let errorDetail = "";
 
-      if ((deliveryMethod === "email" || !deliveryMethod) && email && resendApiKey) {
+      if ((deliveryMethod === "email" || !deliveryMethod) && email) {
+        if (!resendApiKey) {
+          errorDetail = "RESEND_API_KEY not set";
+        } else {
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -61,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
             Authorization: `Bearer ${resendApiKey}`,
           },
           body: JSON.stringify({
-            from: "MediCare Security <onboarding@resend.dev>",
+            from: resendFrom,
             to: [email],
             subject: "Your Medical Portal Access Code",
             html: `
@@ -80,8 +88,14 @@ const handler = async (req: Request): Promise<Response> => {
         if (res.ok) {
           emailSent = true;
         } else {
-          const errData = await res.json();
-          errorDetail = errData.message || "Resend configuration error";
+          let errData: { message?: string } | null = null;
+          try {
+            errData = await res.json();
+          } catch {
+            errData = null;
+          }
+          errorDetail = errData?.message || "Resend configuration error";
+        }
         }
       }
 

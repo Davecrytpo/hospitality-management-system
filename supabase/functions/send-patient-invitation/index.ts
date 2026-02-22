@@ -19,13 +19,19 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const resendFrom = Deno.env.get("RESEND_FROM") || "Hospitality Management System <onboarding@resend.dev>";
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Server configuration error: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization header");
+    if (!authHeader) throw new Error("Missing authorization header. Please sign in again.");
 
     const body: InvitationRequest = await req.json();
     const { patientId, patientEmail, patientPhone, deliveryMethod, firstName } = body;
@@ -95,7 +101,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Use SITE_URL or fallback to a sensible default
     let siteUrl = Deno.env.get("SITE_URL");
     if (!siteUrl) {
-      // Fallback: if we're in Supabase, we can sometimes guess, but better to use a known default or the request origin
       siteUrl = "https://hospitality-management-system-six.vercel.app";
       console.warn("SITE_URL not set, falling back to:", siteUrl);
     }
@@ -114,7 +119,7 @@ const handler = async (req: Request): Promise<Response> => {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendApiKey}` },
             body: JSON.stringify({
-              from: "Hospitality Management System <onboarding@resend.dev>",
+              from: resendFrom,
               to: [patientEmail],
               subject: "Action Required: Complete Your Hospital Registration",
               html: `
@@ -131,15 +136,15 @@ const handler = async (req: Request): Promise<Response> => {
                     </div>
                     <p style="color: #475569; text-align: center;">Or click the button below to go directly:</p>
                     <div style="text-align: center; margin: 24px 0;">
-                      <a href="${registrationLink}" style="display: inline-block; background: #1e40af; color: white; padding: 16px 40px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px;">Complete Registration →</a>
+                      <a href="${registrationLink}" style="display: inline-block; background: #1e40af; color: white; padding: 16px 40px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px;">Complete Registration -></a>
                     </div>
                     <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b; margin-top: 24px;">
-                      <p style="margin: 0; font-size: 13px; color: #92400e;">⏰ <strong>Important:</strong> This verification code expires in <strong>30 minutes</strong>. If it expires, please contact the hospital to generate a new invitation.</p>
+                      <p style="margin: 0; font-size: 13px; color: #92400e;"><strong>Important:</strong> This verification code expires in <strong>30 minutes</strong>. If it expires, please contact the hospital to generate a new invitation.</p>
                     </div>
                     <p style="font-size: 12px; color: #94a3b8; margin-top: 32px; text-align: center;">If you did not expect this email, please ignore it. No account will be created.</p>
                   </div>
                   <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
-                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 Hospitality Management System. All rights reserved.</p>
+                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">(c) 2026 Hospitality Management System. All rights reserved.</p>
                   </div>
                 </div>
               `
@@ -150,9 +155,14 @@ const handler = async (req: Request): Promise<Response> => {
             emailSent = true;
             console.log("Email sent successfully to:", patientEmail);
           } else {
-            const errorData = await res.json();
-            emailErrorMessage = errorData.message || "Unknown error from email service";
-            console.error("Email delivery failed:", errorData);
+            let errorData: { message?: string } | null = null;
+            try {
+              errorData = await res.json();
+            } catch {
+              errorData = null;
+            }
+            emailErrorMessage = errorData?.message || "Unknown error from email service";
+            console.error("Email delivery failed:", errorData || res.statusText);
           }
         } catch (emailErr) {
           emailErrorMessage = `Email sending error: ${emailErr.message}`;

@@ -118,7 +118,11 @@ export default function RegisterPatientPage() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+      if (!session) {
+        toast.error("You must be logged in to send invitations");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("send-patient-invitation", {
         body: {
           patientId,
@@ -128,6 +132,9 @@ export default function RegisterPatientPage() {
           firstName,
           lastName,
         },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        }
       });
 
       if (error) throw error;

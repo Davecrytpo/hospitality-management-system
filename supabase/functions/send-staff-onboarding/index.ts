@@ -10,6 +10,7 @@ serve(async (req) => {
 
   try {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const resendFrom = Deno.env.get("RESEND_FROM") || "Hospitality Management System <onboarding@resend.dev>";
     const body = await req.json();
     const { email, name, role, temporaryPassword } = body;
 
@@ -26,13 +27,13 @@ serve(async (req) => {
       });
     }
 
-    const siteUrl = Deno.env.get("SITE_URL") || "https://id-preview--7c163f81-55bb-444f-8f45-301985b94f0c.lovable.app";
+    const siteUrl = Deno.env.get("SITE_URL") || "https://hospitality-management-system-six.vercel.app";
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendApiKey}` },
       body: JSON.stringify({
-        from: "Hospitality Management System <onboarding@resend.dev>",
+        from: resendFrom,
         to: [email],
         subject: `Welcome to the Medical Staff - ${role}`,
         html: `
@@ -51,12 +52,12 @@ serve(async (req) => {
                 ${temporaryPassword ? `<p style="margin: 8px 0; color: #334155;"><strong>Temporary Password:</strong> <code style="background: #dbeafe; padding: 4px 8px; border-radius: 4px; color: #1e40af;">${temporaryPassword}</code></p>` : ''}
               </div>
               <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                <p style="margin: 0; font-size: 13px; color: #92400e;">🔒 <strong>Security Notice:</strong> Please update your password immediately after your first login for your protection.</p>
+                <p style="margin: 0; font-size: 13px; color: #92400e;"><strong>Security Notice:</strong> Please update your password immediately after your first login for your protection.</p>
               </div>
               <p style="font-size: 12px; color: #94a3b8; margin-top: 32px; text-align: center;">If you believe you received this email in error, please contact hospital administration.</p>
             </div>
             <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
-              <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 Hospitality Management System. All rights reserved.</p>
+              <p style="margin: 0; font-size: 11px; color: #94a3b8;">(c) 2026 Hospitality Management System. All rights reserved.</p>
             </div>
           </div>
         `
