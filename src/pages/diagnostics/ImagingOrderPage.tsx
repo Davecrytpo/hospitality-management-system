@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type PersonOption = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+};
+
 export default function ImagingOrderPage() {
   const navigate = useNavigate();
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PersonOption[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState("");
-  const [doctors, setDoctors] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<PersonOption[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [imagingType, setImagingType] = useState("");
   const [bodyArea, setBodyArea] = useState("");
@@ -23,20 +29,20 @@ export default function ImagingOrderPage() {
   const [indication, setIndication] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const fetchPatients = useCallback(async () => {
+    const { data } = await supabase.from("patients").select("id, first_name, last_name");
+    if (data) setPatients(data);
+  }, []);
+
+  const fetchDoctors = useCallback(async () => {
+    const { data } = await supabase.from("doctors").select("id, first_name, last_name");
+    if (data) setDoctors(data);
+  }, []);
+
   useEffect(() => {
     fetchPatients();
     fetchDoctors();
-  }, []);
-
-  const fetchPatients = async () => {
-    const { data } = await supabase.from("patients").select("id, first_name, last_name");
-    if (data) setPatients(data);
-  };
-
-  const fetchDoctors = async () => {
-    const { data } = await supabase.from("doctors").select("id, first_name, last_name");
-    if (data) setDoctors(data);
-  };
+  }, [fetchDoctors, fetchPatients]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,9 +68,10 @@ export default function ImagingOrderPage() {
 
       toast.success("Imaging order placed successfully");
       navigate("/diagnostics/imaging");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error ordering imaging:", error);
-      toast.error(error.message || "Failed to place imaging order");
+      toast.error(message || "Failed to place imaging order");
     } finally {
       setIsLoading(false);
     }

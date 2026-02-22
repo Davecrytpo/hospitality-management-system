@@ -8,9 +8,21 @@ import { Calendar, Users, ClipboardList, Clock, Activity, ChevronRight, Stethosc
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type AppointmentRow = {
+  id: string;
+  patient_id: string;
+  appointment_time?: string | null;
+  status?: string | null;
+  reason?: string | null;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+};
+
 export default function DoctorDashboardPage() {
   const { toast } = useToast();
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,14 +35,15 @@ export default function DoctorDashboardPage() {
           .order("appointment_time");
         if (error) throw error;
         setAppointments(data || []);
-      } catch (err: any) {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        toast({ title: "Error", description: message, variant: "destructive" });
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [toast]);
 
   const stats = [
     { label: "Today's Appointments", value: appointments.length, icon: Calendar, color: "text-blue-600" },
@@ -81,7 +94,7 @@ export default function DoctorDashboardPage() {
                       </div>
                       <div>
                         <p className="font-medium">{apt.patients?.first_name} {apt.patients?.last_name}</p>
-                        <p className="text-sm text-muted-foreground">{apt.appointment_time} • {apt.reason || "General Consultation"}</p>
+                        <p className="text-sm text-muted-foreground">{apt.appointment_time} - {apt.reason || "General Consultation"}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

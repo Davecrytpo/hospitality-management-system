@@ -111,9 +111,10 @@ export default function PatientRegisterPage() {
 
       setStep("register");
       toast.success("Verification successful!");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Verification error detail:", err);
-      setError(err.message || "Connection failed. Please check your internet and try again.");
+      setError(message || "Connection failed. Please check your internet and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -177,9 +178,10 @@ export default function PatientRegisterPage() {
 
       setStep("success");
       toast.success("Registration completed successfully!");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Registration error:", err);
-      setError(err.message || "Registration failed. Please try again.");
+      setError(message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }

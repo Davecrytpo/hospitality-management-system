@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,21 +13,30 @@ import { useToast } from "@/hooks/use-toast";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
+type BloodUnit = {
+  id: string;
+  blood_type?: string | null;
+  units_available?: number | null;
+  donor_name?: string | null;
+  collection_date?: string | null;
+  expiry_date?: string | null;
+};
+
 export default function BloodBankPage() {
   const { toast } = useToast();
-  const [inventory, setInventory] = useState<any[]>([]);
+  const [inventory, setInventory] = useState<BloodUnit[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ blood_type: "", units_available: "", donor_name: "", collection_date: "", expiry_date: "" });
   const [loading, setLoading] = useState(true);
 
-  const fetchInventory = async () => {
+  const fetchInventory = useCallback(async () => {
     const { data, error } = await supabase.from("blood_bank").select("*").order("blood_type");
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     setInventory(data || []);
     setLoading(false);
-  };
+  }, [toast]);
 
-  useEffect(() => { fetchInventory(); }, []);
+  useEffect(() => { fetchInventory(); }, [fetchInventory]);
 
   const handleAdd = async () => {
     if (!form.blood_type || !form.units_available) return toast({ title: "Please fill required fields", variant: "destructive" });
@@ -46,7 +55,8 @@ export default function BloodBankPage() {
   };
 
   const summary = bloodTypes.map(bt => ({
-    type: bt, units: inventory.filter(i => i.blood_type === bt).reduce((sum, i) => sum + (i.units_available || 0), 0)
+    type: bt,
+    units: inventory.filter(i => i.blood_type === bt).reduce((sum, i) => sum + Number(i.units_available ?? 0), 0),
   }));
 
   return (

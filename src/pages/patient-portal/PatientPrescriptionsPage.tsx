@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,19 +11,19 @@ import { format } from "date-fns";
 interface Prescription {
   id: string;
   medication_name: string;
-  dosage: string;
-  frequency: string;
-  duration: string;
-  instructions: string;
+  dosage?: string | null;
+  frequency?: string | null;
+  duration?: string | null;
+  instructions?: string | null;
   start_date: string;
-  end_date: string;
-  status: string;
-  refills_remaining: number;
-  doctor: {
-    first_name: string;
-    last_name: string;
-    specialization: string;
-  };
+  end_date?: string | null;
+  status?: string | null;
+  refills_remaining?: number | null;
+  doctor?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    specialization?: string | null;
+  } | null;
 }
 
 export default function PatientPrescriptionsPage() {
@@ -31,11 +31,7 @@ export default function PatientPrescriptionsPage() {
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadPrescriptions();
-  }, []);
-
-  const loadPrescriptions = async () => {
+  const loadPrescriptions = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -69,14 +65,18 @@ export default function PatientPrescriptionsPage() {
         .order("start_date", { ascending: false });
 
       if (data) {
-        setPrescriptions(data as any);
+        setPrescriptions(data as Prescription[]);
       }
     } catch (error) {
       console.error("Error loading prescriptions:", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    loadPrescriptions();
+  }, [loadPrescriptions]);
 
   const activePrescriptions = prescriptions.filter((rx) => rx.status === "active");
   const completedPrescriptions = prescriptions.filter((rx) => rx.status !== "active");

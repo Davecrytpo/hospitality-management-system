@@ -4,12 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Package, Plus, Save, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const mockSupplies = [
+type SupplyStatus = "ok" | "low" | "critical";
+
+type SupplyItem = {
+  id: number;
+  item: string;
+  category: string;
+  stock: number;
+  min: number;
+  unit: string;
+  status: SupplyStatus;
+};
+
+const mockSupplies: SupplyItem[] = [
   { id: 1, item: "Sterile Gloves (L)", category: "PPE", stock: 250, min: 100, unit: "pairs", status: "ok" },
   { id: 2, item: "Sterile Gauze 4x4", category: "Wound Care", stock: 80, min: 200, unit: "packs", status: "low" },
   { id: 3, item: "IV Cannula 18G", category: "IV Supplies", stock: 45, min: 50, unit: "pcs", status: "critical" },
@@ -29,7 +41,11 @@ export default function ConsumablesTrackerPage() {
     setForm({ item: "", category: "", stock: "", min: "", unit: "" });
   };
 
-  const statusColor = { ok: "default", low: "secondary", critical: "destructive" };
+  const statusColor: Record<SupplyStatus, BadgeProps["variant"]> = {
+    ok: "default",
+    low: "secondary",
+    critical: "destructive",
+  };
 
   return (
     <DashboardLayout>
@@ -77,7 +93,7 @@ export default function ConsumablesTrackerPage() {
                     <TableCell>{s.category}</TableCell>
                     <TableCell>{s.stock} {s.unit}</TableCell>
                     <TableCell>{s.min} {s.unit}</TableCell>
-                    <TableCell><Badge variant={(statusColor as any)[s.status]}>{s.status === "ok" ? "OK" : s.status.toUpperCase()}</Badge></TableCell>
+                    <TableCell><Badge variant={statusColor[s.status]}>{s.status === "ok" ? "OK" : s.status.toUpperCase()}</Badge></TableCell>
                   </TableRow>
                 ))}
               </TableBody>

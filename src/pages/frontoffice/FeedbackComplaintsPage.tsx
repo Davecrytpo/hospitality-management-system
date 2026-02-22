@@ -6,12 +6,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { MessageSquare, Plus, Save, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-const mockFeedback = [
+type FeedbackStatus = "open" | "resolved" | "under review";
+
+type FeedbackItem = {
+  id: number;
+  name: string;
+  type: "complaint" | "compliment" | "suggestion" | "general";
+  subject: string;
+  rating: number;
+  status: FeedbackStatus;
+  date: string;
+};
+
+const mockFeedback: FeedbackItem[] = [
   { id: 1, name: "Adaeze O.", type: "complaint", subject: "Long wait time at OPD", rating: 2, status: "open", date: "2024-02-15" },
   { id: 2, name: "Emeka J.", type: "compliment", subject: "Excellent care from Dr. Chidi", rating: 5, status: "resolved", date: "2024-02-14" },
   { id: 3, name: "Fatima H.", type: "suggestion", subject: "Add online appointment booking", rating: 4, status: "under review", date: "2024-02-13" },
@@ -38,14 +50,16 @@ export default function FeedbackComplaintsPage() {
       toast({ title: "Feedback submitted successfully!" });
       setShowForm(false);
       setForm({ patient_name: "", feedback_type: "general", subject: "", message: "", rating: "5" });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
   };
 
-  const statusVariant = (s: string) => s === "resolved" ? "default" : s === "under review" ? "secondary" : "outline";
+  const statusVariant = (s: FeedbackStatus): BadgeProps["variant"] =>
+    s === "resolved" ? "default" : s === "under review" ? "secondary" : "outline";
 
   return (
     <DashboardLayout>
@@ -101,13 +115,13 @@ export default function FeedbackComplaintsPage() {
                       <Badge variant={f.type === "complaint" ? "destructive" : f.type === "compliment" ? "default" : "outline"}>{f.type}</Badge>
                       <span className="font-medium">{f.subject}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground">{f.name} • {f.date}</p>
+                    <p className="text-sm text-muted-foreground">{f.name} - {f.date}</p>
                     <div className="flex items-center gap-1 mt-1">
                       {Array.from({ length: f.rating }).map((_, i) => <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={statusVariant(f.status) as any}>{f.status}</Badge>
+                    <Badge variant={statusVariant(f.status)}>{f.status}</Badge>
                     <Button size="sm" variant="outline" onClick={() => toast({ title: "Response sent!" })}>Respond</Button>
                   </div>
                 </div>

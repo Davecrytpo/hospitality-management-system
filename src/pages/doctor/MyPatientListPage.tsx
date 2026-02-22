@@ -10,9 +10,24 @@ import { Search, Eye, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type PatientRow = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  gender?: string | null;
+  blood_type?: string | null;
+};
+
+type AppointmentRow = {
+  patient_id: string;
+  patients: PatientRow | null;
+};
+
 export default function MyPatientListPage() {
   const { toast } = useToast();
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PatientRow[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -24,19 +39,22 @@ export default function MyPatientListPage() {
           .select("patient_id, patients(id, first_name, last_name, email, phone, gender, blood_type)")
           .order("created_at", { ascending: false });
         if (error) throw error;
-        const unique = Array.from(new Map((appts || []).map((a: any) => [a.patient_id, a.patients])).values()).filter(Boolean);
+        const apptsData = (appts ?? []) as AppointmentRow[];
+        const unique = Array.from(new Map(apptsData.map((a) => [a.patient_id, a.patients])).values())
+          .filter((patient): patient is PatientRow => Boolean(patient));
         setPatients(unique);
-      } catch (err: any) {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        toast({ title: "Error", description: message, variant: "destructive" });
       } finally {
         setLoading(false);
       }
     };
     fetchPatients();
-  }, []);
+  }, [toast]);
 
-  const filtered = patients.filter((p: any) =>
-    `${p.first_name} ${p.last_name}`.toLowerCase().includes(search.toLowerCase())
+  const filtered = patients.filter((p) =>
+    `${p.first_name ?? ""} ${p.last_name ?? ""}`.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -71,7 +89,7 @@ export default function MyPatientListPage() {
                   <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
                 ) : filtered.length === 0 ? (
                   <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No patients found.</TableCell></TableRow>
-                ) : filtered.map((p: any) => (
+                ) : filtered.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.first_name} {p.last_name}</TableCell>
                     <TableCell><Badge variant="outline">{p.gender || "N/A"}</Badge></TableCell>

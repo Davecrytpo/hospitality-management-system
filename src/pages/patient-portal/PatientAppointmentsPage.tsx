@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,14 @@ interface Appointment {
   id: string;
   appointment_date: string;
   appointment_time: string;
-  status: string;
-  reason: string;
-  notes: string;
-  doctor: {
-    first_name: string;
-    last_name: string;
-    specialization: string;
-  };
+  status?: string | null;
+  reason?: string | null;
+  notes?: string | null;
+  doctor?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    specialization?: string | null;
+  } | null;
 }
 
 export default function PatientAppointmentsPage() {
@@ -27,11 +27,7 @@ export default function PatientAppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadAppointments();
-  }, []);
-
-  const loadAppointments = async () => {
+  const loadAppointments = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -65,14 +61,18 @@ export default function PatientAppointmentsPage() {
         .order("appointment_date", { ascending: false });
 
       if (data) {
-        setAppointments(data as any);
+        setAppointments(data as Appointment[]);
       }
     } catch (error) {
       console.error("Error loading appointments:", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    loadAppointments();
+  }, [loadAppointments]);
 
   const upcomingAppointments = appointments.filter(
     (apt) => new Date(apt.appointment_date) >= new Date() && apt.status !== "cancelled"

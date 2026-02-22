@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,23 +31,23 @@ interface Appointment {
   id: string;
   appointment_date: string;
   appointment_time: string;
-  status: string;
-  reason: string;
-  doctor: {
-    first_name: string;
-    last_name: string;
-    specialization: string;
-  };
+  status?: string | null;
+  reason?: string | null;
+  doctor?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    specialization?: string | null;
+  } | null;
 }
 
 interface Prescription {
   id: string;
   medication_name: string;
-  dosage: string;
-  frequency: string;
-  status: string;
+  dosage?: string | null;
+  frequency?: string | null;
+  status?: string | null;
   start_date: string;
-  end_date?: string;
+  end_date?: string | null;
 }
 
 export default function PatientDashboard() {
@@ -57,19 +57,7 @@ export default function PatientDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
 
-  useEffect(() => {
-    checkAuthAndLoadData();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        navigate("/patient-portal/login");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const checkAuthAndLoadData = async () => {
+  const checkAuthAndLoadData = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -121,7 +109,7 @@ export default function PatientDashboard() {
           .limit(5);
 
         if (appointmentsData) {
-          setAppointments(appointmentsData as any);
+          setAppointments(appointmentsData as Appointment[]);
         }
 
         // Load prescriptions
@@ -143,7 +131,19 @@ export default function PatientDashboard() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    checkAuthAndLoadData();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        navigate("/patient-portal/login");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [checkAuthAndLoadData, navigate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

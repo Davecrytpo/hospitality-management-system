@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type PersonOption = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+};
+
 export default function InsuranceClaimPage() {
   const navigate = useNavigate();
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PersonOption[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState("");
   const [provider, setProvider] = useState("");
   const [policyNumber, setPolicyNumber] = useState("");
@@ -22,14 +28,14 @@ export default function InsuranceClaimPage() {
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchPatients();
-  }, []);
-
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     const { data } = await supabase.from("patients").select("id, first_name, last_name");
     if (data) setPatients(data);
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPatients();
+  }, [fetchPatients]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,9 +64,10 @@ export default function InsuranceClaimPage() {
 
       toast.success("Insurance claim submitted successfully");
       navigate("/billing/insurance");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error submitting claim:", error);
-      toast.error(error.message || "Failed to submit insurance claim");
+      toast.error(message || "Failed to submit insurance claim");
     } finally {
       setIsLoading(false);
     }

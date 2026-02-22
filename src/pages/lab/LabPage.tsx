@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,34 +10,27 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type LabTestRow = {
+  id: string;
+  test_name?: string | null;
+  priority?: string | null;
+  status?: string | null;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+  doctors?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+};
+
 export default function LabPage() {
   const navigate = useNavigate();
-  const [tests, setTests] = useState<any[]>([]);
+  const [tests, setTests] = useState<LabTestRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchOrders();
-
-    const channel = supabase
-      .channel('lab-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'lab_tests' },
-        (payload) => {
-          fetchOrders();
-          if (payload.eventType === 'INSERT') {
-            toast.info("New lab test requested!");
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("lab_tests")
@@ -51,7 +44,29 @@ export default function LabPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+
+    const channel = supabase
+      .channel("lab-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "lab_tests" },
+        (payload) => {
+          fetchOrders();
+          if (payload.eventType === "INSERT") {
+            toast.info("New lab test requested!");
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchOrders]);
 
   return (
     <DashboardLayout>

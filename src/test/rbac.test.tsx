@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { AuthGuard } from "../components/auth/AuthGuard";
 import { supabase } from "../integrations/supabase/client";
@@ -33,12 +33,12 @@ describe("RBAC - AuthGuard Integration Test", () => {
 
   it("should allow an Admin to access any page", async () => {
     // 1. Mock Session
-    (supabase.auth.getSession as any).mockResolvedValue({
+    (supabase.auth.getSession as unknown as Mock).mockResolvedValue({
       data: { session: { user: { id: "admin-id" } } },
     });
 
     // 2. Mock Admin Profile
-    (supabase.from as any).mockReturnValue({
+    (supabase.from as unknown as Mock).mockReturnValue({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({
@@ -62,12 +62,12 @@ describe("RBAC - AuthGuard Integration Test", () => {
 
   it("should block a Doctor from accessing Pharmacy pages", async () => {
     // 1. Mock Session
-    (supabase.auth.getSession as any).mockResolvedValue({
+    (supabase.auth.getSession as unknown as Mock).mockResolvedValue({
       data: { session: { user: { id: "doctor-id" } } },
     });
 
     // 2. Mock Doctor Profile
-    (supabase.from as any).mockReturnValue({
+    (supabase.from as unknown as Mock).mockReturnValue({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({
@@ -91,11 +91,11 @@ describe("RBAC - AuthGuard Integration Test", () => {
   });
 
   it("should allow a Pharmacist to access Pharmacy pages", async () => {
-    (supabase.auth.getSession as any).mockResolvedValue({
+    (supabase.auth.getSession as unknown as Mock).mockResolvedValue({
       data: { session: { user: { id: "pharmacist-id" } } },
     });
 
-    (supabase.from as any).mockReturnValue({
+    (supabase.from as unknown as Mock).mockReturnValue({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({

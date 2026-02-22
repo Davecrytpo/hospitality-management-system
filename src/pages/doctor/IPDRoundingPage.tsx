@@ -8,9 +8,22 @@ import { BedDouble, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type AdmissionRow = {
+  id: string;
+  patient_id: string;
+  ward?: string | null;
+  bed_number?: string | number | null;
+  diagnosis?: string | null;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    blood_type?: string | null;
+  } | null;
+};
+
 export default function IPDRoundingPage() {
   const { toast } = useToast();
-  const [admissions, setAdmissions] = useState<any[]>([]);
+  const [admissions, setAdmissions] = useState<AdmissionRow[]>([]);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
 
@@ -29,8 +42,9 @@ export default function IPDRoundingPage() {
       if (error) throw error;
       toast({ title: "Rounding note saved!" });
       setNotes(prev => ({ ...prev, [admissionId]: "" }));
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setSaving(null);
     }

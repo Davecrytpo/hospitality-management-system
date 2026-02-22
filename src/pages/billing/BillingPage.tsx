@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,18 +10,27 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type InvoiceRow = {
+  id: string;
+  invoice_number: string;
+  total_amount?: number | string | null;
+  paid_amount?: number | string | null;
+  issue_date?: string | null;
+  status?: string | null;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+};
+
 export default function BillingPage() {
   const navigate = useNavigate();
-  const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [stats, setStats] = useState({ total: 0, pending: 0, overdue: 0 });
 
-  useEffect(() => {
-    fetchInvoices();
-  }, []);
-
-  const fetchInvoices = async () => {
+  const fetchInvoices = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -33,23 +42,30 @@ export default function BillingPage() {
       setInvoices(data || []);
 
       // Calculate simple stats
-      const total = data?.reduce((acc, inv) => acc + Number(inv.total_amount), 0) || 0;
-      const pending = data?.filter(inv => inv.status === 'unpaid' || inv.status === 'partial')
-                          .reduce((acc, inv) => acc + (Number(inv.total_amount) - Number(inv.paid_amount)), 0) || 0;
+      const total = data?.reduce((acc, inv) => acc + Number(inv.total_amount ?? 0), 0) || 0;
+      const pending = data?.filter(inv => inv.status === "unpaid" || inv.status === "partial")
+        .reduce((acc, inv) => acc + (Number(inv.total_amount ?? 0) - Number(inv.paid_amount ?? 0)), 0) || 0;
       
       setStats({ total, pending, overdue: 0 });
-    } catch (err) {
-      console.error(err);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(message);
       toast.error("Failed to load invoices");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const filteredInvoices = invoices.filter(inv =>
-    inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    `${inv.patients?.first_name} ${inv.patients?.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    fetchInvoices();
+  }, [fetchInvoices]);
+
+  const filteredInvoices = invoices.filter((inv) => {
+    const invoiceNumber = inv.invoice_number.toLowerCase();
+    const patientName = `${inv.patients?.first_name ?? ""} ${inv.patients?.last_name ?? ""}`.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return invoiceNumber.includes(query) || patientName.includes(query);
+  });
 
   return (
     <DashboardLayout>

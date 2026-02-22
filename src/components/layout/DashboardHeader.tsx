@@ -37,9 +37,14 @@ interface DashboardHeaderProps {
   sidebarCollapsed: boolean;
 }
 
+type UserProfile = {
+  full_name?: string | null;
+  role?: string | null;
+};
+
 export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHeaderProps) {
   const navigate = useNavigate();
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {

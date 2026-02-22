@@ -12,25 +12,42 @@ import { MonitorCheck, Search, UserPlus, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type PatientRow = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  gender?: string | null;
+};
+
+type QueueEntry = PatientRow & {
+  time: string;
+  ticket: string;
+};
+
 export default function ReceptionDeskPage() {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PatientRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [queue, setQueue] = useState<any[]>([]);
+  const [queue, setQueue] = useState<QueueEntry[]>([]);
 
   useEffect(() => {
     supabase.from("patients").select("id, first_name, last_name, phone, email, gender").order("created_at", { ascending: false }).limit(20)
       .then(({ data }) => { setPatients(data || []); setLoading(false); });
   }, []);
 
-  const addToQueue = (patient: any) => {
+  const addToQueue = (patient: PatientRow) => {
     if (queue.find(q => q.id === patient.id)) return toast({ title: "Patient already in queue" });
     setQueue(prev => [...prev, { ...patient, time: new Date().toLocaleTimeString(), ticket: `Q${String(prev.length + 1).padStart(3, "0")}` }]);
     toast({ title: `${patient.first_name} added to queue` });
   };
 
-  const filtered = patients.filter(p => `${p.first_name} ${p.last_name} ${p.phone}`.toLowerCase().includes(search.toLowerCase()));
+  const filtered = patients.filter((p) => {
+    const fullText = `${p.first_name ?? ""} ${p.last_name ?? ""} ${p.phone ?? ""}`.toLowerCase();
+    return fullText.includes(search.toLowerCase());
+  });
 
   return (
     <DashboardLayout>
@@ -79,7 +96,7 @@ export default function ReceptionDeskPage() {
                         <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">{i + 1}</div>
                         <div>
                           <p className="font-medium">{q.first_name} {q.last_name}</p>
-                          <p className="text-sm text-muted-foreground">{q.ticket} • {q.time}</p>
+                          <p className="text-sm text-muted-foreground">{q.ticket} - {q.time}</p>
                         </div>
                       </div>
                       <Button size="sm" variant="outline" onClick={() => setQueue(prev => prev.filter(item => item.id !== q.id))}>Call</Button>

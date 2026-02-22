@@ -10,7 +10,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Scan, Plus, Save, Eye, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const mockScans = [
+type ScanItem = {
+  id: number;
+  patient: string;
+  study: string;
+  date: string;
+  status: "Pending Report" | "Reported";
+  modality: string;
+};
+
+const mockScans: ScanItem[] = [
   { id: 1, patient: "John Smith", study: "Chest X-Ray", date: "2024-02-15", status: "Pending Report", modality: "X-Ray" },
   { id: 2, patient: "Emily Davis", study: "Brain MRI", date: "2024-02-14", status: "Reported", modality: "MRI" },
   { id: 3, patient: "Robert Wilson", study: "Abdominal CT", date: "2024-02-13", status: "Reported", modality: "CT Scan" },
@@ -19,7 +28,7 @@ const mockScans = [
 
 export default function DiagnosticImagingWorkspacePage() {
   const { toast } = useToast();
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<ScanItem | null>(null);
   const [report, setReport] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -52,7 +61,7 @@ export default function DiagnosticImagingWorkspacePage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">{scan.patient}</p>
-                        <p className="text-sm text-muted-foreground">{scan.study} • {scan.modality} • {scan.date}</p>
+                        <p className="text-sm text-muted-foreground">{scan.study} - {scan.modality} - {scan.date}</p>
                       </div>
                       <Badge variant={scan.status === "Reported" ? "default" : "secondary"}>{scan.status}</Badge>
                     </div>
@@ -76,7 +85,7 @@ export default function DiagnosticImagingWorkspacePage() {
                     <p><strong>Date:</strong> {selected.date}</p>
                   </div>
                   <div className="h-40 bg-muted rounded-lg flex items-center justify-center border-2 border-dashed">
-                    <p className="text-muted-foreground text-sm">Image viewer (DICOM) — Upload in production</p>
+                    <p className="text-muted-foreground text-sm">Image viewer (DICOM) - Upload in production</p>
                   </div>
                   <div className="space-y-1">
                     <Label>Radiologist Report *</Label>

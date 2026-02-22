@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { BookOpen, Plus, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const mockLogs = [
-  { id: 1, nurse: "Nurse Adaeze", shift: "Day (07:00-19:00)", date: "2024-02-19", summary: "Patient in Bed 3 (John Smith) BP elevated — notified Dr. Emeka. Bed 7 patient sleeping well. Quiet shift overall.", priority: "medium" },
+type PriorityLevel = "low" | "medium" | "high";
+
+type HandoverLog = {
+  id: number;
+  nurse: string;
+  shift: string;
+  date: string;
+  summary: string;
+  priority: PriorityLevel;
+};
+
+const mockLogs: HandoverLog[] = [
+  { id: 1, nurse: "Nurse Adaeze", shift: "Day (07:00-19:00)", date: "2024-02-19", summary: "Patient in Bed 3 (John Smith) BP elevated - notified Dr. Emeka. Bed 7 patient sleeping well. Quiet shift overall.", priority: "medium" },
   { id: 2, nurse: "Nurse Chioma", shift: "Night (19:00-07:00)", date: "2024-02-19", summary: "Patient in Bed 2 (Robert Wilson) complained of chest pain at 02:30. ECG done, Dr. on-call attended. Patient stable by 03:15.", priority: "high" },
 ];
 
@@ -26,7 +37,8 @@ export default function ShiftHandoverPage() {
     setForm({ shift: "", summary: "", priority: "low" });
   };
 
-  const priorityVariant = (p: string) => p === "high" ? "destructive" : p === "medium" ? "secondary" : "outline";
+  const priorityVariant = (p: PriorityLevel): BadgeProps["variant"] =>
+    p === "high" ? "destructive" : p === "medium" ? "secondary" : "outline";
 
   return (
     <DashboardLayout>
@@ -63,8 +75,8 @@ export default function ShiftHandoverPage() {
             <Card key={log.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{log.shift} — {log.date}</CardTitle>
-                  <Badge variant={priorityVariant(log.priority) as any}>{log.priority} priority</Badge>
+                  <CardTitle className="text-base">{log.shift} - {log.date}</CardTitle>
+                  <Badge variant={priorityVariant(log.priority)}>{log.priority} priority</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">By: {log.nurse}</p>
               </CardHeader>

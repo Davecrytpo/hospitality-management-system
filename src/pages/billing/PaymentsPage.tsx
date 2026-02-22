@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+type PatientOption = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+};
+
+type InvoiceOption = {
+  id: string;
+  invoice_number: string;
+  total_amount?: number | string | null;
+  paid_amount?: number | string | null;
+  status?: string | null;
+};
+
+type PaymentRow = {
+  id: string;
+  payment_date?: string | null;
+  payment_method?: string | null;
+  reference_number?: string | null;
+  amount?: number | string | null;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+};
+
 export default function PaymentsPage() {
   const navigate = useNavigate();
-  const [payments, setPayments] = useState<any[]>([]);
-  const [patients, setPatients] = useState<any[]>([]);
-  const [invoices, setInvoices] = useState<any[]>([]);
+  const [payments, setPayments] = useState<PaymentRow[]>([]);
+  const [patients, setPatients] = useState<PatientOption[]>([]);
+  const [invoices, setInvoices] = useState<InvoiceOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -30,41 +56,40 @@ export default function PaymentsPage() {
   const [reference, setReference] = useState("");
   const [notes, setNotes] = useState("");
 
-  useEffect(() => {
-    fetchPayments();
-    fetchPatients();
-  }, []);
-
-  useEffect(() => {
-    if (selectedPatientId) {
-      fetchPatientInvoices(selectedPatientId);
-    }
-  }, [selectedPatientId]);
-
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     setIsLoading(true);
     const { data } = await supabase
       .from("payments")
       .select("*, patients(first_name, last_name)")
       .order("created_at", { ascending: false });
     if (data) setPayments(data);
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 500);
-  };
+    setIsLoading(false);
+  }, []);
 
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     const { data } = await supabase.from("patients").select("id, first_name, last_name");
     if (data) setPatients(data);
-  };
+  }, []);
 
-  const fetchPatientInvoices = async (patientId: string) => {
+  const fetchPatientInvoices = useCallback(async (patientId: string) => {
     const { data } = await supabase
       .from("invoices")
       .select("id, invoice_number, total_amount, paid_amount, status")
       .eq("patient_id", patientId)
       .neq("status", "paid");
     if (data) setInvoices(data);
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPayments();
+    fetchPatients();
+  }, [fetchPatients, fetchPayments]);
+
+  useEffect(() => {
+    if (selectedPatientId) {
+      fetchPatientInvoices(selectedPatientId);
+    }
+  }, [fetchPatientInvoices, selectedPatientId]);
 
   const handleRecordPayment = async () => {
     if (!selectedPatientId || !amount) {
@@ -109,9 +134,10 @@ export default function PaymentsPage() {
       fetchPayments();
       // Redirect to receipt
       navigate(`/billing/receipt/${payment.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error recording payment:", error);
-      toast.error(error.message || "Failed to record payment");
+      toast.error(message || "Failed to record payment");
     } finally {
       setIsSubmitting(false);
     }

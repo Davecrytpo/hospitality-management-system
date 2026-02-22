@@ -2,14 +2,25 @@ import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Navigation, Plus, Save, MapPin, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const mockAmbulances = [
+type AmbulanceStatus = "available" | "on-mission" | "maintenance";
+
+type Ambulance = {
+  id: string;
+  driver: string;
+  phone: string;
+  status: AmbulanceStatus;
+  location: string;
+  mission: string | null;
+};
+
+const mockAmbulances: Ambulance[] = [
   { id: "AMB-01", driver: "Yusuf Musa", phone: "+234 701 111 2222", status: "available", location: "Hospital Base", mission: null },
   { id: "AMB-02", driver: "Chibundo Eze", phone: "+234 702 333 4444", status: "on-mission", location: "Oshodi Express", mission: "Pickup: RTA victim" },
   { id: "AMB-03", driver: "Abdul Hassan", phone: "+234 703 555 6666", status: "available", location: "Hospital Base", mission: null },
@@ -18,7 +29,7 @@ const mockAmbulances = [
 
 export default function AmbulanceTrackingPage() {
   const { toast } = useToast();
-  const [ambulances, setAmbulances] = useState(mockAmbulances);
+  const [ambulances, setAmbulances] = useState<Ambulance[]>(mockAmbulances);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ id: "", driver: "", phone: "", mission: "" });
 
@@ -34,7 +45,11 @@ export default function AmbulanceTrackingPage() {
     toast({ title: `${ambId} returned to base` });
   };
 
-  const statusColor = { "available": "default", "on-mission": "destructive", "maintenance": "secondary" };
+  const statusColor: Record<AmbulanceStatus, BadgeProps["variant"]> = {
+    available: "default",
+    "on-mission": "destructive",
+    maintenance: "secondary",
+  };
 
   return (
     <DashboardLayout>
@@ -63,7 +78,7 @@ export default function AmbulanceTrackingPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">{amb.id}</CardTitle>
-                  <Badge variant={(statusColor as any)[amb.status]}>{amb.status.replace("-", " ").toUpperCase()}</Badge>
+                  <Badge variant={statusColor[amb.status]}>{amb.status.replace("-", " ").toUpperCase()}</Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">

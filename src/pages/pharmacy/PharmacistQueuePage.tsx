@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,38 +9,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
+type PrescriptionRow = {
+  id: string;
+  created_at?: string | null;
+  medication?: string | null;
+  dosage?: string | null;
+  duration?: string | null;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+  doctors?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+};
+
 export default function PharmacistQueuePage() {
   const navigate = useNavigate();
-  const [prescriptions, setPrescriptions] = useState<any[]>([]);
+  const [prescriptions, setPrescriptions] = useState<PrescriptionRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchQueue();
-
-    // Set up REALTIME subscription
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'prescriptions'
-        },
-        (payload) => {
-          console.log('Realtime update received:', payload);
-          fetchQueue();
-          toast.info("Queue updated with new prescription!");
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchQueue = async () => {
+  const fetchQueue = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("prescriptions")
@@ -55,7 +45,33 @@ export default function PharmacistQueuePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchQueue();
+
+    // Set up REALTIME subscription
+    const channel = supabase
+      .channel("schema-db-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "prescriptions",
+        },
+        (payload) => {
+          console.log("Realtime update received:", payload);
+          fetchQueue();
+          toast.info("Queue updated with new prescription!");
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchQueue]);
 
   return (
     <DashboardLayout>
@@ -104,7 +120,7 @@ export default function PharmacistQueuePage() {
                     <TableCell>
                       <div className="space-y-1">
                         <span className="font-medium">{rx.medication}</span>
-                        <p className="text-[10px] text-muted-foreground">{rx.dosage} • {rx.duration}</p>
+                        <p className="text-[10px] text-muted-foreground">{rx.dosage} - {rx.duration}</p>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">

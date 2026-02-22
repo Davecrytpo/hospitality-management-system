@@ -70,7 +70,7 @@ export default function AuthPage() {
               user_id: data.user.id,
               email: data.user.email!,
               full_name: data.user.user_metadata?.full_name || "New Staff",
-              role: signupRole as any
+              role: signupRole as "admin" | "doctor"
             })
             .select()
             .single();
@@ -91,9 +91,10 @@ export default function AuthPage() {
           navigate("/dashboard");
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Login error:", err);
-      setError(err.message || "Authentication failed.");
+      setError(message || "Authentication failed.");
     } finally {
       setIsLoading(false);
     }
@@ -125,9 +126,10 @@ export default function AuthPage() {
         toast.success("Account created successfully. You can now login.");
         setActiveTab("login");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Signup error:", err);
-      setError(err.message || "Credential creation failed.");
+      setError(message || "Credential creation failed.");
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +184,7 @@ export default function AuthPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="********"
                     required
                     className="bg-white/5 border-white/5 h-12 rounded-xl focus:border-blue-500/50 transition-all text-white"
                   />

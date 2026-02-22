@@ -5,6 +5,15 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, DollarSign, ArrowUp, ArrowDown, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
+type PaymentRow = {
+  amount?: number | string | null;
+};
+
+type ClaimRow = {
+  claim_amount?: number | string | null;
+  status?: string | null;
+};
+
 export default function RevenueDashboardPage() {
   const [stats, setStats] = useState({ total: 0, paid: 0, pending: 0, claims: 0 });
 
@@ -13,9 +22,11 @@ export default function RevenueDashboardPage() {
       supabase.from("payments").select("amount"),
       supabase.from("insurance_claims").select("claim_amount, status"),
     ]).then(([payments, claims]) => {
-      const totalRevenue = (payments.data || []).reduce((sum: number, p: any) => sum + Number(p.amount), 0);
-      const pendingClaims = (claims.data || []).filter((c: any) => c.status === "pending").reduce((sum: number, c: any) => sum + Number(c.claim_amount), 0);
-      const approvedClaims = (claims.data || []).filter((c: any) => c.status === "approved").reduce((sum: number, c: any) => sum + Number(c.claim_amount), 0);
+      const paymentsData = (payments.data ?? []) as PaymentRow[];
+      const claimsData = (claims.data ?? []) as ClaimRow[];
+      const totalRevenue = paymentsData.reduce((sum, p) => sum + Number(p.amount ?? 0), 0);
+      const pendingClaims = claimsData.filter((c) => c.status === "pending").reduce((sum, c) => sum + Number(c.claim_amount ?? 0), 0);
+      const approvedClaims = claimsData.filter((c) => c.status === "approved").reduce((sum, c) => sum + Number(c.claim_amount ?? 0), 0);
       setStats({ total: totalRevenue, paid: totalRevenue, pending: pendingClaims, claims: approvedClaims });
     });
   }, []);
@@ -30,7 +41,7 @@ export default function RevenueDashboardPage() {
     { dept: "Pharmacy", value: 125000 }, { dept: "Imaging", value: 85000 },
   ];
 
-  const fmt = (n: number) => `₦${n.toLocaleString()}`;
+  const fmt = (n: number) => `NGN ${n.toLocaleString()}`;
 
   return (
     <DashboardLayout>
@@ -43,7 +54,7 @@ export default function RevenueDashboardPage() {
         <div className="grid gap-4 md:grid-cols-4">
           {[
             { label: "Total Collections", value: fmt(stats.total || 855000), icon: DollarSign, trend: "+12%", up: true },
-            { label: "This Month", value: "₦680,000", icon: CreditCard, trend: "+5%", up: true },
+            { label: "This Month", value: "NGN 680,000", icon: CreditCard, trend: "+5%", up: true },
             { label: "Pending Insurance", value: fmt(stats.pending || 125000), icon: TrendingUp, trend: "-3%", up: false },
             { label: "Insurance Approved", value: fmt(stats.claims || 230000), icon: ArrowUp, trend: "+8%", up: true },
           ].map(({ label, value, icon: Icon, trend, up }) => (
@@ -69,8 +80,8 @@ export default function RevenueDashboardPage() {
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={monthlyRevenue}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" /><YAxis tickFormatter={v => `₦${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: any) => [`₦${Number(v).toLocaleString()}`, "Revenue"]} />
+                  <XAxis dataKey="month" /><YAxis tickFormatter={v => `NGN ${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip formatter={(value: number | string) => [`NGN ${Number(value).toLocaleString()}`, "Revenue"]} />
                   <Line type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))" }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -82,8 +93,8 @@ export default function RevenueDashboardPage() {
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={revenueByDept}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="dept" /><YAxis tickFormatter={v => `₦${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: any) => [`₦${Number(v).toLocaleString()}`, "Revenue"]} />
+                  <XAxis dataKey="dept" /><YAxis tickFormatter={v => `NGN ${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip formatter={(value: number | string) => [`NGN ${Number(value).toLocaleString()}`, "Revenue"]} />
                   <Bar dataKey="value" fill="hsl(var(--primary))" radius={4} />
                 </BarChart>
               </ResponsiveContainer>

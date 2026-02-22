@@ -6,9 +6,23 @@ import { Activity, Heart, Thermometer, Wind } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type VitalsRow = {
+  id: string;
+  recorded_at?: string | null;
+  heart_rate?: number | null;
+  blood_pressure_systolic?: number | null;
+  blood_pressure_diastolic?: number | null;
+  temperature?: number | null;
+  oxygen_saturation?: number | null;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+};
+
 export default function WardVitalsMonitorPage() {
   const { toast } = useToast();
-  const [vitals, setVitals] = useState<any[]>([]);
+  const [vitals, setVitals] = useState<VitalsRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +39,7 @@ export default function WardVitalsMonitorPage() {
     fetchVitals();
     const interval = setInterval(fetchVitals, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [toast]);
 
   const getStatus = (spo2: number | null) => {
     if (!spo2) return "unknown";
@@ -39,7 +53,7 @@ export default function WardVitalsMonitorPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2"><Activity className="h-6 w-6 text-primary" /> Ward Vitals Monitor</h1>
-          <p className="text-muted-foreground">Live vitals feed — auto-refreshes every 30 seconds</p>
+          <p className="text-muted-foreground">Live vitals feed auto-refreshes every 30 seconds</p>
         </div>
 
         {loading ? (
@@ -65,8 +79,8 @@ export default function WardVitalsMonitorPage() {
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div className="flex items-center gap-2"><Heart className="h-4 w-4 text-red-500" /><span>HR: {v.heart_rate || "N/A"} bpm</span></div>
                       <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-blue-500" /><span>BP: {v.blood_pressure_systolic}/{v.blood_pressure_diastolic}</span></div>
-                      <div className="flex items-center gap-2"><Thermometer className="h-4 w-4 text-orange-500" /><span>Temp: {v.temperature || "N/A"}°C</span></div>
-                      <div className="flex items-center gap-2"><Wind className="h-4 w-4 text-green-500" /><span>SpO₂: {v.oxygen_saturation || "N/A"}%</span></div>
+                      <div className="flex items-center gap-2"><Thermometer className="h-4 w-4 text-orange-500" /><span>Temp: {v.temperature || "N/A"} C</span></div>
+                      <div className="flex items-center gap-2"><Wind className="h-4 w-4 text-green-500" /><span>SpO2: {v.oxygen_saturation || "N/A"}%</span></div>
                     </div>
                   </CardContent>
                 </Card>

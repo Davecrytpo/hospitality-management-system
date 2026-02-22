@@ -7,9 +7,23 @@ import { BedDouble, User, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type BedStatus = "available" | "occupied" | "maintenance";
+
+type BedRow = {
+  id: string;
+  ward_name: string;
+  bed_number: string | number;
+  status: BedStatus;
+  patients?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    blood_type?: string | null;
+  } | null;
+};
+
 export default function NurseStationPage() {
   const { toast } = useToast();
-  const [beds, setBeds] = useState<any[]>([]);
+  const [beds, setBeds] = useState<BedRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,10 +37,14 @@ export default function NurseStationPage() {
       setLoading(false);
     };
     fetchBeds();
-  }, []);
+  }, [toast]);
 
   const wards = [...new Set(beds.map(b => b.ward_name))];
-  const statusColor = { available: "bg-green-100 border-green-300", occupied: "bg-red-100 border-red-300", maintenance: "bg-yellow-100 border-yellow-300" };
+  const statusColor: Record<BedStatus, string> = {
+    available: "bg-green-100 border-green-300",
+    occupied: "bg-red-100 border-red-300",
+    maintenance: "bg-yellow-100 border-yellow-300",
+  };
 
   return (
     <DashboardLayout>
@@ -61,7 +79,7 @@ export default function NurseStationPage() {
             <CardContent>
               <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {beds.filter(b => b.ward_name === ward).map(bed => (
-                  <div key={bed.id} className={`p-3 rounded-lg border-2 text-center text-sm ${(statusColor as any)[bed.status] || "bg-muted"}`}>
+                  <div key={bed.id} className={`p-3 rounded-lg border-2 text-center text-sm ${statusColor[bed.status] || "bg-muted"}`}>
                     <BedDouble className="h-6 w-6 mx-auto mb-1 opacity-70" />
                     <p className="font-bold">Bed {bed.bed_number}</p>
                     {bed.patients ? (

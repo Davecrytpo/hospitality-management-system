@@ -54,9 +54,10 @@ export default function PatientLoginPage() {
       await supabase.auth.signOut();
 
       setStep("2fa-method");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Login error:", err);
-      setError(err.message || "Authentication failed. Please check your credentials.");
+      setError(message || "Authentication failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
@@ -85,9 +86,10 @@ export default function PatientLoginPage() {
 
       toast.success(`Verification security code dispatched via ${twoFaMethod === "email" ? "email" : "SMS"}`);
       setStep("2fa-verify");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("2FA send error:", err);
-      setError(err.message || "Failed to transmit security code. Please contact administration.");
+      setError(message || "Failed to transmit security code. Please contact administration.");
     } finally {
       setIsLoading(false);
     }
@@ -113,9 +115,10 @@ export default function PatientLoginPage() {
         toast.success("Security verification complete. Access granted.");
         navigate("/patient-portal");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("2FA verify error:", err);
-      setError(err.message || "Invalid security code. Access denied.");
+      setError(message || "Invalid security code. Access denied.");
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +185,7 @@ export default function PatientLoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="********"
                   required
                   className="h-12 bg-white/5 border-white/5 focus:border-blue-500/50 transition-all rounded-xl text-white"
                 />

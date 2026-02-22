@@ -10,14 +10,22 @@ import { Badge } from "@/components/ui/badge";
 import { CreditCard, CheckCircle, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const mockInvoices = [
+type Invoice = {
+  id: string;
+  description: string;
+  amount: number;
+  dueDate: string;
+  status: "unpaid" | "paid";
+};
+
+const mockInvoices: Invoice[] = [
   { id: "INV-2024-001", description: "General Consultation + Lab Tests", amount: 18500, dueDate: "2024-02-28", status: "unpaid" },
   { id: "INV-2024-002", description: "Medication Dispensing", amount: 4200, dueDate: "2024-03-05", status: "unpaid" },
 ];
 
 export default function OnlineBillPaymentPage() {
   const { toast } = useToast();
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [card, setCard] = useState({ number: "", expiry: "", cvv: "", name: "" });
   const [processing, setProcessing] = useState(false);
@@ -33,7 +41,7 @@ export default function OnlineBillPaymentPage() {
       setPaid(prev => [...prev, selectedInvoice.id]);
       setSelectedInvoice(null);
       setProcessing(false);
-      toast({ title: "Payment Successful! 🎉", description: `₦${selectedInvoice.amount.toLocaleString()} paid successfully.` });
+      toast({ title: "Payment Successful!", description: `NGN ${selectedInvoice.amount.toLocaleString()} paid successfully.` });
     }, 2000);
   };
 
@@ -68,7 +76,7 @@ export default function OnlineBillPaymentPage() {
                           <p className="text-xs text-muted-foreground">Due: {inv.dueDate}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-lg">₦{inv.amount.toLocaleString()}</p>
+                          <p className="font-bold text-lg">NGN {inv.amount.toLocaleString()}</p>
                           <Badge variant="secondary">Unpaid</Badge>
                         </div>
                       </div>
@@ -86,7 +94,7 @@ export default function OnlineBillPaymentPage() {
                 <>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm font-medium">Paying: {selectedInvoice.id}</p>
-                    <p className="text-2xl font-bold text-primary">₦{selectedInvoice.amount.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-primary">NGN {selectedInvoice.amount.toLocaleString()}</p>
                   </div>
                   <div className="space-y-1">
                     <Label>Payment Method</Label>
@@ -118,9 +126,9 @@ export default function OnlineBillPaymentPage() {
                   )}
                   <Button className="w-full" disabled={processing} onClick={handlePay}>
                     <CreditCard className="mr-2 h-4 w-4" />
-                    {processing ? "Processing..." : `Pay ₦${selectedInvoice.amount.toLocaleString()}`}
+                    {processing ? "Processing..." : `Pay NGN ${selectedInvoice.amount.toLocaleString()}`}
                   </Button>
-                  <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1"><Lock className="h-3 w-3" /> 256-bit SSL encryption • PCI DSS Compliant</p>
+                  <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1"><Lock className="h-3 w-3" /> 256-bit SSL encryption - PCI DSS Compliant</p>
                 </>
               ) : (
                 <p className="text-center text-muted-foreground py-8">Select an invoice to proceed with payment.</p>

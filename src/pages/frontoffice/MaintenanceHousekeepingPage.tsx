@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Brush, Plus, Save, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const mockTasks = [
+type TaskStatus = "completed" | "in-progress" | "pending";
+
+type Task = {
+  id: number;
+  room: string;
+  task: string;
+  assignee: string;
+  scheduled: string;
+  status: TaskStatus;
+};
+
+const mockTasks: Task[] = [
   { id: 1, room: "Ward A - Room 101", task: "Full Room Sanitization", assignee: "Cleaner Bola", scheduled: "08:00 AM", status: "completed" },
   { id: 2, room: "OPD Waiting Area", task: "Floor Mopping & Disinfection", assignee: "Cleaner Kunle", scheduled: "09:00 AM", status: "in-progress" },
   { id: 3, room: "OT-1 (Operating Theatre)", task: "Post-Op Deep Clean", assignee: "Specialist Team", scheduled: "11:00 AM", status: "pending" },
@@ -20,7 +31,7 @@ const mockTasks = [
 
 export default function MaintenanceHousekeepingPage() {
   const { toast } = useToast();
-  const [tasks, setTasks] = useState(mockTasks);
+  const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ room: "", task: "", assignee: "", scheduled: "" });
 
@@ -37,7 +48,11 @@ export default function MaintenanceHousekeepingPage() {
     toast({ title: "Task marked as completed!" });
   };
 
-  const statusColor = { completed: "default", "in-progress": "secondary", pending: "outline" };
+  const statusColor: Record<TaskStatus, BadgeProps["variant"]> = {
+    completed: "default",
+    "in-progress": "secondary",
+    pending: "outline",
+  };
 
   return (
     <DashboardLayout>
@@ -89,7 +104,7 @@ export default function MaintenanceHousekeepingPage() {
                     <TableCell>{t.task}</TableCell>
                     <TableCell>{t.assignee}</TableCell>
                     <TableCell>{t.scheduled}</TableCell>
-                    <TableCell><Badge variant={(statusColor as any)[t.status]}>{t.status}</Badge></TableCell>
+                    <TableCell><Badge variant={statusColor[t.status]}>{t.status}</Badge></TableCell>
                     <TableCell>
                       {t.status !== "completed" && (
                         <Button size="sm" variant="outline" onClick={() => markDone(t.id)}><CheckCircle className="mr-1 h-3 w-3" /> Done</Button>

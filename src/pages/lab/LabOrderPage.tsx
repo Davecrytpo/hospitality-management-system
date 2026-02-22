@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,12 @@ import { ArrowLeft, Save, Plus, Search, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+type PersonOption = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+};
 
 const testCategories = [
   {
@@ -35,27 +41,27 @@ export default function LabOrderPage() {
   const navigate = useNavigate();
   const [selectedTests, setSelectedTests] = useState<string[]>([]);
   const [urgency, setUrgency] = useState("routine");
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PersonOption[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState("");
-  const [doctors, setDoctors] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<PersonOption[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [notes, setNotes] = useState("");
 
+  const fetchPatients = useCallback(async () => {
+    const { data } = await supabase.from("patients").select("id, first_name, last_name");
+    if (data) setPatients(data);
+  }, []);
+
+  const fetchDoctors = useCallback(async () => {
+    const { data } = await supabase.from("doctors").select("id, first_name, last_name");
+    if (data) setDoctors(data);
+  }, []);
+
   useEffect(() => {
     fetchPatients();
     fetchDoctors();
-  }, []);
-
-  const fetchPatients = async () => {
-    const { data } = await supabase.from("patients").select("id, first_name, last_name");
-    if (data) setPatients(data);
-  };
-
-  const fetchDoctors = async () => {
-    const { data } = await supabase.from("doctors").select("id, first_name, last_name");
-    if (data) setDoctors(data);
-  };
+  }, [fetchDoctors, fetchPatients]);
 
   const toggleTest = (test: string) => {
     setSelectedTests(prev => 
@@ -94,9 +100,10 @@ export default function LabOrderPage() {
 
       toast.success(`${selectedTests.length} Lab test orders placed successfully`);
       navigate("/lab");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error placing lab order:", error);
-      toast.error(error.message || "Failed to place lab order");
+      toast.error(message || "Failed to place lab order");
     } finally {
       setIsLoading(false);
     }

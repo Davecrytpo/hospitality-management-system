@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,25 +11,39 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+type PersonOption = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+};
+
+type PrescriptionRow = {
+  id: string;
+  created_at?: string | null;
+  medication?: string | null;
+  dosage?: string | null;
+  duration?: string | null;
+  doctors?: {
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+};
+
 export default function DispensePage() {
   const navigate = useNavigate();
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PersonOption[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState("");
-  const [prescriptions, setPrescriptions] = useState<any[]>([]);
-  const [selectedRx, setSelectedRx] = useState<any>(null);
+  const [prescriptions, setPrescriptions] = useState<PrescriptionRow[]>([]);
+  const [selectedRx, setSelectedRx] = useState<PrescriptionRow | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDispensing, setIsDispensing] = useState(false);
 
-  useEffect(() => {
-    fetchPatients();
-  }, []);
-
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     const { data } = await supabase.from("patients").select("id, first_name, last_name");
     if (data) setPatients(data);
-  };
+  }, []);
 
-  const fetchPatientPrescriptions = async (patientId: string) => {
+  const fetchPatientPrescriptions = useCallback(async (patientId: string) => {
     setIsLoading(true);
     const { data } = await supabase
       .from("prescriptions")
@@ -38,14 +52,18 @@ export default function DispensePage() {
       .order("created_at", { ascending: false });
     if (data) setPrescriptions(data);
     setIsLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (selectedPatientId) {
       fetchPatientPrescriptions(selectedPatientId);
       setSelectedRx(null);
     }
-  }, [selectedPatientId]);
+  }, [fetchPatientPrescriptions, selectedPatientId]);
+
+  useEffect(() => {
+    fetchPatients();
+  }, [fetchPatients]);
 
   const handleDispense = async () => {
     if (!selectedRx || !selectedPatientId) {
@@ -73,9 +91,10 @@ export default function DispensePage() {
 
       toast.success("Medication dispensed successfully!");
       navigate("/pharmacy");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error("Error dispensing:", error);
-      toast.error(error.message || "Failed to dispense medication");
+      toast.error(message || "Failed to dispense medication");
     } finally {
       setIsDispensing(false);
     }

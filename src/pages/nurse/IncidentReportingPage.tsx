@@ -15,7 +15,6 @@ export default function IncidentReportingPage() {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ incident_type: "", severity: "low", description: "", location: "", action_taken: "" });
-  const [reports, setReports] = useState<any[]>([]);
 
   const handleSubmit = async () => {
     if (!form.incident_type || !form.description) return toast({ title: "Please fill required fields", variant: "destructive" });
@@ -25,8 +24,9 @@ export default function IncidentReportingPage() {
       if (error) throw error;
       toast({ title: "Incident report submitted!" });
       setForm({ incident_type: "", severity: "low", description: "", location: "", action_taken: "" });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setSaving(false);
     }

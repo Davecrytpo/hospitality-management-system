@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,16 @@ interface MedicalRecord {
   id: string;
   record_type: string;
   title: string;
-  description: string;
-  diagnosis: string;
-  treatment: string;
+  description?: string | null;
+  diagnosis?: string | null;
+  treatment?: string | null;
   record_date: string;
-  is_confidential: boolean;
-  doctor: {
-    first_name: string;
-    last_name: string;
-    specialization: string;
-  };
+  is_confidential?: boolean | null;
+  doctor?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    specialization?: string | null;
+  } | null;
 }
 
 export default function PatientRecordsPage() {
@@ -28,11 +28,7 @@ export default function PatientRecordsPage() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadRecords();
-  }, []);
-
-  const loadRecords = async () => {
+  const loadRecords = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -66,14 +62,18 @@ export default function PatientRecordsPage() {
         .order("record_date", { ascending: false });
 
       if (data) {
-        setRecords(data as any);
+        setRecords(data as MedicalRecord[]);
       }
     } catch (error) {
       console.error("Error loading records:", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    loadRecords();
+  }, [loadRecords]);
 
   const getRecordTypeColor = (type: string) => {
     switch (type) {

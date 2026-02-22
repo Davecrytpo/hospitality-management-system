@@ -10,8 +10,17 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type DoctorRow = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  specialization?: string | null;
+  is_available?: boolean | null;
+  department?: string | null;
+};
+
 export default function DoctorsPage() {
-  const [doctors, setDoctors] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<DoctorRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -37,10 +46,12 @@ export default function DoctorsPage() {
     }
   };
 
-  const filteredDoctors = doctors.filter(doctor =>
-    `${doctor.first_name} ${doctor.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDoctors = doctors.filter((doctor) => {
+    const name = `${doctor.first_name ?? ""} ${doctor.last_name ?? ""}`.toLowerCase();
+    const specialization = (doctor.specialization ?? "").toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return name.includes(query) || specialization.includes(query);
+  });
 
   return (
     <DashboardLayout>
@@ -73,7 +84,7 @@ export default function DoctorsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-medical-success">
-                {doctors.filter(d => d.is_available).length}
+                                {doctors.filter(d => d.is_available).length}
               </div>
             </CardContent>
           </Card>
@@ -107,17 +118,17 @@ export default function DoctorsPage() {
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
                           <Avatar className="h-12 w-12">
-                            <AvatarFallback>{doctor.first_name[0]}{doctor.last_name[0]}</AvatarFallback>
+                            <AvatarFallback>{(doctor.first_name ?? "D")[0]}{(doctor.last_name ?? "R")[0]}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                            <h4 className="font-semibold">Dr. {doctor.first_name} {doctor.last_name}</h4>
-                            <p className="text-sm text-muted-foreground">{doctor.specialization}</p>
+                            <h4 className="font-semibold">Dr. {doctor.first_name ?? "Unknown"} {doctor.last_name ?? ""}</h4>
+                            <p className="text-sm text-muted-foreground">{doctor.specialization ?? "General"}</p>
                             <div className="mt-2 flex items-center gap-2">
                               <Badge variant={doctor.is_available ? "default" : "secondary"}>
                                 {doctor.is_available ? "Available" : "Busy"}
                               </Badge>
                               <span className="flex items-center text-sm font-bold text-medical-primary">
-                                {doctor.department}
+                                {doctor.department ?? "General"}
                               </span>
                             </div>
                           </div>

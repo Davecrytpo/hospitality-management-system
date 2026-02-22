@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,18 +16,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+type PatientRow = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  date_of_birth?: string | null;
+  gender?: string | null;
+  phone?: string | null;
+  registration_completed?: boolean | null;
+};
+
 export default function PatientsPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PatientRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, active: 0, critical: 0 });
 
-  useEffect(() => {
-    fetchPatients();
-  }, []);
-
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -42,19 +48,26 @@ export default function PatientsPage() {
       const total = data?.length || 0;
       const active = data?.filter(p => !p.registration_completed).length || 0; // Simplified logic
       setStats({ total, active, critical: 0 });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       toast.error("Failed to load patients");
-      console.error(err);
+      console.error(message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const filteredPatients = patients.filter(patient =>
-    `${patient.first_name} ${patient.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (patient.phone && patient.phone.includes(searchQuery))
-  );
+  useEffect(() => {
+    fetchPatients();
+  }, [fetchPatients]);
+
+  const filteredPatients = patients.filter((patient) => {
+    const name = `${patient.first_name ?? ""} ${patient.last_name ?? ""}`.toLowerCase();
+    const id = patient.id.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    const phone = patient.phone ?? "";
+    return name.includes(query) || id.includes(query) || phone.includes(searchQuery);
+  });
 
   const handleView = (patientId: string) => {
     navigate(`/patients/${patientId}`);
@@ -161,7 +174,11 @@ export default function PatientsPage() {
                     >
                       <TableCell className="font-mono text-xs">{patient.id.substring(0,8)}</TableCell>
                       <TableCell className="font-medium">{patient.first_name} {patient.last_name}</TableCell>
-                      <TableCell>{new Date().getFullYear() - new Date(patient.date_of_birth).getFullYear()}</TableCell>
+                      <TableCell>
+                        {patient.date_of_birth
+                          ? new Date().getFullYear() - new Date(patient.date_of_birth).getFullYear()
+                          : "-"}
+                      </TableCell>
                       <TableCell className="capitalize">{patient.gender || '-'}</TableCell>
                       <TableCell>{patient.phone || '-'}</TableCell>
                       <TableCell>

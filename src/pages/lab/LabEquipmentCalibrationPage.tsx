@@ -6,12 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Wrench, Plus, Save, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const mockEquipment = [
+type CalibrationStatus = "Calibrated" | "Due Soon" | "Overdue";
+
+type EquipmentItem = {
+  id: number;
+  name: string;
+  lastCalibrated: string;
+  nextDue: string;
+  technician: string;
+  status: CalibrationStatus;
+};
+
+const mockEquipment: EquipmentItem[] = [
   { id: 1, name: "Hematology Analyzer XT-4000", lastCalibrated: "2024-01-10", nextDue: "2024-04-10", technician: "Lab Tech John", status: "Calibrated" },
   { id: 2, name: "Centrifuge Model CR-5", lastCalibrated: "2024-01-05", nextDue: "2024-02-05", technician: "Lab Tech Amina", status: "Due Soon" },
   { id: 3, name: "Microscope BX-53", lastCalibrated: "2024-01-15", nextDue: "2024-07-15", technician: "Lab Tech John", status: "Calibrated" },
@@ -30,7 +41,11 @@ export default function LabEquipmentCalibrationPage() {
     setForm({ equipment: "", technician: "", notes: "", nextDue: "" });
   };
 
-  const statusColors = { Calibrated: "default", "Due Soon": "secondary", Overdue: "destructive" };
+  const statusColors: Record<CalibrationStatus, BadgeProps["variant"]> = {
+    Calibrated: "default",
+    "Due Soon": "secondary",
+    Overdue: "destructive",
+  };
 
   return (
     <DashboardLayout>
@@ -71,7 +86,7 @@ export default function LabEquipmentCalibrationPage() {
                     <TableCell>{e.lastCalibrated}</TableCell>
                     <TableCell>{e.nextDue}</TableCell>
                     <TableCell>{e.technician}</TableCell>
-                    <TableCell><Badge variant={(statusColors as any)[e.status] || "secondary"}>{e.status}</Badge></TableCell>
+                    <TableCell><Badge variant={statusColors[e.status] || "secondary"}>{e.status}</Badge></TableCell>
                   </TableRow>
                 ))}
               </TableBody>

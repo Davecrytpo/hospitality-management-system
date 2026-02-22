@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -25,12 +25,44 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+type PatientRecord = {
+  id?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  age?: number | string | null;
+  gender?: string | null;
+  blood_type?: string | null;
+};
+
+type VitalsRecord = {
+  blood_pressure_systolic?: number | null;
+  blood_pressure_diastolic?: number | null;
+  heart_rate?: number | null;
+  temperature?: number | null;
+  oxygen_saturation?: number | null;
+};
+
+type HistoryRecord = {
+  created_at?: string | null;
+  assessment?: string | null;
+  plan?: string | null;
+};
+
+type PrescriptionItem = {
+  medication_name: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+};
+
+type PrescriptionField = keyof PrescriptionItem;
+
 export default function ConsultationRoomPage() {
   const { id: patientId } = useParams();
   const navigate = useNavigate();
-  const [patient, setPatient] = useState<any>(null);
-  const [vitals, setVitals] = useState<any>(null);
-  const [history, setHistory] = useState<any[]>([]);
+  const [patient, setPatient] = useState<PatientRecord | null>(null);
+  const [vitals, setVitals] = useState<VitalsRecord | null>(null);
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSubmitting] = useState(false);
 
@@ -40,33 +72,35 @@ export default function ConsultationRoomPage() {
   const [notes, setNotes] = useState("");
   
   // Dynamic Prescription Items
-  const [prescriptions, setPrescriptions] = useState([{ medication_name: "", dosage: "", frequency: "", duration: "" }]);
+  const [prescriptions, setPrescriptions] = useState<PrescriptionItem[]>([
+    { medication_name: "", dosage: "", frequency: "", duration: "" },
+  ]);
   
   // Lab Order Items
   const [labOrders, setLabOrders] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (patientId) {
-      fetchPatientData();
-    }
-  }, [patientId]);
-
-  const fetchPatientData = async () => {
+  const fetchPatientData = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data: p } = await supabase.from("patients").select("*").eq("id", patientId).single();
       const { data: v } = await supabase.from("vitals").select("*").eq("patient_id", patientId).order("recorded_at", { ascending: false }).limit(1).single();
       const { data: h } = await supabase.from("consultation_notes").select("*").eq("patient_id", patientId).order("created_at", { ascending: false });
       
-      setPatient(p);
-      setVitals(v);
-      setHistory(h || []);
+      setPatient((p ?? null) as PatientRecord | null);
+      setVitals((v ?? null) as VitalsRecord | null);
+      setHistory((h ?? []) as HistoryRecord[]);
     } catch (err) {
       console.error("Error fetching consultation data:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [patientId]);
+
+  useEffect(() => {
+    if (patientId) {
+      fetchPatientData();
+    }
+  }, [fetchPatientData, patientId]);
 
   const addPrescriptionRow = () => setPrescriptions([...prescriptions, { medication_name: "", dosage: "", frequency: "", duration: "" }]);
   
@@ -76,9 +110,9 @@ export default function ConsultationRoomPage() {
     }
   };
 
-  const handlePrescriptionChange = (index: number, field: string, value: string) => {
+  const handlePrescriptionChange = (index: number, field: PrescriptionField, value: string) => {
     const newPrescriptions = [...prescriptions];
-    (newPrescriptions[index] as any)[field] = value;
+    newPrescriptions[index] = { ...newPrescriptions[index], [field]: value };
     setPrescriptions(newPrescriptions);
   };
 
@@ -139,9 +173,10 @@ export default function ConsultationRoomPage() {
 
       toast.success("Consultation finalized and orders sent!");
       navigate("/doctor/dashboard");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Consultation error:", err);
-      toast.error(err.message || "Failed to save consultation");
+      toast.error(message || "Failed to save consultation");
     } finally {
       setIsSubmitting(false);
     }
@@ -163,7 +198,7 @@ export default function ConsultationRoomPage() {
                 Active Consultation: {patient?.first_name} {patient?.last_name}
                 <Badge variant="outline" className="ml-2">ID: {patient?.id?.substring(0,8)}</Badge>
               </h1>
-              <p className="text-sm text-muted-foreground">Age: {patient?.age} • Gender: {patient?.gender} • Blood: {patient?.blood_type}</p>
+              <p className="text-sm text-muted-foreground">Age: {patient?.age} - Gender: {patient?.gender} - Blood: {patient?.blood_type}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -202,7 +237,7 @@ export default function ConsultationRoomPage() {
                     </div>
                     <div className="space-y-1">
                       <p className="text-[10px] uppercase font-bold text-muted-foreground">Temp</p>
-                      <p className="text-lg font-black">{vitals.temperature}°F</p>
+                      <p className="text-lg font-black">{vitals.temperature} F</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[10px] uppercase font-bold text-muted-foreground">SpO2</p>
