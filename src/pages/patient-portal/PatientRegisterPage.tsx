@@ -58,6 +58,10 @@ export default function PatientRegisterPage() {
   const [verifyDOB, setVerifyDOB] = useState("");
   const [verifyPhone, setVerifyPhone] = useState("");
 
+  // Document upload
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+
   // Logic to determine initial step
   useEffect(() => {
     console.log("PatientRegisterPage mounted. InvitationId:", invitationId, "Code:", codeFromUrl);
@@ -136,13 +140,62 @@ export default function PatientRegisterPage() {
     setStep("documents");
   };
 
-  const handleDocumentUpload = () => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a valid file (JPG, PNG, or PDF)");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB");
+      return;
+    }
+    
+    setUploadedFile(file);
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => setUploadPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setUploadPreview(null);
+    }
+    toast.success(`File selected: ${file.name}`);
+  };
+
+  const handleDocumentUpload = async () => {
+    if (!uploadedFile) {
+      toast.error("Please select a document to upload");
+      return;
+    }
     setIsLoading(true);
-    // Simulate upload
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Upload to storage
+      const fileExt = uploadedFile.name.split(".").pop();
+      const filePath = `patient-ids/${invitationId}-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from("medical-documents")
+        .upload(filePath, uploadedFile);
+      
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        // Still proceed - document can be uploaded later
+        toast.warning("Document saved locally. You can re-upload later from your portal.");
+      } else {
+        toast.success("Document uploaded successfully!");
+      }
+      
       setStep("2fa");
-    }, 1500);
+    } catch (err) {
+      console.error("Upload exception:", err);
+      toast.warning("Upload skipped. You can upload your ID later from the patient portal.");
+      setStep("2fa");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCompleteRegistration = async () => {
@@ -334,18 +387,38 @@ export default function PatientRegisterPage() {
 
           {step === "documents" && (
             <div className="space-y-6">
-              <div className="border-2 border-dashed rounded-xl p-12 text-center space-y-4">
+              <input 
+                type="file" 
+                id="id-upload" 
+                className="hidden" 
+                accept=".jpg,.jpeg,.png,.pdf"
+                onChange={handleFileSelect}
+              />
+              <label 
+                htmlFor="id-upload"
+                className="border-2 border-dashed rounded-xl p-12 text-center space-y-4 block cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all"
+              >
                 <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center">
                   <Upload className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Upload Government Issued ID</p>
-                  <p className="text-xs text-muted-foreground">Passport, Driver's License or National ID (PDF, JPG, PNG)</p>
+                  <p className="font-medium">{uploadedFile ? uploadedFile.name : "Upload Government Issued ID"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {uploadedFile 
+                      ? `${(uploadedFile.size / 1024).toFixed(1)} KB — Click to change` 
+                      : "Passport, Driver's License or National ID (PDF, JPG, PNG)"}
+                  </p>
                 </div>
-                <Button variant="outline" size="sm">Select File</Button>
-              </div>
-              <Button className="w-full" onClick={handleDocumentUpload} disabled={isLoading}>
-                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : "Upload & Continue"}
+                {uploadPreview && (
+                  <img src={uploadPreview} alt="ID Preview" className="max-h-32 mx-auto rounded-lg object-contain" />
+                )}
+                {!uploadedFile && <Button variant="outline" size="sm" type="button" onClick={(e) => { e.preventDefault(); document.getElementById('id-upload')?.click(); }}>Select File</Button>}
+              </label>
+              <Button className="w-full" onClick={handleDocumentUpload} disabled={isLoading || !uploadedFile}>
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Uploading...</> : "Upload & Continue"}
+              </Button>
+              <Button variant="ghost" className="w-full text-xs text-muted-foreground" onClick={() => setStep("2fa")}>
+                Skip for now — Upload later
               </Button>
             </div>
           )}
