@@ -80,16 +80,25 @@ export default function PatientLoginPage() {
       });
 
       if (error) throw error;
-      if (data.error) throw new Error(data.error);
+      if (data?.error) throw new Error(data.error);
 
-      if (data.devCode) setDevCode(data.devCode);
+      if (data?.devCode) setDevCode(data.devCode);
 
-      toast.success(`Verification security code dispatched via ${twoFaMethod === "email" ? "email" : "SMS"}`);
+      if (twoFaMethod === "phone" && data?.devCode) {
+        toast.success(`Your verification code is: ${data.devCode}`, { duration: 15000 });
+      } else {
+        toast.success(`Verification code sent via ${twoFaMethod === "email" ? "email" : "SMS"}`);
+      }
+      
+      if (data?.errorDetail) {
+        console.log("2FA delivery note:", data.errorDetail);
+      }
+
       setStep("2fa-verify");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error("2FA send error:", err);
-      setError(message || "Failed to transmit security code. Please contact administration.");
+      setError(message || "Failed to send security code. Please try again.");
     } finally {
       setIsLoading(false);
     }

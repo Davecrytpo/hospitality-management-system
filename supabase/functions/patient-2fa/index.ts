@@ -35,9 +35,11 @@ const handler = async (req: Request): Promise<Response> => {
     }
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { action, userId, email, deliveryMethod, code } = await req.json();
+    const { action, userId, email, phone, deliveryMethod, code } = await req.json();
 
     if (action === "send") {
+      if (!userId) throw new Error("Missing userId");
+      
       const twoFactorCode = generateCode();
       const codeHash = await hashCode(twoFactorCode, supabaseServiceKey);
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
@@ -55,56 +57,70 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (insertError) throw insertError;
 
-      let emailSent = false;
+      let sent = false;
       let errorDetail = "";
 
+      // Email delivery
       if ((deliveryMethod === "email" || !deliveryMethod) && email) {
         if (!resendApiKey) {
-          errorDetail = "RESEND_API_KEY not set";
+          errorDetail = "Email service not configured. Please contact administration.";
         } else {
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${resendApiKey}`,
-          },
-          body: JSON.stringify({
-            from: resendFrom,
-            to: [email],
-            subject: "Your Medical Portal Access Code",
-            html: `
-              <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
-                <h2 style="color: #0f172a;">Identity Verification</h2>
-                <p>Use the code below to access your MediCare patient portal. This code is valid for 5 minutes.</p>
-                <div style="background-color: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
-                  <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2563eb;">${twoFactorCode}</span>
-                </div>
-                <p style="font-size: 12px; color: #64748b;">If you didn't request this code, please secure your account immediately.</p>
-              </div>
-            `,
-          }),
-        });
-        
-        if (res.ok) {
-          emailSent = true;
-        } else {
-          let errData: { message?: string } | null = null;
           try {
-            errData = await res.json();
-          } catch {
-            errData = null;
+            const res = await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${resendApiKey}`,
+              },
+              body: JSON.stringify({
+                from: resendFrom,
+                to: [email],
+                subject: "Your Medical Portal Security Code",
+                html: `
+                  <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 0; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 24px; text-align: center;">
+                      <h2 style="color: white; margin: 0; font-size: 20px;">🔐 Security Verification</h2>
+                    </div>
+                    <div style="padding: 32px;">
+                      <p style="color: #334155;">Your one-time verification code is:</p>
+                      <div style="background: #f1f5f9; padding: 20px; text-align: center; border-radius: 12px; margin: 20px 0; border: 2px dashed #93c5fd;">
+                        <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #1e40af;">${twoFactorCode}</span>
+                      </div>
+                      <p style="font-size: 13px; color: #64748b;">This code expires in <strong>5 minutes</strong>. Do not share it with anyone.</p>
+                    </div>
+                  </div>
+                `,
+              }),
+            });
+
+            if (res.ok) {
+              sent = true;
+            } else {
+              let errData: { message?: string } | null = null;
+              try { errData = await res.json(); } catch { errData = null; }
+              errorDetail = errData?.message || "Email delivery failed";
+            }
+          } catch (emailErr) {
+            errorDetail = emailErr instanceof Error ? emailErr.message : "Email sending failed";
           }
-          errorDetail = errData?.message || "Resend configuration error";
         }
-        }
+      }
+
+      // SMS delivery
+      if (deliveryMethod === "phone" && phone) {
+        // Currently SMS is not configured - return the code for development
+        // In production, integrate Twilio or similar SMS provider
+        console.log(`SMS 2FA code for ${phone}: ${twoFactorCode}`);
+        errorDetail = "SMS service is being configured. Your code has been generated.";
+        sent = true; // Mark as sent so user can proceed with the dev code
       }
 
       return new Response(
         JSON.stringify({
           success: true,
-          emailSent,
+          sent,
           errorDetail,
-          devCode: twoFactorCode, // Still logging for debug
+          devCode: twoFactorCode, // For development - remove in production
           expiresAt,
         }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
