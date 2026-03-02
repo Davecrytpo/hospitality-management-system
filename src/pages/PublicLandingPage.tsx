@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
@@ -37,7 +37,9 @@ import {
   Bone,
   Syringe
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
+import SplashScreen from "@/components/SplashScreen";
 
 const EKGLine = () => (
   <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
@@ -63,12 +65,12 @@ const stats = [
 ];
 
 const specialties = [
-  { name: "Cardiology", icon: HeartPulse, desc: "Advanced cardiac care with state-of-the-art catheterization labs and electrophysiology studies.", color: "text-red-400" },
-  { name: "Neurology", icon: Brain, desc: "Comprehensive neurological diagnostics including EEG, EMG, and advanced neuroimaging.", color: "text-purple-400" },
-  { name: "Orthopedics", icon: Bone, desc: "Joint replacement, sports medicine, and minimally invasive spinal surgery.", color: "text-amber-400" },
-  { name: "Pediatrics", icon: Baby, desc: "Dedicated pediatric ward with specialized neonatal intensive care unit (NICU).", color: "text-green-400" },
-  { name: "Emergency Medicine", icon: Ambulance, desc: "24/7 Level-1 trauma center with rapid response teams and helicopter landing pad.", color: "text-orange-400" },
-  { name: "Oncology", icon: Syringe, desc: "Multi-disciplinary cancer treatment including chemotherapy, radiation, and immunotherapy.", color: "text-pink-400" },
+  { name: "Cardiology", icon: HeartPulse, desc: "Advanced cardiac care with state-of-the-art catheterization labs and electrophysiology studies.", color: "text-red-400", link: "/doctors/specializations" },
+  { name: "Neurology", icon: Brain, desc: "Comprehensive neurological diagnostics including EEG, EMG, and advanced neuroimaging.", color: "text-purple-400", link: "/doctors/specializations" },
+  { name: "Orthopedics", icon: Bone, desc: "Joint replacement, sports medicine, and minimally invasive spinal surgery.", color: "text-amber-400", link: "/doctors/specializations" },
+  { name: "Pediatrics", icon: Baby, desc: "Dedicated pediatric ward with specialized neonatal intensive care unit (NICU).", color: "text-green-400", link: "/doctors/specializations" },
+  { name: "Emergency Medicine", icon: Ambulance, desc: "24/7 Level-1 trauma center with rapid response teams and helicopter landing pad.", color: "text-orange-400", link: "/departments/emergency" },
+  { name: "Oncology", icon: Syringe, desc: "Multi-disciplinary cancer treatment including chemotherapy, radiation, and immunotherapy.", color: "text-pink-400", link: "/doctors/specializations" },
 ];
 
 const networkFeatures = [
@@ -96,10 +98,19 @@ const services = [
 
 export default function PublicLandingPage() {
   const [mounted, setMounted] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const navigate = useNavigate();
+  
+  const handleSplashComplete = useCallback(() => setShowSplash(false), []);
+  
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
   return (
+    <>
+      <AnimatePresence>
+        {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+      </AnimatePresence>
     <div className="min-h-screen bg-[#020617] text-slate-50 selection:bg-blue-500/30 overflow-x-hidden font-sans">
       {/* Background */}
       <div className="fixed inset-0 z-0">
@@ -260,14 +271,16 @@ export default function PublicLandingPage() {
             {specialties.map((s, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                 whileHover={{ y: -6 }}
-                className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group">
+                onClick={() => navigate(s.link)}
+                className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group cursor-pointer">
                 <div className="flex items-start gap-4">
                   <div className={`h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center ${s.color} shrink-0`}>
                     <s.icon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white mb-1">{s.name}</h3>
+                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">{s.name}</h3>
                     <p className="text-slate-400 text-sm leading-relaxed">{s.desc}</p>
+                    <span className="text-[10px] font-bold text-blue-400/60 uppercase tracking-widest mt-2 inline-block group-hover:text-blue-400 transition-colors">View Department →</span>
                   </div>
                 </div>
               </motion.div>
@@ -463,5 +476,6 @@ export default function PublicLandingPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
