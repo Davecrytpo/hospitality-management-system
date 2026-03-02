@@ -36,7 +36,7 @@ export default function LabSampleTrackingPage() {
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
         if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
-        setTests(data || []);
+        setTests((data as LabTestRow[]) || []);
         setLoading(false);
       });
   }, [toast]);

@@ -51,7 +51,8 @@ export default function ERRealtimeBoardPage() {
   const addCase = () => {
     if (!form.patient || !form.complaint) return toast({ title: "Fill required fields", variant: "destructive" });
     setCases(prev => [...prev, {
-      id: `ER00${prev.length + 1}`, ...form,
+      id: `ER00${prev.length + 1}`, patient: form.patient, complaint: form.complaint,
+      triage: form.triage as TriageLevel,
       time: new Date().toLocaleTimeString(), status: "Triage", doctor: "Unassigned"
     }]);
     toast({ title: "ER case registered!" });

@@ -33,7 +33,7 @@ export default function NurseStationPage() {
         .select("*, patients(first_name, last_name, blood_type)")
         .order("ward_name").order("bed_number");
       if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
-      setBeds(data || []);
+      setBeds((data as BedRow[]) || []);
       setLoading(false);
     };
     fetchBeds();

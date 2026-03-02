@@ -184,7 +184,7 @@ export default function PaymentsPage() {
                       <SelectContent>
                         {invoices.map(inv => (
                           <SelectItem key={inv.id} value={inv.id}>
-                            {inv.invoice_number} (Due: ${inv.total_amount - (inv.paid_amount || 0)})
+                            {inv.invoice_number} (Due: ${Number(inv.total_amount) - Number(inv.paid_amount || 0)})
                           </SelectItem>
                         ))}
                       </SelectContent>
