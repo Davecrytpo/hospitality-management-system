@@ -128,7 +128,7 @@ export default function ExpensesPayrollPage() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table></div>
             </CardContent>
           </Card>
         )}

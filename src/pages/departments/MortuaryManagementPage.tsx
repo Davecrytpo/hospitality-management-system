@@ -76,7 +76,7 @@ export default function MortuaryManagementPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       </div>

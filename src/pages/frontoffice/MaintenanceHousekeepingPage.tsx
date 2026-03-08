@@ -113,7 +113,7 @@ export default function MaintenanceHousekeepingPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       </div>

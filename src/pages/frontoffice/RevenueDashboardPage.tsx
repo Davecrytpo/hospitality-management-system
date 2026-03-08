@@ -51,7 +51,7 @@ export default function RevenueDashboardPage() {
           <p className="text-muted-foreground">Financial overview for management</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {[
             { label: "Total Collections", value: fmt(stats.total || 855000), icon: DollarSign, trend: "+12%", up: true },
             { label: "This Month", value: "NGN 680,000", icon: CreditCard, trend: "+5%", up: true },

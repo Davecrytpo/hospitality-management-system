@@ -97,9 +97,9 @@ export default function DoctorsPage() {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input 
+                   <Input 
                     placeholder="Search doctors..." 
-                    className="pl-8 w-64"
+                    className="pl-8 w-full sm:w-64"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
