@@ -119,8 +119,8 @@ export default function PharmacistQueuePage() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <span className="font-medium">{(rx as any).medication_name || (rx as any).medication || "N/A"}</span>
-                        <p className="text-[10px] text-muted-foreground">{(rx as any).dosage} - {(rx as any).duration}</p>
+                        <span className="font-medium">{rx.medication_name || "N/A"}</span>
+                        <p className="text-[10px] text-muted-foreground">{rx.dosage} - {rx.duration}</p>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">
