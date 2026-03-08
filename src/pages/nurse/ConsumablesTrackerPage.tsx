@@ -97,7 +97,7 @@ export default function ConsumablesTrackerPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       </div>

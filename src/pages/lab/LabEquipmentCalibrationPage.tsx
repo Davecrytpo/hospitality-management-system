@@ -90,7 +90,7 @@ export default function LabEquipmentCalibrationPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       </div>
