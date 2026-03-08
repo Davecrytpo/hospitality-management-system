@@ -114,12 +114,12 @@ export default function AppointmentsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Appointment List</CardTitle>
-              <div className="flex items-center gap-2">
-                <div className="relative">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative flex-1 sm:flex-initial">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input 
                     placeholder="Search appointments..." 
-                    className="pl-8 w-64"
+                    className="pl-8 w-full sm:w-64"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
