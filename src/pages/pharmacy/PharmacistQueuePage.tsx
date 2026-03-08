@@ -12,7 +12,7 @@ import { toast } from "sonner";
 type PrescriptionRow = {
   id: string;
   created_at?: string | null;
-  medication?: string | null;
+  medication_name?: string | null;
   dosage?: string | null;
   duration?: string | null;
   patients?: {
@@ -119,7 +119,7 @@ export default function PharmacistQueuePage() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <span className="font-medium">{rx.medication}</span>
+                        <span className="font-medium">{rx.medication_name || "N/A"}</span>
                         <p className="text-[10px] text-muted-foreground">{rx.dosage} - {rx.duration}</p>
                       </div>
                     </TableCell>

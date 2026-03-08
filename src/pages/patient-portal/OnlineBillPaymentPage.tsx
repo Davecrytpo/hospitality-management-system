@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, CheckCircle, Lock } from "lucide-react";
+import { CreditCard, CheckCircle, Lock, ArrowLeft, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Invoice = {
@@ -48,11 +47,18 @@ export default function OnlineBillPaymentPage() {
   const unpaidInvoices = mockInvoices.filter(i => !paid.includes(i.id));
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><CreditCard className="h-6 w-6 text-primary" /> Online Bill Payment</h1>
-          <p className="text-muted-foreground">Pay your hospital invoices securely online</p>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="outline" size="icon" asChild>
+            <Link to="/patient-portal">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2"><CreditCard className="h-6 w-6 text-primary" /> Online Bill Payment</h1>
+            <p className="text-muted-foreground">Pay your hospital invoices securely online</p>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -137,6 +143,6 @@ export default function OnlineBillPaymentPage() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
