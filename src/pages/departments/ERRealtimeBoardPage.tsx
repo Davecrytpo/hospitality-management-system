@@ -71,7 +71,7 @@ export default function ERRealtimeBoardPage() {
           <Button variant="destructive" onClick={() => setShowForm(!showForm)}><Plus className="mr-2 h-4 w-4" /> Register Case</Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {["critical", "severe", "moderate", "mild"].map(s => (
             <Card key={s} className={s === "critical" ? "border-destructive" : ""}>
               <CardHeader className="pb-2"><CardTitle className="text-sm capitalize">{s}</CardTitle></CardHeader>
