@@ -12,7 +12,7 @@ import { toast } from "sonner";
 type PrescriptionRow = {
   id: string;
   created_at?: string | null;
-  medication?: string | null;
+  medication_name?: string | null;
   dosage?: string | null;
   duration?: string | null;
   patients?: {
