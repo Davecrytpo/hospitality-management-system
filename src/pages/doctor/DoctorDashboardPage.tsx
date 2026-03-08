@@ -52,6 +52,8 @@ export default function DoctorDashboardPage() {
     { label: "Avg. Wait Time", value: "12 min", icon: Clock, color: "text-purple-600" },
   ];
 
+  const nextPatientId = appointments.find((appointment) => appointment.patient_id)?.patient_id;
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -60,7 +62,9 @@ export default function DoctorDashboardPage() {
             <h1 className="text-2xl font-bold flex items-center gap-2"><Stethoscope className="h-6 w-6 text-primary" /> Doctor Dashboard</h1>
             <p className="text-muted-foreground">Your clinical workspace for today</p>
           </div>
-          <Button asChild><Link to="/doctor/consultation">Start Consultation</Link></Button>
+          <Button asChild>
+            <Link to={nextPatientId ? `/doctor/consultation/${nextPatientId}` : "/doctor/patients"}>Start Consultation</Link>
+          </Button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
@@ -100,7 +104,7 @@ export default function DoctorDashboardPage() {
                     <div className="flex items-center gap-2">
                       <Badge variant={apt.status === "completed" ? "default" : "secondary"}>{apt.status}</Badge>
                       <Button size="sm" variant="ghost" asChild>
-                        <Link to={`/doctor/consultation?patient=${apt.patient_id}`}><ChevronRight className="h-4 w-4" /></Link>
+                        <Link to={`/doctor/consultation/${apt.patient_id}`}><ChevronRight className="h-4 w-4" /></Link>
                       </Button>
                     </div>
                   </div>

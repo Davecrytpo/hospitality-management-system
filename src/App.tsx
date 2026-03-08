@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 
@@ -213,6 +213,7 @@ const App = () => (
             {/* Clinical / Doctor Portal */}
             <Route path="/doctor/dashboard" element={<DoctorRoute><DoctorDashboardPage /></DoctorRoute>} />
             <Route path="/doctor/consultation/:id" element={<DoctorRoute><ConsultationRoomPage /></DoctorRoute>} />
+            <Route path="/doctor/consultation" element={<DoctorRoute><Navigate to="/doctor/patients" replace /></DoctorRoute>} />
             <Route path="/doctor/patients" element={<DoctorRoute><MyPatientListPage /></DoctorRoute>} />
             <Route path="/doctor/rounds" element={<DoctorRoute><IPDRoundingPage /></DoctorRoute>} />
             <Route path="/doctor/surgeries" element={<DoctorRoute><SurgerySchedulePage /></DoctorRoute>} />
@@ -337,6 +338,24 @@ const App = () => (
             <Route path="/patient-portal/records" element={<PatientRoute><PatientRecordsPage /></PatientRoute>} />
             <Route path="/patient-portal/profile" element={<PatientRoute><PatientProfilePage /></PatientRoute>} />
             <Route path="/patient-portal/billing" element={<PatientRoute><OnlineBillPaymentPage /></PatientRoute>} />
+
+            {/* Route Safety Nets for Unknown Nested Paths */}
+            <Route path="/doctor/*" element={<DoctorRoute><Navigate to="/doctor/dashboard" replace /></DoctorRoute>} />
+            <Route path="/nurse/*" element={<NurseRoute><Navigate to="/nurse/station" replace /></NurseRoute>} />
+            <Route path="/patients/*" element={<StaffRoute><Navigate to="/patients" replace /></StaffRoute>} />
+            <Route path="/appointments/*" element={<StaffRoute><Navigate to="/appointments" replace /></StaffRoute>} />
+            <Route path="/admissions/*" element={<StaffRoute><Navigate to="/admissions" replace /></StaffRoute>} />
+            <Route path="/records/*" element={<StaffRoute><Navigate to="/records" replace /></StaffRoute>} />
+            <Route path="/prescriptions/*" element={<StaffRoute><Navigate to="/prescriptions" replace /></StaffRoute>} />
+            <Route path="/pharmacy/*" element={<PharmacyRoute><Navigate to="/pharmacy" replace /></PharmacyRoute>} />
+            <Route path="/lab/*" element={<LabRoute><Navigate to="/lab" replace /></LabRoute>} />
+            <Route path="/diagnostics/*" element={<StaffRoute><Navigate to="/diagnostics/reports" replace /></StaffRoute>} />
+            <Route path="/vitals/*" element={<StaffRoute><Navigate to="/vitals" replace /></StaffRoute>} />
+            <Route path="/reception/*" element={<ReceptionRoute><Navigate to="/reception" replace /></ReceptionRoute>} />
+            <Route path="/finance/*" element={<FinanceRoute><Navigate to="/finance/revenue" replace /></FinanceRoute>} />
+            <Route path="/departments/*" element={<StaffRoute><Navigate to="/departments" replace /></StaffRoute>} />
+            <Route path="/billing/*" element={<FinanceRoute><Navigate to="/billing" replace /></FinanceRoute>} />
+            <Route path="/patient-portal/*" element={<PatientRoute><Navigate to="/patient-portal" replace /></PatientRoute>} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
