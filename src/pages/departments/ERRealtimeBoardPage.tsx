@@ -63,7 +63,7 @@ export default function ERRealtimeBoardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2"><AlertTriangle className="h-6 w-6 text-destructive" /> Emergency Room - Live Board</h1>
             <p className="text-muted-foreground flex items-center gap-2"><Clock className="h-4 w-4" /> {time}</p>
@@ -71,7 +71,7 @@ export default function ERRealtimeBoardPage() {
           <Button variant="destructive" onClick={() => setShowForm(!showForm)}><Plus className="mr-2 h-4 w-4" /> Register Case</Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {["critical", "severe", "moderate", "mild"].map(s => (
             <Card key={s} className={s === "critical" ? "border-destructive" : ""}>
               <CardHeader className="pb-2"><CardTitle className="text-sm capitalize">{s}</CardTitle></CardHeader>

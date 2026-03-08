@@ -32,7 +32,7 @@ export default function MortuaryManagementPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2"><BookOpen className="h-6 w-6 text-primary" /> Mortuary Management</h1>
             <p className="text-muted-foreground">Record keeping for deceased patients</p>
@@ -59,7 +59,7 @@ export default function MortuaryManagementPage() {
 
         <Card>
           <CardContent className="pt-4">
-            <Table>
+            <div className="overflow-x-auto -mx-6 px-6"><Table>
               <TableHeader>
                 <TableRow><TableHead>Case ID</TableHead><TableHead>Name</TableHead><TableHead>Age</TableHead><TableHead>Date of Death</TableHead><TableHead>Cause</TableHead><TableHead>Certified By</TableHead><TableHead>Status</TableHead></TableRow>
               </TableHeader>
@@ -76,7 +76,7 @@ export default function MortuaryManagementPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       </div>

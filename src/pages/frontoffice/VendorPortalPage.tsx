@@ -34,7 +34,7 @@ export default function VendorPortalPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2"><Building2 className="h-6 w-6 text-primary" /> Vendor Portal</h1>
             <p className="text-muted-foreground">Manage payments to electricity, food, laundry, and other vendors</p>
@@ -72,7 +72,7 @@ export default function VendorPortalPage() {
 
         <Card>
           <CardContent className="pt-4">
-            <Table>
+            <div className="overflow-x-auto -mx-6 px-6"><Table>
               <TableHeader><TableRow><TableHead>Vendor</TableHead><TableHead>Service</TableHead><TableHead>Contact</TableHead><TableHead>Monthly Amount</TableHead><TableHead>Last Payment</TableHead><TableHead>Status</TableHead><TableHead>Action</TableHead></TableRow></TableHeader>
               <TableBody>
                 {mockVendors.map(v => (
@@ -87,7 +87,7 @@ export default function VendorPortalPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       </div>

@@ -56,7 +56,7 @@ export default function DoctorsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">All Doctors</h1>
             <p className="text-muted-foreground">Manage medical staff and their schedules</p>
@@ -69,7 +69,7 @@ export default function DoctorsPage() {
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Total Doctors</CardTitle>
@@ -97,9 +97,9 @@ export default function DoctorsPage() {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input 
+                   <Input 
                     placeholder="Search doctors..." 
-                    className="pl-8 w-64"
+                    className="pl-8 w-full sm:w-64"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />

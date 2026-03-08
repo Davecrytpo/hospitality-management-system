@@ -43,7 +43,7 @@ export default function ExpensesPayrollPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2"><Wallet className="h-6 w-6 text-primary" /> Expenses & Payroll</h1>
             <p className="text-muted-foreground">Manage hospital costs and staff salaries</p>
@@ -94,7 +94,7 @@ export default function ExpensesPayrollPage() {
         {activeTab === "expenses" && (
           <Card>
             <CardContent className="pt-4">
-              <Table>
+              <div className="overflow-x-auto -mx-6 px-6"><Table>
                 <TableHeader><TableRow><TableHead>Category</TableHead><TableHead>Description</TableHead><TableHead>Amount</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {mockExpenses.map(e => (
@@ -107,7 +107,7 @@ export default function ExpensesPayrollPage() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table></div>
             </CardContent>
           </Card>
         )}
@@ -115,7 +115,7 @@ export default function ExpensesPayrollPage() {
         {activeTab === "payroll" && (
           <Card>
             <CardContent className="pt-4">
-              <Table>
+              <div className="overflow-x-auto -mx-6 px-6"><Table>
                 <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Role</TableHead><TableHead>Salary</TableHead><TableHead>Status</TableHead><TableHead>Action</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {mockPayroll.map(p => (
@@ -128,7 +128,7 @@ export default function ExpensesPayrollPage() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table></div>
             </CardContent>
           </Card>
         )}
