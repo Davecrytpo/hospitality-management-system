@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Building2, Heart } from "lucide-react";
+import { Loader2, Hospital, ArrowLeft, ShieldCheck } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -22,18 +22,9 @@ export default function AuthPage() {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .single();
-
+        const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", session.user.id).single();
         if (profile) {
-          if (profile.role === "patient") {
-            navigate("/patient-portal", { replace: true });
-          } else if (profile.role === "admin" || profile.role === "doctor") {
-            navigate("/dashboard", { replace: true });
-          }
+          navigate(profile.role === "patient" ? "/patient-portal" : "/dashboard", { replace: true });
         }
       }
     };
@@ -44,57 +35,25 @@ export default function AuthPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (signInError) throw signInError;
-
       if (data.user) {
-        // Wait a small moment for the DB trigger to finish if they just signed up
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("user_id", data.user.id)
-          .single();
-
+        const { data: profile, error: profileError } = await supabase.from("profiles").select("role").eq("user_id", data.user.id).single();
         if (profileError || !profile) {
-          // Fallback creation if trigger failed
           const signupRole = email.toLowerCase().includes("admin") ? "admin" : "doctor";
-          const { data: newProfile, error: createError } = await supabase
-            .from("profiles")
-            .upsert({
-              user_id: data.user.id,
-              email: data.user.email!,
-              full_name: data.user.user_metadata?.full_name || "New Staff",
-              role: signupRole as "admin" | "doctor"
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error("Critical Profile Error:", createError);
-            throw new Error("Account verified but profile initialization failed. Please contact IT.");
-          }
-          
+          const { data: newProfile, error: createError } = await supabase.from("profiles")
+            .upsert({ user_id: data.user.id, email: data.user.email!, full_name: data.user.user_metadata?.full_name || "New Staff", role: signupRole as "admin" | "doctor" })
+            .select().single();
+          if (createError) throw new Error("Profile initialization failed. Please contact IT.");
           navigate(newProfile.role === "patient" ? "/patient-portal" : "/dashboard");
           return;
         }
-
-        toast.success("Identity Authorized");
-        if (profile.role === "patient") {
-          navigate("/patient-portal");
-        } else {
-          navigate("/dashboard");
-        }
+        toast.success("Welcome back");
+        navigate(profile.role === "patient" ? "/patient-portal" : "/dashboard");
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error("Login error:", err);
-      setError(message || "Authentication failed.");
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIsLoading(false);
     }
@@ -104,149 +63,103 @@ export default function AuthPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-
     const signupRole = email.toLowerCase().includes("admin") ? "admin" : "doctor";
-
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth`,
-          data: {
-            full_name: fullName,
-            role: signupRole,
-          },
-        },
+        email: email.trim(), password,
+        options: { emailRedirectTo: `${window.location.origin}/auth`, data: { full_name: fullName, role: signupRole } },
       });
-
       if (signUpError) throw signUpError;
-
-      if (data.user) {
-        toast.success("Account created successfully. You can now login.");
-        setActiveTab("login");
-      }
+      if (data.user) { toast.success("Account created. You can now login."); setActiveTab("login"); }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error("Signup error:", err);
-      setError(message || "Credential creation failed.");
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 selection:bg-blue-500/30">
-      <Card className="w-full max-w-md bg-slate-900/50 border-white/5 backdrop-blur-2xl shadow-2xl rounded-[32px]">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto h-16 w-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Building2 className="h-8 w-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ background: "linear-gradient(145deg, hsl(222 47% 5%) 0%, hsl(222 47% 11%) 50%, hsl(217 91% 8%) 100%)" }}>
+      
+      {/* Subtle background */}
+      <div className="absolute inset-0 opacity-[0.03]"
+        style={{ backgroundImage: `linear-gradient(hsl(217 91% 50%) 1px, transparent 1px), linear-gradient(90deg, hsl(217 91% 50%) 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full"
+        style={{ background: "radial-gradient(circle, hsl(217 91% 50% / 0.06) 0%, transparent 70%)" }} />
+
+      <Card className="relative z-10 w-full max-w-[420px] bg-white/[0.04] border-white/[0.06] backdrop-blur-2xl shadow-2xl rounded-2xl">
+        <CardHeader className="text-center space-y-4 pb-2">
+          <div className="mx-auto h-14 w-14 rounded-xl flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, hsl(217 91% 50%), hsl(255 60% 58%))", boxShadow: "0 0 40px hsl(217 91% 50% / 0.2)" }}>
+            <Hospital className="h-7 w-7 text-white" />
           </div>
-          <CardTitle className="text-2xl font-black text-white tracking-tight italic">
-            Institutional Portal
-          </CardTitle>
-          <CardDescription className="text-slate-400">
-            Authorized personnel only. Secure biometric access active.
-          </CardDescription>
+          <div>
+            <CardTitle className="text-xl font-bold text-white tracking-tight">Staff Portal</CardTitle>
+            <CardDescription className="text-white/40 text-sm mt-1 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="h-3 w-3" /> Authorized personnel only
+            </CardDescription>
+          </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="pt-4">
           {error && (
-            <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold uppercase tracking-widest">
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/15 rounded-lg text-red-400 text-xs font-medium">
               {error}
             </div>
           )}
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/5 border-white/5 rounded-xl h-12 p-1">
-              <TabsTrigger value="login" className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white">Login</TabsTrigger>
-              <TabsTrigger value="signup" className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white">Request Access</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-5 bg-white/[0.04] border border-white/[0.06] rounded-lg h-10 p-0.5">
+              <TabsTrigger value="login" className="rounded-md text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-white text-white/50">Login</TabsTrigger>
+              <TabsTrigger value="signup" className="rounded-md text-xs font-semibold data-[state=active]:bg-primary data-[state=active]:text-white text-white/50">Request Access</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email" className="text-[10px] font-black uppercase text-slate-500 ml-1">Work Email</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@medicare-hospital.com"
-                    required
-                    className="bg-white/5 border-white/5 h-12 rounded-xl focus:border-blue-500/50 transition-all text-white"
-                  />
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-email" className="text-[11px] font-semibold uppercase text-white/30 tracking-wider">Email</Label>
+                  <Input id="login-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@hospital.com" required
+                    className="bg-white/[0.04] border-white/[0.06] h-11 rounded-lg text-white placeholder:text-white/20 focus:border-primary/50" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password" id="pass-label" className="text-[10px] font-black uppercase text-slate-500 ml-1">Access Key</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="********"
-                    required
-                    className="bg-white/5 border-white/5 h-12 rounded-xl focus:border-blue-500/50 transition-all text-white"
-                  />
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-password" className="text-[11px] font-semibold uppercase text-white/30 tracking-wider">Password</Label>
+                  <Input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required
+                    className="bg-white/[0.04] border-white/[0.06] h-11 rounded-lg text-white placeholder:text-white/20 focus:border-primary/50" />
                 </div>
-
-                <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-500 font-black uppercase tracking-widest text-xs rounded-xl" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Authenticate"}
+                <Button type="submit" className="w-full h-11 font-semibold text-sm rounded-lg" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign In"}
                 </Button>
               </form>
             </TabsContent>
 
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name" className="text-[10px] font-black uppercase text-slate-500 ml-1">Full Name</Label>
-                  <Input
-                    id="signup-name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="John Doe"
-                    required
-                    className="bg-white/5 border-white/5 h-12 rounded-xl text-white"
-                  />
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-name" className="text-[11px] font-semibold uppercase text-white/30 tracking-wider">Full Name</Label>
+                  <Input id="signup-name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="John Doe" required
+                    className="bg-white/[0.04] border-white/[0.06] h-11 rounded-lg text-white placeholder:text-white/20" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-[10px] font-black uppercase text-slate-500 ml-1">Work Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@medicare-hospital.com"
-                    required
-                    className="bg-white/5 border-white/5 h-12 rounded-xl text-white"
-                  />
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-email" className="text-[11px] font-semibold uppercase text-white/30 tracking-wider">Work Email</Label>
+                  <Input id="signup-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@hospital.com" required
+                    className="bg-white/[0.04] border-white/[0.06] h-11 rounded-lg text-white placeholder:text-white/20" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" id="reg-pass-label" className="text-[10px] font-black uppercase text-slate-500 ml-1">Choose Access Key</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 8 characters"
-                    required
-                    minLength={8}
-                    className="bg-white/5 border-white/5 h-12 rounded-xl text-white"
-                  />
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-password" className="text-[11px] font-semibold uppercase text-white/30 tracking-wider">Password</Label>
+                  <Input id="signup-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" required minLength={8}
+                    className="bg-white/[0.04] border-white/[0.06] h-11 rounded-lg text-white placeholder:text-white/20" />
                 </div>
-
-                <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-500 font-black uppercase tracking-widest text-xs rounded-xl" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Create Credentials"}
+                <Button type="submit" className="w-full h-11 font-semibold text-sm rounded-lg" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Create Account"}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
 
-          <div className="mt-8 pt-6 border-t border-white/5">
-            <Button variant="ghost" className="w-full text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest" asChild>
-              <Link to="/">
-                <Heart className="mr-2 h-3 w-3" /> Back to System Core
-              </Link>
+          <div className="mt-6 pt-5 border-t border-white/[0.06]">
+            <Button variant="ghost" className="w-full text-white/30 hover:text-white/60 text-xs font-medium" asChild>
+              <Link to="/"><ArrowLeft className="mr-2 h-3 w-3" /> Back to Home</Link>
             </Button>
           </div>
         </CardContent>
