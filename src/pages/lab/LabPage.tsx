@@ -161,7 +161,7 @@ export default function LabPage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {test.status === 'completed' ? <CheckCircle className="h-3 w-3 text-medical-success" /> : <Clock className="h-3 w-3 text-medical-warning" />}
-                        <span className="text-xs capitalize">{test.status.replace('_', ' ')}</span>
+                        <span className="text-xs capitalize">{(test.status || 'unknown').replace('_', ' ')}</span>
                       </div>
                     </TableCell>
                     <TableCell>

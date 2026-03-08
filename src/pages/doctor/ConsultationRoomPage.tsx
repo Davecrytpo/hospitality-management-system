@@ -335,7 +335,7 @@ export default function ConsultationRoomPage() {
                       
                       <div className="space-y-3">
                         {prescriptions.map((p, index) => (
-                          <div key={index} className="grid grid-cols-12 gap-3 items-end p-4 border rounded-xl bg-muted/30">
+                          <div key={index} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end p-4 border rounded-xl bg-muted/30">
                             <div className="col-span-4 space-y-1.5">
                               <Label className="text-[10px] uppercase">Medicine Name</Label>
                               <Input 
