@@ -155,8 +155,6 @@ export default function PatientsPage() {
             ) : (
               <div className="overflow-x-auto -mx-6 px-6">
               <Table>
-            ) : (
-              <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Patient ID</TableHead>
