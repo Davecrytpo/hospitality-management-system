@@ -95,7 +95,7 @@ export default function MaintenanceHousekeepingPage() {
 
         <Card>
           <CardContent className="pt-4">
-            <Table>
+            <div className="overflow-x-auto -mx-6 px-6"><Table>
               <TableHeader><TableRow><TableHead>Room/Area</TableHead><TableHead>Task</TableHead><TableHead>Assignee</TableHead><TableHead>Scheduled</TableHead><TableHead>Status</TableHead><TableHead>Action</TableHead></TableRow></TableHeader>
               <TableBody>
                 {tasks.map(t => (
