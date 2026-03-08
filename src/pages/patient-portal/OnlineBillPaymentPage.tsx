@@ -143,6 +143,6 @@ export default function OnlineBillPaymentPage() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
