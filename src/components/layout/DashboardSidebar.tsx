@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Calendar, BedDouble, FileText, Pill,
   FlaskConical, Stethoscope, Activity, Building2, CreditCard,
   Settings, HelpCircle, ChevronLeft, ChevronRight, ChevronDown,
-  Hospital, Ambulance, Heart, Megaphone, Headset, X
+  Heart, Ambulance, Megaphone, Headset, X
 } from "lucide-react";
 
 interface SidebarProps {
