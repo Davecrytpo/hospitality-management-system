@@ -72,7 +72,7 @@ export default function VendorPortalPage() {
 
         <Card>
           <CardContent className="pt-4">
-            <Table>
+            <div className="overflow-x-auto -mx-6 px-6"><Table>
               <TableHeader><TableRow><TableHead>Vendor</TableHead><TableHead>Service</TableHead><TableHead>Contact</TableHead><TableHead>Monthly Amount</TableHead><TableHead>Last Payment</TableHead><TableHead>Status</TableHead><TableHead>Action</TableHead></TableRow></TableHeader>
               <TableBody>
                 {mockVendors.map(v => (
