@@ -59,7 +59,7 @@ export default function MortuaryManagementPage() {
 
         <Card>
           <CardContent className="pt-4">
-            <Table>
+            <div className="overflow-x-auto -mx-6 px-6"><Table>
               <TableHeader>
                 <TableRow><TableHead>Case ID</TableHead><TableHead>Name</TableHead><TableHead>Age</TableHead><TableHead>Date of Death</TableHead><TableHead>Cause</TableHead><TableHead>Certified By</TableHead><TableHead>Status</TableHead></TableRow>
               </TableHeader>
