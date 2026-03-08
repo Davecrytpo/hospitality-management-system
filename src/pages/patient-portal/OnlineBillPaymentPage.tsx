@@ -47,11 +47,18 @@ export default function OnlineBillPaymentPage() {
   const unpaidInvoices = mockInvoices.filter(i => !paid.includes(i.id));
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><CreditCard className="h-6 w-6 text-primary" /> Online Bill Payment</h1>
-          <p className="text-muted-foreground">Pay your hospital invoices securely online</p>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="outline" size="icon" asChild>
+            <Link to="/patient-portal">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2"><CreditCard className="h-6 w-6 text-primary" /> Online Bill Payment</h1>
+            <p className="text-muted-foreground">Pay your hospital invoices securely online</p>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
