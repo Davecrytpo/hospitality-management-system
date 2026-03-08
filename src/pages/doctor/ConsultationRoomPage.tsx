@@ -336,7 +336,7 @@ export default function ConsultationRoomPage() {
                       <div className="space-y-3">
                         {prescriptions.map((p, index) => (
                           <div key={index} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end p-4 border rounded-xl bg-muted/30">
-                            <div className="col-span-4 space-y-1.5">
+                            <div className="sm:col-span-4 space-y-1.5">
                               <Label className="text-[10px] uppercase">Medicine Name</Label>
                               <Input 
                                 placeholder="Search medicine..." 
@@ -344,7 +344,7 @@ export default function ConsultationRoomPage() {
                                 onChange={(e) => handlePrescriptionChange(index, "medication_name", e.target.value)}
                               />
                             </div>
-                            <div className="col-span-3 space-y-1.5">
+                            <div className="sm:col-span-3 space-y-1.5">
                               <Label className="text-[10px] uppercase">Dosage</Label>
                               <Input 
                                 placeholder="500mg" 
@@ -352,7 +352,7 @@ export default function ConsultationRoomPage() {
                                 onChange={(e) => handlePrescriptionChange(index, "dosage", e.target.value)}
                               />
                             </div>
-                            <div className="col-span-2 space-y-1.5">
+                            <div className="sm:col-span-2 space-y-1.5">
                               <Label className="text-[10px] uppercase">Freq</Label>
                               <Input 
                                 placeholder="1-0-1" 
@@ -360,7 +360,7 @@ export default function ConsultationRoomPage() {
                                 onChange={(e) => handlePrescriptionChange(index, "frequency", e.target.value)}
                               />
                             </div>
-                            <div className="col-span-2 space-y-1.5">
+                            <div className="sm:col-span-2 space-y-1.5">
                               <Label className="text-[10px] uppercase">Duration</Label>
                               <Input 
                                 placeholder="5 days" 
@@ -368,7 +368,7 @@ export default function ConsultationRoomPage() {
                                 onChange={(e) => handlePrescriptionChange(index, "duration", e.target.value)}
                               />
                             </div>
-                            <div className="col-span-1">
+                            <div className="sm:col-span-1">
                               <Button variant="ghost" size="icon" className="text-destructive" onClick={() => removePrescriptionRow(index)}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
