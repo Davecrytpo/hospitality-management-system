@@ -82,7 +82,7 @@ export default function ConsumablesTrackerPage() {
             )}
           </CardHeader>
           <CardContent>
-            <Table>
+            <div className="overflow-x-auto -mx-6 px-6"><Table>
               <TableHeader>
                 <TableRow><TableHead>Item</TableHead><TableHead>Category</TableHead><TableHead>Stock</TableHead><TableHead>Min. Required</TableHead><TableHead>Status</TableHead></TableRow>
               </TableHeader>
