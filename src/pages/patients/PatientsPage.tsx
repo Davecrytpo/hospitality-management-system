@@ -151,7 +151,10 @@ export default function PatientsPage() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin text-medical-primary" /></div>
+              <div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+            ) : (
+              <div className="overflow-x-auto -mx-6 px-6">
+              <Table>
             ) : (
               <Table>
                 <TableHeader>
