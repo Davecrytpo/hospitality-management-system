@@ -75,7 +75,7 @@ export default function LabEquipmentCalibrationPage() {
 
         <Card>
           <CardContent className="pt-4">
-            <Table>
+            <div className="overflow-x-auto -mx-6 px-6"><Table>
               <TableHeader>
                 <TableRow><TableHead>Equipment</TableHead><TableHead>Last Calibrated</TableHead><TableHead>Next Due</TableHead><TableHead>Technician</TableHead><TableHead>Status</TableHead></TableRow>
               </TableHeader>
@@ -90,7 +90,7 @@ export default function LabEquipmentCalibrationPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       </div>
