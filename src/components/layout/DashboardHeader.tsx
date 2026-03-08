@@ -85,7 +85,7 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
                 </AvatarFallback>
               </Avatar>
               <div className="hidden flex-col items-start lg:flex">
-                <span className="text-sm font-semibold leading-none">{userProfile?.full_name || "Staff"}</span>
+                <span className="text-sm font-semibold leading-none text-foreground">{userProfile?.full_name || "Staff"}</span>
                 <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mt-0.5">
                   {userProfile?.role || "Staff"}
                 </span>
