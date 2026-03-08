@@ -94,7 +94,7 @@ export default function ExpensesPayrollPage() {
         {activeTab === "expenses" && (
           <Card>
             <CardContent className="pt-4">
-              <Table>
+              <div className="overflow-x-auto -mx-6 px-6"><Table>
                 <TableHeader><TableRow><TableHead>Category</TableHead><TableHead>Description</TableHead><TableHead>Amount</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {mockExpenses.map(e => (
