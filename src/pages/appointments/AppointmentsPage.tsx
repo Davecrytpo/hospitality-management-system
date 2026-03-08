@@ -58,7 +58,7 @@ export default function AppointmentsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">All Appointments</h1>
             <p className="text-muted-foreground">Manage patient appointments and schedules</p>
@@ -71,7 +71,7 @@ export default function AppointmentsPage() {
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/appointments/calendar")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
@@ -114,12 +114,12 @@ export default function AppointmentsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Appointment List</CardTitle>
-              <div className="flex items-center gap-2">
-                <div className="relative">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative flex-1 sm:flex-initial">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input 
                     placeholder="Search appointments..." 
-                    className="pl-8 w-64"
+                    className="pl-8 w-full sm:w-64"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -138,6 +138,7 @@ export default function AppointmentsPage() {
             </div>
           </CardHeader>
           <CardContent>
+            <div className="overflow-x-auto -mx-6 px-6">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -212,6 +213,7 @@ export default function AppointmentsPage() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

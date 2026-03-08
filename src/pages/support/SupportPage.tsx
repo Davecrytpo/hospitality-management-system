@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, MessageSquare, Book, Phone, Mail } from "lucide-react";
+import { HelpCircle, MessageSquare, Book, Phone, Mail, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const faqs = [
   { q: "How do I register a new patient?", a: "Navigate to Patients > Register Patient and fill in the required information." },
@@ -15,6 +17,27 @@ const faqs = [
 ];
 
 export default function SupportPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!name || !email || !subject || !message) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    setIsSubmitting(true);
+    // Simulate submission
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast.success("Support ticket submitted!", {
+      description: "We'll get back to you within 24 hours."
+    });
+    setName(""); setEmail(""); setSubject(""); setMessage("");
+    setIsSubmitting(false);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -23,40 +46,40 @@ export default function SupportPage() {
           <p className="text-muted-foreground">Get help with using the hospital management system</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-3">
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <div className="rounded-full bg-medical-primary/10 p-3 mb-4">
-                  <Book className="h-6 w-6 text-medical-primary" />
+                <div className="rounded-full bg-primary/10 p-3 mb-4">
+                  <Book className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold">Documentation</h3>
                 <p className="text-sm text-muted-foreground mt-2">Browse our comprehensive guides</p>
-                <Button variant="outline" className="mt-4">View Docs</Button>
+                <Button variant="outline" className="mt-4" onClick={() => toast.info("Documentation portal opening...")}>View Docs</Button>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <div className="rounded-full bg-medical-secondary/10 p-3 mb-4">
-                  <MessageSquare className="h-6 w-6 text-medical-secondary" />
+                <div className="rounded-full bg-primary/10 p-3 mb-4">
+                  <MessageSquare className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold">Live Chat</h3>
                 <p className="text-sm text-muted-foreground mt-2">Chat with our support team</p>
-                <Button variant="outline" className="mt-4">Start Chat</Button>
+                <Button variant="outline" className="mt-4" onClick={() => toast.info("Live chat connecting...")}>Start Chat</Button>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <div className="rounded-full bg-medical-success/10 p-3 mb-4">
-                  <Phone className="h-6 w-6 text-medical-success" />
+                <div className="rounded-full bg-primary/10 p-3 mb-4">
+                  <Phone className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold">Phone Support</h3>
                 <p className="text-sm text-muted-foreground mt-2">Call us: +1 800-MEDICARE</p>
-                <Button variant="outline" className="mt-4">Call Now</Button>
+                <Button variant="outline" className="mt-4" onClick={() => { window.location.href = "tel:+18006334227"; }}>Call Now</Button>
               </div>
             </CardContent>
           </Card>
@@ -89,25 +112,28 @@ export default function SupportPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Your Name</Label>
-                <Input placeholder="Enter your name" />
+                <Input placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label>Email</Label>
-                <Input type="email" placeholder="your@email.com" />
+                <Input type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Subject</Label>
-              <Input placeholder="Brief description of your issue" />
+              <Input placeholder="Brief description of your issue" value={subject} onChange={(e) => setSubject(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Message</Label>
-              <Textarea placeholder="Describe your issue in detail" className="min-h-[120px]" />
+              <Textarea placeholder="Describe your issue in detail" className="min-h-[120px]" value={message} onChange={(e) => setMessage(e.target.value)} />
             </div>
-            <Button>Submit Ticket</Button>
+            <Button onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {isSubmitting ? "Submitting..." : "Submit Ticket"}
+            </Button>
           </CardContent>
         </Card>
       </div>
