@@ -159,6 +159,7 @@ export default function StaffManagementPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

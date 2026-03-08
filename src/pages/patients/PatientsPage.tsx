@@ -220,6 +220,7 @@ export default function PatientsPage() {
                   )}
                 </TableBody>
               </Table>
+              </div>
             )}
           </CardContent>
         </Card>
