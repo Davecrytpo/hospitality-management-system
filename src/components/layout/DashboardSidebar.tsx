@@ -164,8 +164,7 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
         {/* Logo area */}
         <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl shrink-0"
-              className="bg-sidebar-primary">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl shrink-0 bg-sidebar-primary">
               <Heart className="h-5 w-5 text-white" fill="currentColor" />
             </div>
             {!collapsed && (
