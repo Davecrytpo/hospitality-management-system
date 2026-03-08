@@ -213,6 +213,7 @@ export default function AppointmentsPage() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
