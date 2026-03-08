@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Calendar, BedDouble, FileText, Pill,
   FlaskConical, Stethoscope, Activity, Building2, CreditCard,
   Settings, HelpCircle, ChevronLeft, ChevronRight, ChevronDown,
-  Hospital, Ambulance, Heart, Megaphone, Headset, X
+  Heart, Ambulance, Megaphone, Headset, X
 } from "lucide-react";
 
 interface SidebarProps {
@@ -164,9 +164,8 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
         {/* Logo area */}
         <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl shrink-0"
-              style={{ background: "linear-gradient(135deg, hsl(217 91% 50%), hsl(255 60% 58%))" }}>
-              <Hospital className="h-5 w-5 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl shrink-0 bg-sidebar-primary">
+              <Heart className="h-5 w-5 text-white" fill="currentColor" />
             </div>
             {!collapsed && (
               <div className="overflow-hidden">
