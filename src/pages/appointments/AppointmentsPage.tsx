@@ -71,7 +71,7 @@ export default function AppointmentsPage() {
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/appointments/calendar")}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
