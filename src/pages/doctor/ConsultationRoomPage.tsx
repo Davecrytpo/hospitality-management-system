@@ -188,27 +188,27 @@ export default function ConsultationRoomPage() {
     <DashboardLayout>
       <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
         {/* Header */}
-        <div className="flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" asChild>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
+          <div className="flex items-center gap-4 min-w-0">
+            <Button variant="outline" size="icon" asChild className="shrink-0">
               <Link to="/doctor/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                Active Consultation: {patient?.first_name} {patient?.last_name}
-                <Badge variant="outline" className="ml-2">ID: {patient?.id?.substring(0,8)}</Badge>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold flex flex-wrap items-center gap-2">
+                <span className="truncate">Consultation: {patient?.first_name} {patient?.last_name}</span>
+                <Badge variant="outline" className="shrink-0">ID: {patient?.id?.substring(0,8)}</Badge>
               </h1>
               <p className="text-sm text-muted-foreground">Age: {patient?.age} - Gender: {patient?.gender} - Blood: {patient?.blood_type}</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => toast.info("Emergency Triage initiated")}>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-initial" onClick={() => toast.info("Emergency Triage initiated")}>
               <AlertCircle className="mr-2 h-4 w-4 text-medical-danger" />
-              Emergency Triage
+              <span className="hidden sm:inline">Emergency </span>Triage
             </Button>
-            <Button onClick={handleFinishConsultation} disabled={isSaving}>
+            <Button size="sm" className="flex-1 sm:flex-initial" onClick={handleFinishConsultation} disabled={isSaving}>
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-              Finish Consultation
+              Finish
             </Button>
           </div>
         </div>
