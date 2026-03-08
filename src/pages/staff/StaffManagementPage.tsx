@@ -102,6 +102,7 @@ export default function StaffManagementPage() {
             </div>
           </CardHeader>
           <CardContent>
+            <div className="overflow-x-auto -mx-6 px-6">
             <Table>
               <TableHeader>
                 <TableRow>
