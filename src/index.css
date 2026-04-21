@@ -1,0 +1,309 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* On Time Medical Group — Navy + Teal brand */
+    --background: 200 40% 99%;
+    --foreground: 215 50% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 50% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 50% 12%;
+
+    /* Primary = deep navy from logo */
+    --primary: 215 65% 18%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 188 85% 42%;
+
+    /* Secondary surface */
+    --secondary: 195 35% 95%;
+    --secondary-foreground: 215 50% 14%;
+
+    --muted: 200 25% 95%;
+    --muted-foreground: 215 16% 42%;
+
+    /* Accent = teal from logo clock */
+    --accent: 188 85% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 65% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 30% 90%;
+    --input: 200 30% 90%;
+    --ring: 188 85% 42%;
+
+    --radius: 0.875rem;
+
+    /* Medical Design System — On Time Medical */
+    --medical-primary: 215 65% 18%;       /* navy */
+    --medical-secondary: 188 85% 42%;     /* teal */
+    --medical-accent: 188 75% 52%;        /* bright cyan */
+    --medical-deep: 215 70% 12%;          /* darker navy for depth */
+    --medical-success: 158 64% 40%;
+    --medical-warning: 36 95% 52%;
+    --medical-danger: 0 70% 50%;
+    --medical-info: 200 95% 45%;
+    --medical-surface: 200 40% 97%;
+    --medical-glow: 188 90% 48%;
+    --medical-soft: 195 50% 92%;
+
+    /* Premium gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(215 70% 12%) 0%, hsl(215 65% 18%) 45%, hsl(188 85% 35%) 100%);
+    --gradient-brand: linear-gradient(135deg, hsl(215 65% 18%) 0%, hsl(188 85% 42%) 100%);
+    --gradient-glow: radial-gradient(circle at top, hsl(188 90% 48% / 0.35), transparent 60%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(200 40% 98%) 100%);
+
+    /* Premium shadows */
+    --shadow-elevated: 0 30px 80px -25px hsl(215 65% 18% / 0.25);
+    --shadow-glow: 0 0 60px -10px hsl(188 90% 48% / 0.45);
+    --shadow-card: 0 10px 30px -12px hsl(215 50% 12% / 0.08);
+
+    /* Sidebar — deep navy */
+    --sidebar-background: 215 70% 11%;
+    --sidebar-foreground: 200 30% 92%;
+    --sidebar-primary: 188 85% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 55% 16%;
+    --sidebar-accent-foreground: 200 30% 95%;
+    --sidebar-border: 215 50% 20%;
+    --sidebar-ring: 188 85% 48%;
+    --sidebar-muted: 215 55% 16%;
+  }
+
+  .dark {
+    --background: 215 75% 7%;
+    --foreground: 200 30% 94%;
+
+    --card: 215 65% 11%;
+    --card-foreground: 200 30% 94%;
+
+    --popover: 215 65% 11%;
+    --popover-foreground: 200 30% 94%;
+
+    --primary: 188 85% 48%;
+    --primary-foreground: 215 75% 7%;
+    --primary-glow: 188 90% 60%;
+
+    --secondary: 215 50% 16%;
+    --secondary-foreground: 200 30% 94%;
+
+    --muted: 215 50% 14%;
+    --muted-foreground: 200 18% 68%;
+
+    --accent: 188 85% 48%;
+    --accent-foreground: 215 75% 7%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 45% 18%;
+    --input: 215 45% 18%;
+    --ring: 188 85% 48%;
+
+    --medical-primary: 188 85% 48%;
+    --medical-secondary: 188 75% 55%;
+    --medical-accent: 200 90% 60%;
+    --medical-deep: 215 80% 5%;
+    --medical-success: 158 60% 50%;
+    --medical-warning: 36 92% 60%;
+    --medical-danger: 0 68% 60%;
+    --medical-info: 200 90% 60%;
+    --medical-surface: 215 65% 11%;
+    --medical-glow: 188 90% 56%;
+    --medical-soft: 215 55% 14%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(215 80% 5%) 0%, hsl(215 70% 10%) 45%, hsl(188 75% 25%) 100%);
+    --gradient-brand: linear-gradient(135deg, hsl(215 65% 18%) 0%, hsl(188 85% 48%) 100%);
+    --gradient-glow: radial-gradient(circle at top, hsl(188 90% 56% / 0.35), transparent 60%);
+    --gradient-card: linear-gradient(180deg, hsl(215 65% 11%) 0%, hsl(215 60% 9%) 100%);
+
+    --shadow-elevated: 0 30px 80px -25px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 60px -10px hsl(188 90% 56% / 0.55);
+    --shadow-card: 0 10px 30px -12px hsl(0 0% 0% / 0.4);
+
+    --sidebar-background: 215 80% 5%;
+    --sidebar-foreground: 200 25% 80%;
+    --sidebar-primary: 188 85% 52%;
+    --sidebar-primary-foreground: 215 80% 5%;
+    --sidebar-accent: 215 60% 12%;
+    --sidebar-accent-foreground: 200 30% 92%;
+    --sidebar-border: 215 50% 14%;
+    --sidebar-ring: 188 85% 52%;
+    --sidebar-muted: 215 60% 12%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.15);
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.3);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border border-border/50;
+  }
+
+  .glass-dark {
+    background: hsl(var(--sidebar-background) / 0.82);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  .gradient-text {
+    @apply text-transparent bg-clip-text;
+    background-image: var(--gradient-brand);
+  }
+
+  .gradient-text-glow {
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(135deg, hsl(var(--primary-glow)) 0%, hsl(var(--accent)) 100%);
+  }
+
+  .bg-gradient-hero { background-image: var(--gradient-hero); }
+  .bg-gradient-brand { background-image: var(--gradient-brand); }
+  .bg-gradient-card { background-image: var(--gradient-card); }
+
+  .card-hover {
+    @apply transition-all duration-500 hover:-translate-y-1;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card-hover:hover {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .glow-primary { box-shadow: var(--shadow-glow); }
+  .glow-sm { box-shadow: 0 0 24px -6px hsl(var(--medical-glow) / 0.32); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+
+  .medical-grid {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.45) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.45) 1px, transparent 1px);
+    background-size: 36px 36px;
+    background-position: center;
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  }
+
+  .noise-texture {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  }
+
+  .scanline {
+    position: relative;
+    overflow: hidden;
+  }
+  .scanline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      hsl(var(--medical-glow) / 0.22) 50%,
+      transparent 100%
+    );
+    animation: scanline 4.5s linear infinite;
+    pointer-events: none;
+  }
+
+  .ambient-orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(80px);
+    background: radial-gradient(circle, hsl(var(--accent) / 0.4) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--accent) / 0.18) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .pulse-ring {
+    position: relative;
+  }
+  .pulse-ring::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    border: 2px solid hsl(var(--accent));
+    animation: pulse-ring 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: reveal-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+@keyframes reveal-up {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}

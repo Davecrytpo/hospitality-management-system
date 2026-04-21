@@ -1,0 +1,13 @@
+project_id = "juykldyhclfvltesyuhq"
+
+[functions.send-patient-invitation]
+verify_jwt = false
+
+[functions.verify-patient-invitation]
+verify_jwt = false
+
+[functions.complete-patient-registration]
+verify_jwt = false
+
+[functions.patient-2fa]
+verify_jwt = false
