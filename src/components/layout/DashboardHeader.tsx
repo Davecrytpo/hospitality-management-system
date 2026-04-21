@@ -10,6 +10,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -49,12 +50,13 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
         <Button variant="ghost" size="icon" onClick={onMenuToggle} className="lg:hidden h-9 w-9">
           <Menu className="h-5 w-5" />
         </Button>
-        <div className="hidden md:block">
+        <div className="hidden sm:block">
           <GlobalSearch />
         </div>
       </div>
 
       <div className="flex items-center gap-2">
+        <NotificationCenter audience="staff" compact />
         {userProfile?.role === 'admin' && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

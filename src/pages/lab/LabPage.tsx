@@ -160,7 +160,7 @@ export default function LabPage() {
                 <Button variant="outline" size="icon" onClick={handleRefresh} aria-label="Refresh lab orders">
                   <RotateCw className="h-4 w-4" />
                 </Button>
-                <div className="relative w-64">
+                <div className="relative w-full sm:w-64">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search orders..."
@@ -240,3 +240,4 @@ export default function LabPage() {
     </DashboardLayout>
   );
 }
+

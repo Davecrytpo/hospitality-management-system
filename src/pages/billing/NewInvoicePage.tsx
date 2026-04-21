@@ -94,7 +94,7 @@ export default function NewInvoicePage() {
               </Table>
 
               <div className="mt-4 flex justify-end">
-                <div className="w-64 space-y-2">
+                <div className="w-full sm:w-64 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>$0.00</span>
@@ -126,3 +126,4 @@ export default function NewInvoicePage() {
     </DashboardLayout>
   );
 }
+

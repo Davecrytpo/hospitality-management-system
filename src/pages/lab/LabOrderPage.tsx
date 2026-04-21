@@ -187,7 +187,7 @@ export default function LabOrderPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Select Tests</CardTitle>
-                  <div className="relative w-64">
+                  <div className="relative w-full sm:w-64">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search tests..." className="pl-8" />
                   </div>
@@ -241,3 +241,4 @@ export default function LabOrderPage() {
     </DashboardLayout>
   );
 }
+

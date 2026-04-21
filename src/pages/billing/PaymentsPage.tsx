@@ -265,7 +265,7 @@ export default function PaymentsPage() {
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search payments..." className="pl-8 w-64" />
+                  <Input placeholder="Search payments..." className="pl-8 w-full sm:w-64" />
                 </div>
                 <Button variant="outline" size="icon">
                   <Filter className="h-4 w-4" />
@@ -324,3 +324,4 @@ export default function PaymentsPage() {
     </DashboardLayout>
   );
 }
+

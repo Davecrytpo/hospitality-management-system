@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PublicSiteFooter } from "@/components/landing/PublicSiteFooter";
 import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
+import { NotificationBanner } from "@/components/notifications/NotificationBanner";
 import {
   hospitalStats,
   landingFaqs,
@@ -34,10 +35,20 @@ export default function PublicLandingPage() {
       <PublicSiteHeader />
 
       <main>
+        <section className="container mx-auto px-4 pt-4 sm:px-6">
+          <NotificationBanner audience="public" />
+        </section>
+
         <section className="relative overflow-hidden border-b border-border">
-          <img src={publicHeroImage} alt="On Time Medical flagship medical campus entrance" className="absolute inset-0 h-full w-full object-cover" loading="eager" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/88 to-background/55" />
+          <img
+            src={publicHeroImage}
+            alt="On Time Medical flagship medical campus entrance"
+            className="absolute inset-0 h-full w-full scale-[1.03] object-cover object-center saturate-110"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/88 to-background/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+          <div className="noise-texture absolute inset-0 opacity-[0.04]" />
           <div className="ambient-orb -left-12 top-20 h-80 w-80" />
           <div className="ambient-orb right-0 top-24 h-[30rem] w-[30rem] opacity-60" />
 
@@ -316,7 +327,7 @@ export default function PublicLandingPage() {
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     Verified patient feedback
                   </div>
-                  <p className="mt-5 font-display text-xl leading-relaxed text-foreground">“{testimonial.quote}”</p>
+                  <p className="mt-5 font-display text-xl leading-relaxed text-foreground">"{testimonial.quote}"</p>
                   <div className="mt-6">
                     <p className="font-display text-lg font-semibold">{testimonial.name}</p>
                     <p className="text-sm text-muted-foreground">{testimonial.role}</p>
@@ -348,7 +359,7 @@ export default function PublicLandingPage() {
             <div className="space-y-3">
               {landingFaqs.map((faq, index) => (
                 <div key={faq.question} className="overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-card">
-                  <button
+                  <button type="button"
                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
                     className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left"
                   >

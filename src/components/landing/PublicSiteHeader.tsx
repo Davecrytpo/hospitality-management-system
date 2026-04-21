@@ -5,6 +5,7 @@ import { Menu, X, ChevronRight, Mail, Phone, MapPin } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/button";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -143,6 +144,7 @@ export function PublicSiteHeader() {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
+          <NotificationCenter audience="public" compact />
           <ThemeToggle />
           <Button variant="outline" size="sm" className="rounded-full" asChild>
             <Link to="/patient-portal/login">Patient Portal</Link>
@@ -153,6 +155,7 @@ export function PublicSiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 xl:hidden">
+          <NotificationCenter audience="public" compact />
           <ThemeToggle />
           <Button variant="outline" size="icon" className="rounded-full" onClick={() => setMobileOpen((open) => !open)}>
             {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}

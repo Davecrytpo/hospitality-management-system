@@ -129,7 +129,7 @@ export default function ViewInvoicePage() {
 
             {/* Summary */}
             <div className="flex justify-end">
-              <div className="w-64 space-y-3">
+              <div className="w-full sm:w-64 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>${invoiceData.subtotal.toFixed(2)}</span>
@@ -161,3 +161,4 @@ export default function ViewInvoicePage() {
     </DashboardLayout>
   );
 }
+

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
+import { NotificationBanner } from "@/components/notifications/NotificationBanner";
 import { cn } from "@/lib/utils";
 import { useLocation } from "react-router-dom";
 
@@ -46,6 +47,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         
         <main className="flex-1 p-4 md:p-6 w-full max-w-full overflow-x-hidden">
           <div className="mx-auto w-full max-w-[1600px]">
+            <NotificationBanner audience="staff" />
+            <div className="h-4" />
             {children}
           </div>
         </main>

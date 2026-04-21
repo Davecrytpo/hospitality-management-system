@@ -165,14 +165,14 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
         <Input
           ref={inputRef}
           placeholder="Search patients, doctors, records..."
-          className="w-64 pl-9 pr-8 lg:w-80"
+          className="w-[min(60vw,18rem)] pl-9 pr-8 lg:w-80"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.length >= 1 && setIsOpen(true)}
         />
         {query && (
-          <button
+          <button type="button"
             onClick={clearSearch}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
@@ -182,7 +182,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
       </div>
 
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 z-50 mt-1 w-full min-w-[320px] rounded-lg border bg-popover shadow-lg">
+        <div className="absolute top-full left-0 z-50 mt-1 w-full min-w-[280px] rounded-lg border bg-popover shadow-lg sm:min-w-[320px]">
           <div className="p-2">
             <p className="px-2 py-1 text-xs font-medium text-muted-foreground">
               {suggestions.length} result{suggestions.length !== 1 ? "s" : ""} found
@@ -190,7 +190,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
             {suggestions.map((item, index) => {
               const Icon = item.icon;
               return (
-                <button
+                <button type="button"
                   key={item.path}
                   onClick={() => handleSelect(item)}
                   className={cn(
@@ -213,7 +213,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
       )}
 
       {isOpen && query.length >= 1 && suggestions.length === 0 && (
-        <div className="absolute top-full left-0 z-50 mt-1 w-full min-w-[320px] rounded-lg border bg-popover p-4 shadow-lg">
+        <div className="absolute top-full left-0 z-50 mt-1 w-full min-w-[280px] rounded-lg border bg-popover p-4 shadow-lg sm:min-w-[320px]">
           <p className="text-center text-sm text-muted-foreground">No results found for "{query}"</p>
         </div>
       )}

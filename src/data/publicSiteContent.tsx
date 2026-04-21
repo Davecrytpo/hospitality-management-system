@@ -522,7 +522,7 @@ export const publicSpecialties: PublicCatalogItem[] = [
     icon: Microscope,
     image: diagnosticImagingImg,
     metrics: [
-      { value: "MRI • CT • US", label: "Imaging coverage" },
+      { value: "MRI / CT / US", label: "Imaging coverage" },
       { value: "Same-day", label: "Urgent report visibility" },
       { value: "Integrated", label: "Clinical follow-through" },
     ],
