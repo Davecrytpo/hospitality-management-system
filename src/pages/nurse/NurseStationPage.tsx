@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BedDouble, User, Activity } from "lucide-react";
+import { BedDouble, RotateCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { DataStatePanel } from "@/components/ui/data-state-panel";
+import { getErrorMessage, runActionWithFeedback } from "@/lib/action-feedback";
 
 type BedStatus = "available" | "occupied" | "maintenance";
 
@@ -22,22 +23,34 @@ type BedRow = {
 };
 
 export default function NurseStationPage() {
-  const { toast } = useToast();
   const [beds, setBeds] = useState<BedRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchBeds = async () => {
+  const fetchBeds = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
       const { data, error } = await supabase
         .from("ward_beds")
         .select("*, patients(first_name, last_name, blood_type)")
-        .order("ward_name").order("bed_number");
-      if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+        .order("ward_name")
+        .order("bed_number");
+      if (error) {
+        throw error;
+      }
       setBeds((data as BedRow[]) || []);
+    } catch (error: unknown) {
+      console.error(error);
+      setErrorMessage(getErrorMessage(error, "Failed to load ward bed status"));
+    } finally {
       setLoading(false);
-    };
+    }
+  }, []);
+
+  useEffect(() => {
     fetchBeds();
-  }, [toast]);
+  }, [fetchBeds]);
 
   const wards = [...new Set(beds.map(b => b.ward_name))];
   const statusColor: Record<BedStatus, string> = {
@@ -46,12 +59,30 @@ export default function NurseStationPage() {
     maintenance: "bg-yellow-100 border-yellow-300",
   };
 
+  const handleRefresh = async () => {
+    try {
+      await runActionWithFeedback({
+        actionLabel: "Refreshing ward beds...",
+        run: fetchBeds,
+        successMessage: "Ward status refreshed",
+        errorMessage: "Failed to refresh ward status",
+      });
+    } catch {
+      // feedback already handled by helper
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><BedDouble className="h-6 w-6 text-primary" /> Nurse Station Overview</h1>
-          <p className="text-muted-foreground">Bird's eye view of all ward beds</p>
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2"><BedDouble className="h-6 w-6 text-primary" /> Nurse Station Overview</h1>
+            <p className="text-muted-foreground">Bird's eye view of all ward beds</p>
+          </div>
+          <Button variant="outline" size="icon" onClick={handleRefresh} aria-label="Refresh ward beds">
+            <RotateCw className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -68,11 +99,25 @@ export default function NurseStationPage() {
         </div>
 
         {loading ? (
-          <p className="text-center text-muted-foreground">Loading ward data...</p>
+          <DataStatePanel
+            state="loading"
+            title="Loading ward status"
+            description="Please wait while bed occupancy data is fetched."
+          />
+        ) : errorMessage ? (
+          <DataStatePanel
+            state="error"
+            title="Could not load ward status"
+            description={errorMessage}
+            actionLabel="Try again"
+            onAction={handleRefresh}
+          />
         ) : wards.length === 0 ? (
-          <Card><CardContent className="py-12 text-center text-muted-foreground">
-            No ward beds configured. Add beds via the Admissions module.
-          </CardContent></Card>
+          <DataStatePanel
+            state="empty"
+            title="No ward beds configured"
+            description="Add beds from the Admissions module to start monitoring occupancy."
+          />
         ) : wards.map(ward => (
           <Card key={ward}>
             <CardHeader><CardTitle>{ward}</CardTitle></CardHeader>

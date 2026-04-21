@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Users, ClipboardList, Clock, Activity, ChevronRight, Stethoscope } from "lucide-react";
+import { Calendar, Users, ClipboardList, Clock, Activity, ChevronRight, Stethoscope, RotateCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { DataStatePanel } from "@/components/ui/data-state-panel";
+import { getErrorMessage, runActionWithFeedback } from "@/lib/action-feedback";
 
 type AppointmentRow = {
   id: string;
@@ -21,29 +22,34 @@ type AppointmentRow = {
 };
 
 export default function DoctorDashboardPage() {
-  const { toast } = useToast();
   const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*, patients(first_name, last_name)")
+        .eq("appointment_date", new Date().toISOString().split("T")[0])
+        .order("appointment_time");
+      if (error) {
+        throw error;
+      }
+      setAppointments(data || []);
+    } catch (err: unknown) {
+      console.error(err);
+      setErrorMessage(getErrorMessage(err, "Failed to load appointments"));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("appointments")
-          .select("*, patients(first_name, last_name)")
-          .eq("appointment_date", new Date().toISOString().split("T")[0])
-          .order("appointment_time");
-        if (error) throw error;
-        setAppointments(data || []);
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        toast({ title: "Error", description: message, variant: "destructive" });
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
-  }, [toast]);
+  }, [fetchData]);
 
   const stats = [
     { label: "Today's Appointments", value: appointments.length, icon: Calendar, color: "text-blue-600" },
@@ -54,6 +60,19 @@ export default function DoctorDashboardPage() {
 
   const nextPatientId = appointments.find((appointment) => appointment.patient_id)?.patient_id;
 
+  const handleRefresh = async () => {
+    try {
+      await runActionWithFeedback({
+        actionLabel: "Refreshing appointments...",
+        run: fetchData,
+        successMessage: "Appointments refreshed",
+        errorMessage: "Failed to refresh appointments",
+      });
+    } catch {
+      // feedback already handled by helper
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -62,9 +81,14 @@ export default function DoctorDashboardPage() {
             <h1 className="text-2xl font-bold flex items-center gap-2"><Stethoscope className="h-6 w-6 text-primary" /> Doctor Dashboard</h1>
             <p className="text-muted-foreground">Your clinical workspace for today</p>
           </div>
-          <Button asChild>
-            <Link to={nextPatientId ? `/doctor/consultation/${nextPatientId}` : "/doctor/patients"}>Start Consultation</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={handleRefresh} aria-label="Refresh appointments">
+              <RotateCw className="h-4 w-4" />
+            </Button>
+            <Button asChild>
+              <Link to={nextPatientId ? `/doctor/consultation/${nextPatientId}` : "/doctor/patients"}>Start Consultation</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
@@ -85,9 +109,25 @@ export default function DoctorDashboardPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-muted-foreground text-center py-8">Loading...</p>
+              <DataStatePanel
+                state="loading"
+                title="Loading today's appointments"
+                description="Please wait while your schedule is fetched."
+              />
+            ) : errorMessage ? (
+              <DataStatePanel
+                state="error"
+                title="Could not load appointments"
+                description={errorMessage}
+                actionLabel="Try again"
+                onAction={handleRefresh}
+              />
             ) : appointments.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No appointments scheduled for today.</p>
+              <DataStatePanel
+                state="empty"
+                title="No appointments scheduled"
+                description="You are clear for now. New appointments for today will appear here."
+              />
             ) : (
               <div className="space-y-3">
                 {appointments.map((apt) => (

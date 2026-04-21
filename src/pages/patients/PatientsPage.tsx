@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users, UserPlus, Search, Filter, MoreHorizontal, Eye, Edit, Trash2, Loader2 } from "lucide-react";
+import { Users, UserPlus, Search, MoreHorizontal, Eye, Edit, Trash2, RotateCw } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
@@ -15,6 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DataStatePanel } from "@/components/ui/data-state-panel";
+import { getErrorMessage, runActionWithFeedback } from "@/lib/action-feedback";
 
 type PatientRow = {
   id: string;
@@ -31,10 +32,12 @@ export default function PatientsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [patients, setPatients] = useState<PatientRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [stats, setStats] = useState({ total: 0, active: 0, critical: 0 });
 
   const fetchPatients = useCallback(async () => {
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       const { data, error } = await supabase
         .from("patients")
@@ -49,9 +52,8 @@ export default function PatientsPage() {
       const active = data?.filter(p => !p.registration_completed).length || 0; // Simplified logic
       setStats({ total, active, critical: 0 });
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      toast.error("Failed to load patients");
-      console.error(message);
+      console.error(err);
+      setErrorMessage(getErrorMessage(err, "Failed to load patients"));
     } finally {
       setIsLoading(false);
     }
@@ -79,12 +81,35 @@ export default function PatientsPage() {
 
   const handleDelete = async (patientId: string, name: string) => {
     if (confirm(`Are you sure you want to delete ${name}?`)) {
-      const { error } = await supabase.from("patients").delete().eq("id", patientId);
-      if (error) toast.error("Delete failed");
-      else {
-        toast.success("Patient deleted");
-        fetchPatients();
+      try {
+        await runActionWithFeedback({
+          actionLabel: "Deleting patient...",
+          run: async () => {
+            const { error } = await supabase.from("patients").delete().eq("id", patientId);
+            if (error) {
+              throw error;
+            }
+            await fetchPatients();
+          },
+          successMessage: "Patient deleted successfully",
+          errorMessage: "Delete failed",
+        });
+      } catch {
+        // feedback already handled by helper
       }
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      await runActionWithFeedback({
+        actionLabel: "Refreshing patients...",
+        run: fetchPatients,
+        successMessage: "Patients refreshed",
+        errorMessage: "Failed to refresh patients",
+      });
+    } catch {
+      // feedback already handled by helper
     }
   };
 
@@ -137,6 +162,9 @@ export default function PatientsPage() {
             <div className="flex items-center justify-between">
               <CardTitle>Patient Records</CardTitle>
               <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Button variant="outline" size="icon" onClick={handleRefresh} aria-label="Refresh patients">
+                  <RotateCw className="h-4 w-4" />
+                </Button>
                 <div className="relative flex-1 sm:flex-initial">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input 
@@ -151,7 +179,27 @@ export default function PatientsPage() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              <DataStatePanel
+                state="loading"
+                title="Loading patients"
+                description="Please wait while patient records are fetched."
+              />
+            ) : errorMessage ? (
+              <DataStatePanel
+                state="error"
+                title="Could not load patient records"
+                description={errorMessage}
+                actionLabel="Try again"
+                onAction={handleRefresh}
+              />
+            ) : filteredPatients.length === 0 ? (
+              <DataStatePanel
+                state="empty"
+                title="No matching patients"
+                description={searchQuery ? "Try a different name, ID, or phone number." : "Register a patient to start managing records here."}
+                actionLabel={searchQuery ? "Clear search" : undefined}
+                onAction={searchQuery ? () => setSearchQuery("") : undefined}
+              />
             ) : (
               <div className="overflow-x-auto -mx-6 px-6">
               <Table>
@@ -209,13 +257,6 @@ export default function PatientsPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {filteredPatients.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        No patients found
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
               </div>

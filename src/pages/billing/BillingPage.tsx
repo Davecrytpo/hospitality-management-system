@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CreditCard, Plus, Search, Filter, Eye, Printer, DollarSign, Loader2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Plus, Search, Eye, Printer, DollarSign, RotateCw } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { DataStatePanel } from "@/components/ui/data-state-panel";
+import { getErrorMessage, runActionWithFeedback } from "@/lib/action-feedback";
 
 type InvoiceRow = {
   id: string;
@@ -24,14 +26,15 @@ type InvoiceRow = {
 };
 
 export default function BillingPage() {
-  const navigate = useNavigate();
   const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [stats, setStats] = useState({ total: 0, pending: 0, overdue: 0 });
 
   const fetchInvoices = useCallback(async () => {
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       const { data, error } = await supabase
         .from("invoices")
@@ -48,9 +51,8 @@ export default function BillingPage() {
       
       setStats({ total, pending, overdue: 0 });
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error(message);
-      toast.error("Failed to load invoices");
+      console.error(err);
+      setErrorMessage(getErrorMessage(err, "Failed to load invoices"));
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +68,19 @@ export default function BillingPage() {
     const query = searchQuery.toLowerCase();
     return invoiceNumber.includes(query) || patientName.includes(query);
   });
+
+  const handleRefresh = async () => {
+    try {
+      await runActionWithFeedback({
+        actionLabel: "Refreshing invoices...",
+        run: fetchInvoices,
+        successMessage: "Invoices refreshed",
+        errorMessage: "Failed to refresh invoices",
+      });
+    } catch {
+      // feedback already handled by helper
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -116,6 +131,9 @@ export default function BillingPage() {
             <div className="flex items-center justify-between">
               <CardTitle>Invoice List</CardTitle>
               <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon" onClick={handleRefresh} aria-label="Refresh invoices">
+                  <RotateCw className="h-4 w-4" />
+                </Button>
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input 
@@ -130,7 +148,27 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin text-medical-primary" /></div>
+              <DataStatePanel
+                state="loading"
+                title="Loading invoices"
+                description="Please wait while billing records are fetched."
+              />
+            ) : errorMessage ? (
+              <DataStatePanel
+                state="error"
+                title="Could not load invoices"
+                description={errorMessage}
+                actionLabel="Try again"
+                onAction={handleRefresh}
+              />
+            ) : filteredInvoices.length === 0 ? (
+              <DataStatePanel
+                state="empty"
+                title="No invoices found"
+                description={searchQuery ? "Try a different invoice number or patient name." : "Create a new invoice to populate billing records."}
+                actionLabel={searchQuery ? "Clear search" : undefined}
+                onAction={searchQuery ? () => setSearchQuery("") : undefined}
+              />
             ) : (
               <Table>
                 <TableHeader>
@@ -165,18 +203,11 @@ export default function BillingPage() {
                           <Button variant="ghost" size="icon" asChild>
                             <Link to={`/billing/${invoice.id}`}><Eye className="h-4 w-4" /></Link>
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => window.print()}><Printer className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => { toast.info("Preparing print view"); window.print(); }}><Printer className="h-4 w-4" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
-                  {filteredInvoices.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-10 text-muted-foreground italic">
-                        No invoices found
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
             )}
