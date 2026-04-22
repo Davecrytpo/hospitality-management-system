@@ -315,30 +315,67 @@ export default function PublicLandingPage() {
 
         <section className="py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6">
-            <div className="mb-10 max-w-2xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Why this feels stronger</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                This homepage behaves like the front door of a serious care network.
-              </h2>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {publicOverviewCards.map((card, index) => (
-                <motion.article
-                  key={card.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="rounded-[1.75rem] border border-border bg-card p-6 shadow-card"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
-                    <card.icon className="h-5 w-5" />
+            <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -24 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.55 }}
+                className="relative"
+              >
+                <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-elevated">
+                  <img
+                    src={overviewCommandImg}
+                    alt="On Time Medical clinical command center with live patient flow dashboards"
+                    className="h-[22rem] w-full object-cover sm:h-[28rem]"
+                    loading="lazy"
+                    width={1920}
+                    height={1080}
+                  />
+                </div>
+                <div className="absolute -bottom-5 -right-3 hidden rounded-2xl border border-brand-red/30 bg-card px-4 py-3 shadow-elevated sm:flex sm:items-center sm:gap-3">
+                  <span className="relative flex h-3 w-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
+                    <span className="relative inline-flex h-3 w-3 rounded-full bg-brand-red" />
+                  </span>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-red">Live coordination</p>
+                    <p className="text-sm font-semibold text-foreground">Emergency · ICU · Wards</p>
                   </div>
-                  <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">{card.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{card.description}</p>
-                </motion.article>
-              ))}
+                </div>
+              </motion.div>
+
+              <div className="max-w-2xl">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Why this homepage feels different
+                </p>
+                <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                  Built like the digital front door of a serious care network.
+                </h2>
+                <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+                  Every section connects to a real destination — services, specialties, urgent access, and patient utilities — through a sharper, modern interface that performs beautifully on desktop and mobile.
+                </p>
+
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                  {publicOverviewCards.map((card, index) => (
+                    <motion.article
+                      key={card.title}
+                      initial={{ opacity: 0, y: 18 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-60px" }}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                      className="rounded-[1.5rem] border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/35"
+                    >
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary text-accent">
+                        <card.icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="mt-4 font-display text-lg font-semibold tracking-tight">{card.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{card.description}</p>
+                    </motion.article>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
