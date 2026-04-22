@@ -59,8 +59,11 @@ export default function PublicLandingPage() {
                   transition={{ duration: 0.45 }}
                   className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-card/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-accent shadow-card backdrop-blur-md"
                 >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Hospital-grade access with a premium first impression
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" />
+                  </span>
+                  A modern front door for serious healthcare
                 </motion.div>
 
                 <motion.h1
@@ -69,7 +72,7 @@ export default function PublicLandingPage() {
                   transition={{ duration: 0.55, delay: 0.05 }}
                   className="max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-5xl xl:text-7xl"
                 >
-                  A hospital experience people trust from the first screen.
+                  A hospital experience people <span className="gradient-text">trust</span> from the very first screen.
                 </motion.h1>
 
                 <motion.p
@@ -78,7 +81,7 @@ export default function PublicLandingPage() {
                   transition={{ duration: 0.55, delay: 0.1 }}
                   className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:text-[1.18rem]"
                 >
-                  Present services, specialties, urgent access, and patient tools through a sharper front door that feels modern, immediate, and deeply professional on both desktop and mobile.
+                  Discover services, specialties, urgent access, and patient tools through a sharper digital entrance — modern, immediate, and deeply professional on every device.
                 </motion.p>
 
                 <motion.div
@@ -93,8 +96,11 @@ export default function PublicLandingPage() {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" className="rounded-full px-7" asChild>
-                    <Link to="/specialties">Explore specialties</Link>
+                  <Button size="lg" variant="outline" className="rounded-full px-7 border-brand-red/40 text-brand-red hover:bg-brand-red hover:text-white" asChild>
+                    <a href="tel:+1800668463">
+                      <Siren className="mr-2 h-4 w-4" />
+                      24/7 Emergency
+                    </a>
                   </Button>
                 </motion.div>
 
@@ -108,7 +114,7 @@ export default function PublicLandingPage() {
                     "24/7 urgent care routing",
                     "Premium patient-facing flows",
                     "Mobile-first patient access",
-                    "Real services, not dead ends",
+                    "Real services, real next steps",
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-2 rounded-2xl border border-border/80 bg-card/80 px-4 py-3 text-sm text-foreground shadow-card backdrop-blur-md">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
@@ -138,26 +144,28 @@ export default function PublicLandingPage() {
                 initial={{ opacity: 0, y: 22 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.65, delay: 0.12 }}
-                className="relative min-h-[32rem]"
+                className="relative min-h-[34rem]"
               >
                 <motion.div
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute right-0 top-0 w-full max-w-[42rem] rounded-[2.2rem] border border-slate-200/70 bg-white/75 p-3 shadow-[0_40px_90px_-30px_rgba(15,23,42,0.28)] backdrop-blur-xl"
+                  className="relative w-full rounded-[2.2rem] border border-border/70 bg-card/75 p-3 shadow-elevated backdrop-blur-xl"
                 >
                   <div className="relative overflow-hidden rounded-[1.8rem]">
                     <img
-                      src={heroHospitalLobbyReal}
-                      alt="Real hospital reception and waiting area"
-                      className="h-[24rem] w-full object-cover sm:h-[30rem]"
+                      src={heroAtriumPremium}
+                      alt="On Time Medical hospital atrium with marble floors, navy walls and warm sunset light"
+                      className="h-[26rem] w-full object-cover sm:h-[34rem]"
                       loading="eager"
+                      width={1920}
+                      height={1080}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-slate-950/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/10 to-transparent" />
                     <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-3 sm:left-6 sm:right-6">
                       <div className="inline-flex items-center gap-2 rounded-full bg-slate-950/70 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur-md">
                         <span className="relative flex h-2.5 w-2.5">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
+                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-red" />
                         </span>
                         Live hospital access
                       </div>
@@ -173,79 +181,36 @@ export default function PublicLandingPage() {
                 </motion.div>
 
                 <motion.div
-                  initial={{ opacity: 0, x: -18, y: 12 }}
-                  animate={{ opacity: 1, x: 0, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.35 }}
-                  className="absolute -bottom-2 left-0 z-10 w-[72%] max-w-[19rem] rounded-[1.8rem] border border-border bg-card/92 p-3 shadow-elevated backdrop-blur-xl sm:-bottom-4 sm:left-6"
-                >
-                  <div className="overflow-hidden rounded-[1.35rem]">
-                    <img
-                      src={heroHospitalExteriorReal}
-                      alt="Real hospital exterior with modern glass facade and entrance"
-                      className="h-44 w-full object-cover"
-                      loading="eager"
-                    />
-                  </div>
-                  <div className="space-y-3 p-4">
-                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-                      <Shield className="h-3.5 w-3.5" />
-                      Premium reception experience
-                    </div>
-                    <p className="font-display text-lg font-semibold leading-tight text-foreground">A more confident first impression before a patient ever signs in.</p>
-                  </div>
-                </motion.div>
-
-                <motion.div
                   initial={{ opacity: 0, x: 18, y: -8 }}
                   animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={{ duration: 0.55, delay: 0.4 }}
-                  className="absolute right-2 top-8 z-10 w-[12.5rem] rounded-[1.6rem] border border-border bg-card/92 p-4 shadow-card backdrop-blur-xl sm:right-4"
+                  className="absolute -right-2 top-10 z-10 hidden w-[14rem] rounded-[1.6rem] border border-border bg-card/95 p-4 shadow-elevated backdrop-blur-xl sm:block"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-red-soft text-brand-red">
                       <MonitorSmartphone className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Fast patient flow</p>
-                      <p className="mt-1 text-sm font-medium text-foreground">Check-in, verification, registration</p>
+                      <p className="mt-1 text-sm font-medium text-foreground">Check-in, verify, register</p>
                     </div>
                   </div>
                 </motion.div>
 
                 <motion.div
-                  initial={{ opacity: 0, x: 18, y: 8 }}
+                  initial={{ opacity: 0, x: -18, y: 8 }}
                   animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={{ duration: 0.55, delay: 0.5 }}
-                  className="absolute bottom-24 right-0 z-10 w-[12.5rem] rounded-[1.6rem] border border-border bg-card/92 p-4 shadow-card backdrop-blur-xl sm:bottom-10 sm:right-8"
+                  className="absolute -bottom-4 -left-2 z-10 hidden w-[14rem] rounded-[1.6rem] border border-border bg-card/95 p-4 shadow-elevated backdrop-blur-xl sm:block"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-accent">
                       <HeartPulse className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Immediate care routing</p>
-                      <p className="mt-1 text-sm font-medium text-foreground">Emergency, specialty, diagnostics</p>
+                      <p className="mt-1 text-sm font-medium text-foreground">Emergency • Specialty • Diagnostics</p>
                     </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.58 }}
-                  className="absolute bottom-0 right-0 left-0 rounded-[1.7rem] border border-slate-200/80 bg-white/90 p-4 shadow-card backdrop-blur-md sm:left-auto sm:w-[22rem]"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Open public pathways</p>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Service discovery, specialty access, and patient utilities stay one tap away.</p>
-                    </div>
-                    <Link
-                      to="/verify"
-                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground transition hover:bg-primary/90"
-                    >
-                      <MoveRight className="h-4 w-4" />
-                    </Link>
                   </div>
                 </motion.div>
               </motion.div>
