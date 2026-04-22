@@ -211,7 +211,7 @@ export default function PublicCatalogPage() {
               <div className="mt-5 space-y-4">
                 {item.highlights.map((highlight) => (
                   <div key={highlight} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-red" />
                     <p className="text-sm leading-relaxed text-muted-foreground">{highlight}</p>
                   </div>
                 ))}
