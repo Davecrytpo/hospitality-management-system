@@ -45,175 +45,108 @@ export default function PublicLandingPage() {
           <NotificationBanner audience="public" />
         </section>
 
-        <section className="relative overflow-hidden border-b border-border bg-[radial-gradient(circle_at_top_left,_rgba(13,148,136,0.18),transparent_32%),radial-gradient(circle_at_85%_15%,_rgba(15,23,42,0.1),transparent_22%)]">
-          <div className="absolute inset-0 medical-grid opacity-[0.16]" />
-          <div className="ambient-orb -left-16 top-12 h-80 w-80 opacity-60" />
-          <div className="ambient-orb right-[-8rem] top-24 h-[28rem] w-[28rem] opacity-50" />
+        <section className="relative overflow-hidden border-b border-border">
+          {/* Full-bleed real hospital photograph */}
+          <div className="absolute inset-0">
+            <img
+              src={heroAtriumPremium}
+              alt="On Time Medical hospital exterior at twilight with illuminated emergency entrance and arriving ambulance"
+              className="h-full w-full object-cover"
+              loading="eager"
+              width={1920}
+              height={1280}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/92 via-slate-950/72 to-slate-950/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-slate-950/55" />
+          </div>
 
-          <div className="container relative mx-auto px-4 py-14 sm:px-6 lg:py-24">
-            <div className="grid items-center gap-12 xl:grid-cols-[1.02fr_0.98fr]">
-              <div className="max-w-3xl space-y-8">
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45 }}
-                  className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-card/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-accent shadow-card backdrop-blur-md"
-                >
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" />
-                  </span>
-                  A modern front door for serious healthcare
-                </motion.div>
+          <div className="container relative mx-auto px-4 py-20 sm:px-6 lg:py-28 xl:py-32">
+            <div className="max-w-4xl space-y-8 text-white">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45 }}
+                className="inline-flex items-center gap-2 rounded-full border border-brand-red/40 bg-brand-red/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-md"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" />
+                </span>
+                A modern front door for serious healthcare
+              </motion.div>
 
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.05 }}
-                  className="max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-5xl xl:text-7xl"
-                >
-                  A hospital experience people <span className="gradient-text">trust</span> from the very first screen.
-                </motion.h1>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.05 }}
+                className="font-display text-4xl font-bold tracking-tight drop-shadow-2xl sm:text-5xl xl:text-7xl"
+              >
+                A hospital experience people <span className="text-brand-red">trust</span> from the very first screen.
+              </motion.h1>
 
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.1 }}
-                  className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:text-[1.18rem]"
-                >
-                  Discover services, specialties, urgent access, and patient tools through a sharper digital entrance — modern, immediate, and deeply professional on every device.
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.16 }}
-                  className="flex flex-wrap gap-3"
-                >
-                  <Button size="lg" className="rounded-full px-7" asChild>
-                    <Link to="/services">
-                      Explore services
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button size="lg" variant="outline" className="rounded-full px-7 border-brand-red/40 text-brand-red hover:bg-brand-red hover:text-white" asChild>
-                    <a href="tel:+1800668463">
-                      <Siren className="mr-2 h-4 w-4" />
-                      24/7 Emergency
-                    </a>
-                  </Button>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.2 }}
-                  className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
-                >
-                  {[
-                    "24/7 urgent care routing",
-                    "Premium patient-facing flows",
-                    "Mobile-first patient access",
-                    "Real services, real next steps",
-                  ].map((item) => (
-                    <div key={item} className="flex items-center gap-2 rounded-2xl border border-border/80 bg-card/80 px-4 py-3 text-sm text-foreground shadow-card backdrop-blur-md">
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </motion.div>
-
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  {hospitalStats.map((stat, index) => (
-                    <motion.div
-                      key={stat.label}
-                      initial={{ opacity: 0, y: 18 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.45, delay: 0.24 + index * 0.06 }}
-                      className="rounded-[1.75rem] border border-border bg-card/85 p-5 shadow-card backdrop-blur-md"
-                    >
-                      <stat.icon className="h-5 w-5 text-accent" />
-                      <p className="mt-4 font-display text-3xl font-bold text-foreground">{stat.value}</p>
-                      <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.1 }}
+                className="max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg lg:text-[1.18rem]"
+              >
+                Discover services, specialties, urgent access, and patient tools through a sharper digital entrance — modern, immediate, and deeply professional on every device.
+              </motion.p>
 
               <motion.div
-                initial={{ opacity: 0, y: 22 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.12 }}
-                className="relative min-h-[34rem]"
+                transition={{ duration: 0.55, delay: 0.16 }}
+                className="flex flex-wrap gap-3"
               >
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative w-full rounded-[2.2rem] border border-border/70 bg-card/75 p-3 shadow-elevated backdrop-blur-xl"
-                >
-                  <div className="relative overflow-hidden rounded-[1.8rem]">
-                    <img
-                      src={heroAtriumPremium}
-                      alt="On Time Medical hospital atrium with marble floors, navy walls and warm sunset light"
-                      className="h-[26rem] w-full object-cover sm:h-[34rem]"
-                      loading="eager"
-                      width={1920}
-                      height={1080}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/10 to-transparent" />
-                    <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-3 sm:left-6 sm:right-6">
-                      <div className="inline-flex items-center gap-2 rounded-full bg-slate-950/70 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur-md">
-                        <span className="relative flex h-2.5 w-2.5">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
-                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-red" />
-                        </span>
-                        Live hospital access
-                      </div>
-                      <div className="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
-                        Mobile-first experience
-                      </div>
-                    </div>
-                    <div className="absolute bottom-4 left-4 right-4 rounded-[1.6rem] border border-white/15 bg-slate-950/55 p-4 text-white backdrop-blur-md sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-xs">
-                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70">Digital front door</p>
-                      <p className="mt-2 font-display text-2xl font-semibold leading-tight">Clear entry into care, diagnostics, and urgent access.</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 18, y: -8 }}
-                  animate={{ opacity: 1, x: 0, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.4 }}
-                  className="absolute -right-2 top-10 z-10 hidden w-[14rem] rounded-[1.6rem] border border-border bg-card/95 p-4 shadow-elevated backdrop-blur-xl sm:block"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-red-soft text-brand-red">
-                      <MonitorSmartphone className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Fast patient flow</p>
-                      <p className="mt-1 text-sm font-medium text-foreground">Check-in, verify, register</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -18, y: 8 }}
-                  animate={{ opacity: 1, x: 0, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.5 }}
-                  className="absolute -bottom-4 -left-2 z-10 hidden w-[14rem] rounded-[1.6rem] border border-border bg-card/95 p-4 shadow-elevated backdrop-blur-xl sm:block"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary text-accent">
-                      <HeartPulse className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Immediate care routing</p>
-                      <p className="mt-1 text-sm font-medium text-foreground">Emergency • Specialty • Diagnostics</p>
-                    </div>
-                  </div>
-                </motion.div>
+                <Button size="lg" className="rounded-full bg-white px-7 text-slate-900 hover:bg-white/90" asChild>
+                  <Link to="/services">
+                    Explore services
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" className="rounded-full bg-brand-red px-7 text-white shadow-lg hover:bg-brand-red/90 pulse-red" asChild>
+                  <a href="tel:+1800668463">
+                    <Siren className="mr-2 h-4 w-4" />
+                    24/7 Emergency
+                  </a>
+                </Button>
               </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.2 }}
+                className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+              >
+                {[
+                  "24/7 urgent care routing",
+                  "Premium patient-facing flows",
+                  "Mobile-first patient access",
+                  "Real services, real next steps",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white shadow-card backdrop-blur-md">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-brand-red" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </motion.div>
+
+              <div className="grid gap-4 pt-2 sm:grid-cols-2 xl:grid-cols-4">
+                {hospitalStats.map((stat, index) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.24 + index * 0.06 }}
+                    className="rounded-[1.75rem] border border-white/15 bg-white/10 p-5 shadow-card backdrop-blur-xl"
+                  >
+                    <stat.icon className="h-5 w-5 text-brand-red" />
+                    <p className="mt-4 font-display text-3xl font-bold text-white">{stat.value}</p>
+                    <p className="mt-1 text-sm text-white/75">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
