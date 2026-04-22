@@ -110,40 +110,69 @@ export default function PublicCatalogPage() {
     <div className="min-h-screen bg-background text-foreground">
       <PublicSiteHeader />
       <main>
-        <section className="relative overflow-hidden border-b border-border bg-gradient-hero text-primary-foreground">
-          <img src={item.image} alt={item.title} className="absolute inset-0 h-full w-full object-cover opacity-20" loading="eager" />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/85 to-primary/65" />
+        {/* Hero with large prominent unique image */}
+        <section className="relative overflow-hidden border-b border-border">
+          <div className="absolute inset-0">
+            <img src={item.image} alt={item.title} className="h-full w-full object-cover" loading="eager" width={1920} height={1080} />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-slate-950/30" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30" />
+          </div>
           <div className="container relative mx-auto px-4 py-16 sm:px-6 lg:py-24">
-            <div className="max-w-4xl space-y-6">
-              <Link to={`/${kind}`} className="inline-flex items-center gap-2 text-sm text-primary-foreground/75 transition hover:text-primary-foreground">
+            <div className="max-w-3xl space-y-6 text-white">
+              <Link to={`/${kind}`} className="inline-flex items-center gap-2 text-sm text-white/80 transition hover:text-white">
                 <ArrowLeft className="h-4 w-4" />
                 Back to {label.toLowerCase()}
               </Link>
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/15 bg-primary-foreground/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-primary-foreground/80 backdrop-blur-md">
-                <item.icon className="h-3.5 w-3.5" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-brand-red/40 bg-brand-red/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-white backdrop-blur-md">
+                <item.icon className="h-3.5 w-3.5 text-brand-red" />
                 {item.eyebrow}
               </div>
-              <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">{item.title}</h1>
-              <p className="max-w-3xl text-base leading-relaxed text-primary-foreground/85 sm:text-lg">{item.summary}</p>
+              <h1 className="font-display text-4xl font-bold tracking-tight drop-shadow-2xl sm:text-5xl lg:text-6xl">{item.title}</h1>
+              <p className="max-w-3xl text-base leading-relaxed text-white/90 sm:text-lg">{item.summary}</p>
               <div className="flex flex-wrap gap-3">
                 {item.primaryAction.href.startsWith("tel:") ? (
-                  <Button size="lg" className="rounded-full bg-card text-card-foreground hover:bg-card/90" asChild>
+                  <Button size="lg" className="rounded-full bg-white px-7 text-slate-900 hover:bg-white/90" asChild>
                     <a href={item.primaryAction.href}>{item.primaryAction.label} <ArrowRight className="ml-2 h-4 w-4" /></a>
                   </Button>
                 ) : (
-                  <Button size="lg" className="rounded-full bg-card text-card-foreground hover:bg-card/90" asChild>
+                  <Button size="lg" className="rounded-full bg-white px-7 text-slate-900 hover:bg-white/90" asChild>
                     <Link to={item.primaryAction.href}>{item.primaryAction.label} <ArrowRight className="ml-2 h-4 w-4" /></Link>
                   </Button>
                 )}
                 {item.secondaryAction.href.startsWith("tel:") ? (
-                  <Button size="lg" variant="outline" className="rounded-full border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10" asChild>
+                  <Button size="lg" className="rounded-full bg-brand-red px-7 text-white hover:bg-brand-red/90" asChild>
                     <a href={item.secondaryAction.href}>{item.secondaryAction.label}</a>
                   </Button>
                 ) : (
-                  <Button size="lg" variant="outline" className="rounded-full border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10" asChild>
+                  <Button size="lg" variant="outline" className="rounded-full border-white/40 bg-transparent px-7 text-white hover:bg-white/10" asChild>
                     <Link to={item.secondaryAction.href}>{item.secondaryAction.label}</Link>
                   </Button>
                 )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured image showcase — large, no gradient overlay */}
+        <section className="border-b border-border bg-muted/30 py-10 lg:py-14">
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-elevated">
+              <div className="relative">
+                <img
+                  src={item.image}
+                  alt={`${item.title} at On Time Medical`}
+                  className="h-[20rem] w-full object-cover sm:h-[26rem] lg:h-[32rem]"
+                  loading="lazy"
+                  width={1920}
+                  height={1080}
+                />
+                <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-brand-red/30 bg-card/95 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-brand-red shadow-elevated backdrop-blur-md sm:bottom-6 sm:left-6">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" />
+                  </span>
+                  Inside our {item.shortTitle.toLowerCase()} experience
+                </div>
               </div>
             </div>
           </div>
@@ -154,7 +183,7 @@ export default function PublicCatalogPage() {
             <div className="grid gap-4 md:grid-cols-3">
               {item.metrics.map((metric) => (
                 <div key={metric.label} className="rounded-[1.75rem] border border-border bg-card p-6 shadow-card">
-                  <p className="font-display text-3xl font-bold text-foreground">{metric.value}</p>
+                  <p className="font-display text-3xl font-bold text-brand-red">{metric.value}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{metric.label}</p>
                 </div>
               ))}
