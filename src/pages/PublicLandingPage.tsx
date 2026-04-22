@@ -13,6 +13,7 @@ import {
   MoveRight,
   Shield,
   ShieldCheck,
+  Siren,
   Sparkles,
 } from "lucide-react";
 
@@ -20,8 +21,8 @@ import { Button } from "@/components/ui/button";
 import { PublicSiteFooter } from "@/components/landing/PublicSiteFooter";
 import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
 import { NotificationBanner } from "@/components/notifications/NotificationBanner";
-import heroHospitalExteriorReal from "@/assets/hero-hospital-exterior-real.jpg";
-import heroHospitalLobbyReal from "@/assets/hero-hospital-lobby-real.jpg";
+import heroAtriumPremium from "@/assets/public-hero-atrium-premium.jpg";
+import overviewCommandImg from "@/assets/public-overview-command.jpg";
 import {
   hospitalStats,
   landingFaqs,
