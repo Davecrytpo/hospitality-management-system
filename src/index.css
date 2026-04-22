@@ -32,8 +32,13 @@
     --accent: 188 85% 42%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 48%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
+
+    /* Brand red — used moderately for urgent / emergency / accent moments */
+    --brand-red: 358 75% 50%;
+    --brand-red-foreground: 0 0% 100%;
+    --brand-red-soft: 358 85% 96%;
 
     --border: 200 30% 90%;
     --input: 200 30% 90%;
@@ -100,8 +105,12 @@
     --accent: 188 85% 48%;
     --accent-foreground: 215 75% 7%;
 
-    --destructive: 0 65% 55%;
+    --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 100%;
+
+    --brand-red: 358 80% 60%;
+    --brand-red-foreground: 0 0% 100%;
+    --brand-red-soft: 358 60% 16%;
 
     --border: 215 45% 18%;
     --input: 215 45% 18%;
@@ -202,6 +211,22 @@
   .bg-gradient-hero { background-image: var(--gradient-hero); }
   .bg-gradient-brand { background-image: var(--gradient-brand); }
   .bg-gradient-card { background-image: var(--gradient-card); }
+
+  /* Brand red utilities — apply sparingly */
+  .text-brand-red { color: hsl(var(--brand-red)); }
+  .bg-brand-red { background-color: hsl(var(--brand-red)); color: hsl(var(--brand-red-foreground)); }
+  .bg-brand-red-soft { background-color: hsl(var(--brand-red-soft)); }
+  .border-brand-red { border-color: hsl(var(--brand-red)); }
+  .ring-brand-red { --tw-ring-color: hsl(var(--brand-red)); }
+  .pulse-red {
+    box-shadow: 0 0 0 0 hsl(var(--brand-red) / 0.55);
+    animation: pulse-red 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+  @keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 hsl(var(--brand-red) / 0.55); }
+    70% { box-shadow: 0 0 0 14px hsl(var(--brand-red) / 0); }
+    100% { box-shadow: 0 0 0 0 hsl(var(--brand-red) / 0); }
+  }
 
   .card-hover {
     @apply transition-all duration-500 hover:-translate-y-1;
