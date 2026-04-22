@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { PublicSiteFooter } from "@/components/landing/PublicSiteFooter";
 import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
 import { NotificationBanner } from "@/components/notifications/NotificationBanner";
-import heroAtriumPremium from "@/assets/public-hero-atrium-premium.jpg";
+import heroAtriumPremium from "@/assets/public-hero-real-hospital.jpg";
 import overviewCommandImg from "@/assets/public-overview-command.jpg";
 import {
   hospitalStats,
