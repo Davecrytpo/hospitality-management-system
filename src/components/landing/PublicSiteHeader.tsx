@@ -20,32 +20,32 @@ export function PublicSiteHeader() {
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-otmg-border bg-card/95 backdrop-blur">
-      <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-5 px-4 py-4 lg:px-6">
+    <header className="sticky top-0 z-50 bg-card/98 shadow-sm backdrop-blur">
+      <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 lg:px-6">
         <Link to="/" aria-label="On Time Medical Group home" className="inline-flex">
-          <img src={logo} alt="On Time Medical Group" className="h-20 w-20 object-contain" width={80} height={80} />
+          <img src={logo} alt="On Time Medical Group" className="h-[92px] w-[92px] object-contain lg:h-[104px] lg:w-[104px]" width={104} height={104} />
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-7 xl:gap-10 lg:flex">
           {navItems.map((item) => (
             <Link
               key={item.label}
               to={item.href}
-              className={cn("nav-mock-link", location.pathname === item.href && "nav-mock-link-active")}
+              className={cn("nav-mock-link whitespace-nowrap", location.pathname === item.href && "nav-mock-link-active")}
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
-          <Button variant="outline" className="btn-mock-outline h-12 px-5 text-[13px] uppercase" asChild>
+        <div className="hidden shrink-0 items-center gap-3 lg:flex">
+          <Button variant="outline" className="btn-mock-outline h-12 px-4 text-[12px] uppercase" asChild>
             <Link to="/patient-portal/login">
               <Lock className="mr-2 h-4 w-4" />
               Patient Portal Login
             </Link>
           </Button>
-          <Button className="btn-mock-red h-12 px-5 text-[13px] uppercase" asChild>
+          <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" asChild>
             <Link to="/services/smart-appointments">
               <Calendar className="mr-2 h-4 w-4" />
               Book Appointment
