@@ -39,6 +39,12 @@
     --brand-red: 358 75% 50%;
     --brand-red-foreground: 0 0% 100%;
     --brand-red-soft: 358 85% 96%;
+    --otmg-navy: 222 73% 25%;
+    --otmg-page: 220 55% 98%;
+    --otmg-soft: 218 78% 96%;
+    --otmg-border: 218 50% 88%;
+    --otmg-blue-soft: 220 42% 37%;
+    --otmg-gold: 43 100% 48%;
 
     --border: 200 30% 90%;
     --input: 200 30% 90%;
@@ -111,6 +117,12 @@
     --brand-red: 358 80% 60%;
     --brand-red-foreground: 0 0% 100%;
     --brand-red-soft: 358 60% 16%;
+    --otmg-navy: 220 35% 92%;
+    --otmg-page: 215 75% 7%;
+    --otmg-soft: 215 50% 14%;
+    --otmg-border: 215 45% 18%;
+    --otmg-blue-soft: 213 18% 74%;
+    --otmg-gold: 43 100% 55%;
 
     --border: 215 45% 18%;
     --input: 215 45% 18%;
@@ -218,6 +230,24 @@
   .bg-brand-red-soft { background-color: hsl(var(--brand-red-soft)); }
   .border-brand-red { border-color: hsl(var(--brand-red)); }
   .ring-brand-red { --tw-ring-color: hsl(var(--brand-red)); }
+  .text-otmg-navy { color: hsl(var(--otmg-navy)); }
+  .text-otmg-blue-soft { color: hsl(var(--otmg-blue-soft)); }
+  .text-otmg-gold { color: hsl(var(--otmg-gold)); }
+  .bg-otmg-navy { background-color: hsl(var(--otmg-navy)); }
+  .bg-otmg-page { background-color: hsl(var(--otmg-page)); }
+  .bg-otmg-soft { background-color: hsl(var(--otmg-soft)); }
+  .border-otmg-border { border-color: hsl(var(--otmg-border)); }
+  .shadow-mock { box-shadow: 0 24px 58px -34px hsl(222 73% 25% / 0.38); }
+  .btn-mock-red { border-radius: 0.375rem; background-color: hsl(var(--brand-red)); color: hsl(var(--brand-red-foreground)); font-weight: 800; }
+  .btn-mock-red:hover { background-color: hsl(var(--brand-red) / 0.9); }
+  .btn-mock-navy { border-radius: 0.375rem; background-color: hsl(var(--otmg-navy)); color: hsl(var(--primary-foreground)); font-weight: 800; }
+  .btn-mock-navy:hover { background-color: hsl(var(--otmg-navy) / 0.92); }
+  .btn-mock-outline { border-radius: 0.375rem; border-color: hsl(var(--otmg-navy) / 0.58); color: hsl(var(--otmg-navy)); font-weight: 800; }
+  .btn-mock-outline:hover { background-color: hsl(var(--otmg-soft)); color: hsl(var(--otmg-navy)); }
+  .nav-mock-link { border-bottom: 2px solid transparent; padding-bottom: 0.5rem; color: hsl(var(--otmg-navy)); font-size: 0.8125rem; font-weight: 800; letter-spacing: 0; text-transform: uppercase; transition: color 160ms ease, border-color 160ms ease; }
+  .nav-mock-link:hover, .nav-mock-link-active { border-bottom-color: hsl(var(--brand-red)); color: hsl(var(--brand-red)); }
+  .mobile-mock-link { border-radius: 0.375rem; border: 1px solid hsl(var(--otmg-border)); padding: 0.75rem 1rem; color: hsl(var(--otmg-navy)); font-size: 0.875rem; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
+  .google-word { font-weight: 800; color: hsl(217 89% 61%); }
   .pulse-red {
     box-shadow: 0 0 0 0 hsl(var(--brand-red) / 0.55);
     animation: pulse-red 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
