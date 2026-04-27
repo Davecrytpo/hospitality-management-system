@@ -255,7 +255,7 @@ export default function PublicLandingPage() {
               transition={{ duration: 0.45 }}
               className="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-12"
             >
-              <h1 className="max-w-[520px] font-display text-[2.8rem] font-extrabold uppercase leading-[0.94] text-[#13306b] sm:text-[3.8rem]">
+              <h1 className="max-w-[700px] font-display text-[2.8rem] font-extrabold uppercase leading-[0.94] text-[#13306b] sm:text-[3.8rem]">
                 Comprehensive Healthcare That&apos;s <span className="text-[#ef2027]">On Time.</span> Every Time.
               </h1>
               <p className="mt-6 max-w-[510px] text-base leading-8 text-[#334e86]">
@@ -302,7 +302,7 @@ export default function PublicLandingPage() {
               <img
                 src={heroImage}
                 alt="Doctor discussing care with a patient"
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover object-top"
                 loading="eager"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-transparent" />
