@@ -20,7 +20,7 @@ import {
   Star,
   Stethoscope,
   UserRound,
-  Venus,
+  CircleDot,
   X,
 } from "lucide-react";
 
@@ -52,7 +52,7 @@ const trustHighlights = [
 const serviceCards = [
   { number: "1.", title: "Primary Care", description: "Personalized care for your everyday health needs.", icon: Stethoscope, href: "/services/smart-appointments" },
   { number: "2.", title: "Preventive Care", description: "Stay ahead of health issues with screenings, vaccinations & more.", icon: ShieldCheck, href: "/services/advanced-diagnostics" },
-  { number: "3.", title: "Women's Health", description: "Compassionate care for every stage of a woman's life.", icon: Venus, href: "/specialties/pediatrics" },
+  { number: "3.", title: "Women's Health", description: "Compassionate care for every stage of a woman's life.", icon: CircleDot, href: "/specialties/pediatrics" },
   { number: "4.", title: "Chronic Disease Management", description: "Ongoing care to help you manage chronic conditions.", icon: HeartPulse, href: "/specialties/cardiology" },
   { number: "5.", title: "Mental Health Services (OMHC)", description: "Support for your mental wellness and emotional well-being.", icon: Brain, href: "/specialties/neurology" },
   { number: "6.", title: "Substance Use Treatment", description: "Evidence-based treatment and recovery support.", icon: HeartHandshake, href: "/services/premium-inpatient-care" },
