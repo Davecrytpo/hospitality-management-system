@@ -3,434 +3,582 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Building2,
+  BookOpenText,
+  Brain,
   Calendar,
-  CheckCircle2,
+  Check,
   ChevronRight,
-  Clock3,
+  FileText,
+  HeartHandshake,
   HeartPulse,
-  MonitorSmartphone,
-  MoveRight,
-  Shield,
+  HousePlus,
+  Lock,
+  MapPin,
+  Menu,
+  Phone,
   ShieldCheck,
-  Siren,
-  Sparkles,
+  Star,
+  Stethoscope,
+  UserRound,
+  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { PublicSiteFooter } from "@/components/landing/PublicSiteFooter";
-import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
-import { NotificationBanner } from "@/components/notifications/NotificationBanner";
-import heroAtriumPremium from "@/assets/public-hero-real-hospital.jpg";
-import overviewCommandImg from "@/assets/public-overview-command.jpg";
-import {
-  hospitalStats,
-  landingFaqs,
-  landingTestimonials,
-  locationHighlights,
-  publicOverviewCards,
-  publicServices,
-  publicSpecialties,
-} from "@/data/publicSiteContent";
+import heroImage from "@/assets/public-hero-real-hospital.jpg";
+import campusImage from "@/assets/hospital-exterior.jpg";
+import portraitImage from "@/assets/doctor-portrait.jpg";
+import blogWellnessImage from "@/assets/service-pharmacy-support.jpg";
+import blogUrgentCareImage from "@/assets/service-smart-appointments-v2.jpg";
+import logo from "@/assets/logo-ontime.png";
+
+const navItems = [
+  { label: "Home", href: "/" },
+  { label: "Services", href: "#services" },
+  { label: "About Us", href: "#about" },
+  { label: "Patient Resources", href: "#resources" },
+  { label: "Insurance", href: "#insurance" },
+  { label: "Contact", href: "#contact" },
+];
+
+const trustHighlights = [
+  {
+    title: "Same-Day Appointments Available",
+    icon: Calendar,
+  },
+  {
+    title: "Most Insurance Plans Accepted",
+    icon: ShieldCheck,
+  },
+  {
+    title: "All-in-One Care Mind, Body, You.",
+    icon: UserRound,
+  },
+  {
+    title: "Convenient Locations Near You",
+    icon: MapPin,
+  },
+  {
+    title: "Compassionate Care, Every Step of the Way",
+    icon: HeartHandshake,
+  },
+];
+
+const serviceCards = [
+  {
+    number: "1.",
+    title: "Primary Care",
+    description: "Personalized care for your everyday health needs.",
+    icon: Stethoscope,
+  },
+  {
+    number: "2.",
+    title: "Preventive Care",
+    description: "Stay ahead of health issues with screenings, vaccinations, and more.",
+    icon: ShieldCheck,
+  },
+  {
+    number: "3.",
+    title: "Women's Health",
+    description: "Compassionate care for every stage of a woman's life.",
+    icon: HeartPulse,
+  },
+  {
+    number: "4.",
+    title: "Chronic Disease Management",
+    description: "Ongoing care to help you manage chronic conditions.",
+    icon: HeartPulse,
+  },
+  {
+    number: "5.",
+    title: "Mental Health Services (OMHC)",
+    description: "Support for your mental wellness and emotional well-being.",
+    icon: Brain,
+  },
+  {
+    number: "6.",
+    title: "Substance Use Treatment",
+    description: "Evidence-based treatment and recovery support.",
+    icon: HeartHandshake,
+  },
+];
+
+const checkList = [
+  "Experienced providers you can trust",
+  "Integrated services for whole-person wellness",
+  "Telehealth options for your convenience",
+  "Commitment to our community",
+];
+
+const stats = [
+  { value: "10,000+", label: "Patients Served", icon: UserRound },
+  { value: "Same-Day", label: "Appointments", icon: Calendar },
+  { value: "Most Major", label: "Insurance Accepted", icon: ShieldCheck },
+  { value: "Patient Focused", label: "Care", icon: HeartPulse },
+];
+
+const resourceLinks = ["New Patient Forms", "Patient Portal", "FAQs", "Health Tips"];
+
+const insuranceLogos = ["aetna", "United Healthcare", "CareFirst", "Cigna", "BlueCross BlueShield", "Medicare.gov"];
 
 export default function PublicLandingPage() {
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <PublicSiteHeader />
+    <div className="min-h-screen bg-[#f7f9ff] text-[#13306b]">
+      <header className="sticky top-0 z-50 border-b border-[#d9e1f2] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-6 px-4 py-4 lg:px-6">
+          <Link to="/" className="flex items-center gap-3">
+            <img src={logo} alt="On Time Medical Group" className="h-16 w-16 object-contain lg:h-20 lg:w-20" />
+          </Link>
 
-      <main>
-        <section className="container mx-auto px-4 pt-4 sm:px-6">
-          <NotificationBanner audience="public" />
-        </section>
+          <nav className="hidden items-center gap-8 lg:flex">
+            {navItems.map((item) => (
+              item.href.startsWith("#") ? (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className={`text-[13px] font-bold uppercase tracking-[0.04em] transition hover:text-[#ef2027] ${
+                    item.label === "Home" ? "border-b-2 border-[#ef2027] pb-2 text-[#ef2027]" : "text-[#13306b]"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className="border-b-2 border-[#ef2027] pb-2 text-[13px] font-bold uppercase tracking-[0.04em] text-[#ef2027]"
+                >
+                  {item.label}
+                </Link>
+              )
+            ))}
+          </nav>
 
-        <section className="relative overflow-hidden border-b border-border">
-          {/* Full-bleed real hospital photograph */}
-          <div className="absolute inset-0">
-            <img
-              src={heroAtriumPremium}
-              alt="On Time Medical hospital exterior at twilight with illuminated emergency entrance and arriving ambulance"
-              className="h-full w-full object-cover"
-              loading="eager"
-              width={1920}
-              height={1280}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/92 via-slate-950/72 to-slate-950/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-slate-950/55" />
+          <div className="hidden items-center gap-3 lg:flex">
+            <Button
+              variant="outline"
+              className="h-12 rounded-md border-[#13306b] px-5 text-[13px] font-bold uppercase text-[#13306b] hover:bg-[#13306b] hover:text-white"
+              asChild
+            >
+              <Link to="/patient-portal/login">
+                <Lock className="mr-2 h-4 w-4" />
+                Patient Portal Login
+              </Link>
+            </Button>
+            <Button className="h-12 rounded-md bg-[#ef2027] px-5 text-[13px] font-bold uppercase text-white hover:bg-[#d61920]" asChild>
+              <Link to="/services/smart-appointments">
+                <Calendar className="mr-2 h-4 w-4" />
+                Book Appointment
+              </Link>
+            </Button>
           </div>
 
-          <div className="container relative mx-auto px-4 py-20 sm:px-6 lg:py-28 xl:py-32">
-            <div className="max-w-4xl space-y-8 text-white">
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-                className="inline-flex items-center gap-2 rounded-full border border-brand-red/40 bg-brand-red/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-md"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" />
-                </span>
-                A modern front door for serious healthcare
-              </motion.div>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-md border-[#d0dcf4] text-[#13306b] lg:hidden"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.05 }}
-                className="font-display text-4xl font-bold tracking-tight drop-shadow-2xl sm:text-5xl xl:text-7xl"
-              >
-                A hospital experience people <span className="text-brand-red">trust</span> from the very first screen.
-              </motion.h1>
+        {mobileMenuOpen && (
+          <div className="border-t border-[#d9e1f2] bg-white lg:hidden">
+            <div className="mx-auto flex max-w-[1240px] flex-col gap-3 px-4 py-4">
+              {navItems.map((item) => (
+                item.href.startsWith("#") ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-xl border border-[#e2e9f7] px-4 py-3 text-sm font-bold uppercase tracking-[0.04em] text-[#13306b]"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.label}
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-xl border border-[#e2e9f7] px-4 py-3 text-sm font-bold uppercase tracking-[0.04em] text-[#13306b]"
+                  >
+                    {item.label}
+                  </Link>
+                )
+              ))}
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.1 }}
-                className="max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg lg:text-[1.18rem]"
-              >
-                Discover services, specialties, urgent access, and patient tools through a sharper digital entrance — modern, immediate, and deeply professional on every device.
-              </motion.p>
+              <div className="grid gap-3 pt-2 sm:grid-cols-2">
+                <Button
+                  variant="outline"
+                  className="h-12 rounded-md border-[#13306b] text-[13px] font-bold uppercase text-[#13306b]"
+                  asChild
+                >
+                  <Link to="/patient-portal/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Patient Portal Login
+                  </Link>
+                </Button>
+                <Button className="h-12 rounded-md bg-[#ef2027] text-[13px] font-bold uppercase text-white hover:bg-[#d61920]" asChild>
+                  <Link to="/services/smart-appointments" onClick={() => setMobileMenuOpen(false)}>
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Book Appointment
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.16 }}
-                className="flex flex-wrap gap-3"
-              >
-                <Button size="lg" className="rounded-full bg-white px-7 text-slate-900 hover:bg-white/90" asChild>
-                  <Link to="/services">
-                    Explore services
+      <main>
+        <section className="mx-auto max-w-[1240px] px-4 pb-6 pt-8 lg:px-6">
+          <div className="mb-6 flex justify-end">
+            <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-xl font-extrabold text-[#13306b] sm:text-2xl">
+              <Phone className="h-5 w-5" />
+              410-754-4343
+            </a>
+          </div>
+
+          <div className="grid overflow-hidden rounded-[28px] bg-white shadow-[0_30px_80px_-45px_rgba(19,48,107,0.35)] lg:grid-cols-[0.92fr_1.08fr]">
+            <motion.div
+              initial={{ opacity: 0, x: -22 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.45 }}
+              className="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-12"
+            >
+              <h1 className="max-w-[520px] font-display text-[2.8rem] font-extrabold uppercase leading-[0.94] text-[#13306b] sm:text-[3.8rem]">
+                Comprehensive Healthcare That&apos;s <span className="text-[#ef2027]">On Time.</span> Every Time.
+              </h1>
+              <p className="mt-6 max-w-[510px] text-base leading-8 text-[#334e86]">
+                On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion,
+                convenience, and a commitment to your well-being.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                <Button className="h-14 rounded-md bg-[#ef2027] px-7 text-[14px] font-bold uppercase text-white hover:bg-[#d61920]" asChild>
+                  <Link to="/services/smart-appointments">
+                    Book Appointment
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" className="rounded-full bg-brand-red px-7 text-white shadow-lg hover:bg-brand-red/90 pulse-red" asChild>
-                  <a href="tel:+1800668463">
-                    <Siren className="mr-2 h-4 w-4" />
-                    24/7 Emergency
+                <Button
+                  variant="outline"
+                  className="h-14 rounded-md border-[#9fb1d8] px-7 text-[14px] font-bold uppercase text-[#13306b] hover:bg-[#f3f6fd]"
+                  asChild
+                >
+                  <a href="tel:+14107544343">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Call Us 410-754-4343
                   </a>
                 </Button>
-              </motion.div>
+              </div>
 
-              <motion.div
+              <div className="mt-8 flex items-start gap-4 rounded-2xl border border-[#dfe7f6] bg-[#f8fbff] p-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#edf2fb] text-[#13306b]">
+                  <HousePlus className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-[#13306b]">Telehealth available for eligible services.</p>
+                  <p className="mt-1 text-sm leading-6 text-[#516997]">Connect with your care team from the comfort of your home.</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 22 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.45, delay: 0.08 }}
+              className="relative min-h-[420px] lg:min-h-[640px]"
+            >
+              <img
+                src={heroImage}
+                alt="Doctor discussing care with a patient"
+                className="h-full w-full object-cover object-center"
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-transparent" />
+            </motion.div>
+          </div>
+
+          <div className="-mt-3 grid rounded-[24px] bg-[#13306b] text-white shadow-[0_24px_48px_-28px_rgba(19,48,107,0.55)] md:grid-cols-3 xl:grid-cols-5">
+            {trustHighlights.map((item, index) => (
+              <div
+                key={item.title}
+                className={`flex items-center gap-4 px-5 py-5 ${index !== trustHighlights.length - 1 ? "border-b border-white/15 xl:border-b-0 xl:border-r" : ""}`}
+              >
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/40">
+                  <item.icon className="h-6 w-6" />
+                </div>
+                <p className="max-w-[150px] text-[15px] font-semibold leading-7">{item.title}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="services" className="mx-auto max-w-[1240px] px-4 py-8 lg:px-6">
+          <div className="text-center">
+            <p className="font-display text-[2.2rem] font-extrabold uppercase tracking-tight text-[#13306b]">Our Services</p>
+            <div className="mx-auto mt-2 h-1 w-14 rounded-full bg-[#ef2027]" />
+            <p className="mt-3 text-lg text-[#4f6796]">Comprehensive care for you and your family at every stage of life.</p>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+            {serviceCards.map((service, index) => (
+              <motion.article
+                key={service.title}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.2 }}
-                className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
-              >
-                {[
-                  "24/7 urgent care routing",
-                  "Premium patient-facing flows",
-                  "Mobile-first patient access",
-                  "Real services, real next steps",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white shadow-card backdrop-blur-md">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-brand-red" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </motion.div>
-
-              <div className="grid gap-4 pt-2 sm:grid-cols-2 xl:grid-cols-4">
-                {hospitalStats.map((stat, index) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.45, delay: 0.24 + index * 0.06 }}
-                    className="rounded-[1.75rem] border border-white/15 bg-white/10 p-5 shadow-card backdrop-blur-xl"
-                  >
-                    <stat.icon className="h-5 w-5 text-brand-red" />
-                    <p className="mt-4 font-display text-3xl font-bold text-white">{stat.value}</p>
-                    <p className="mt-1 text-sm text-white/75">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Services</p>
-                <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                  Powerful pathways, not generic landing-page cards.
-                </h2>
-              </div>
-              <Button variant="outline" className="rounded-full" asChild>
-                <Link to="/services">Browse all services</Link>
-              </Button>
-            </div>
-
-            <div className="grid gap-6 xl:grid-cols-2">
-              {publicServices.map((service, index) => (
-                <motion.div
-                  key={service.slug}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.45, delay: index * 0.06 }}
-                >
-                  <Link to={`/services/${service.slug}`} className="group block h-full">
-                    <article className="grid h-full overflow-hidden rounded-[2rem] border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-accent/35 hover:shadow-elevated md:grid-cols-[0.9fr_1.1fr]">
-                      <div className="relative min-h-[18rem] overflow-hidden">
-                        <img src={service.image} alt={service.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-                      </div>
-                      <div className="flex flex-col justify-between p-6 lg:p-7">
-                        <div>
-                          <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-                            <service.icon className="h-3.5 w-3.5" />
-                            {service.eyebrow}
-                          </div>
-                          <h3 className="mt-4 font-display text-2xl font-bold tracking-tight">{service.title}</h3>
-                          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{service.excerpt}</p>
-                        </div>
-                        <div className="mt-6 flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock3 className="h-4 w-4 text-accent" />
-                            Real page, real next steps
-                          </div>
-                          <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent">
-                            Learn More <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                          </span>
-                        </div>
-                      </div>
-                    </article>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-muted/35 py-16 lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Specialties</p>
-                <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                  Every specialty under one roof, and every one has its own page.
-                </h2>
-              </div>
-              <Button variant="outline" className="rounded-full" asChild>
-                <Link to="/specialties">See all specialties</Link>
-              </Button>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {publicSpecialties.map((specialty, index) => (
-                <motion.div
-                  key={specialty.slug}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.4, delay: index * 0.04 }}
-                >
-                  <Link to={`/specialties/${specialty.slug}`} className="group block h-full rounded-[1.75rem] border border-border bg-card p-5 transition duration-300 hover:-translate-y-1 hover:border-accent/35 hover:shadow-elevated">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
-                      <specialty.icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">{specialty.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{specialty.excerpt}</p>
-                    <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-accent">
-                      Explore specialty <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                    </span>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-              <motion.div
-                initial={{ opacity: 0, x: -24 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.55 }}
-                className="relative"
+                transition={{ duration: 0.35, delay: index * 0.05 }}
+                className="flex min-h-[320px] flex-col rounded-[18px] border border-[#dbe4f4] bg-white px-6 py-7 text-center shadow-[0_15px_30px_-26px_rgba(19,48,107,0.35)]"
               >
-                <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-elevated">
-                  <img
-                    src={overviewCommandImg}
-                    alt="On Time Medical clinical command center with live patient flow dashboards"
-                    className="h-[22rem] w-full object-cover sm:h-[28rem]"
-                    loading="lazy"
-                    width={1920}
-                    height={1080}
-                  />
+                <div className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full ${index % 2 === 0 ? "bg-[#eef4ff] text-[#13306b]" : "bg-[#fff1f1] text-[#ef2027]"}`}>
+                  <service.icon className="h-10 w-10" />
                 </div>
-                <div className="absolute -bottom-5 -right-3 hidden rounded-2xl border border-brand-red/30 bg-card px-4 py-3 shadow-elevated sm:flex sm:items-center sm:gap-3">
-                  <span className="relative flex h-3 w-3">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75" />
-                    <span className="relative inline-flex h-3 w-3 rounded-full bg-brand-red" />
-                  </span>
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-red">Live coordination</p>
-                    <p className="text-sm font-semibold text-foreground">Emergency · ICU · Wards</p>
+                <h3 className="mt-6 text-[1.08rem] font-extrabold text-[#13306b]">
+                  {service.number} {service.title}
+                </h3>
+                <p className="mt-4 text-sm leading-7 text-[#4f6796]">{service.description}</p>
+                <Link to="/services" className="mt-auto inline-flex items-center justify-center gap-2 pt-8 text-sm font-extrabold text-[#ef2027]">
+                  Learn More
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </motion.article>
+            ))}
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <Button className="h-12 rounded-md bg-[#13306b] px-8 text-[13px] font-bold uppercase text-white hover:bg-[#10295b]" asChild>
+              <Link to="/services">View All Services</Link>
+            </Button>
+          </div>
+        </section>
+
+        <section id="about" className="mx-auto max-w-[1240px] px-4 py-4 lg:px-6">
+          <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+            <div className="overflow-hidden rounded-[24px] bg-white shadow-[0_22px_60px_-36px_rgba(19,48,107,0.35)]">
+              <img src={campusImage} alt="On Time Medical Group building exterior" className="h-full w-full object-cover" loading="lazy" />
+            </div>
+
+            <div className="relative overflow-hidden rounded-[28px] bg-[#f7f9ff] px-2 py-4">
+              <div className="absolute right-0 top-1/2 hidden h-72 w-72 -translate-y-1/2 rounded-full border-[18px] border-[#eaf0fb] xl:block" />
+              <div className="absolute right-[6.8rem] top-[7.6rem] hidden h-24 w-24 rounded-full border-[10px] border-[#eef4ff] xl:block" />
+
+              <p className="text-sm font-bold uppercase tracking-[0.08em] text-[#ef2027]">About On Time Medical Group</p>
+              <h2 className="mt-3 max-w-[420px] font-display text-[3rem] font-extrabold leading-none text-[#13306b]">Why Choose Us?</h2>
+              <p className="mt-5 max-w-[560px] text-base leading-8 text-[#4f6796]">
+                We&apos;re more than a healthcare provider, we&apos;re your partner in health. Our patient-centered approach ensures you get the right care,
+                at the right time, every time.
+              </p>
+
+              <div className="mt-7 grid gap-4 sm:grid-cols-2">
+                {checkList.map((item) => (
+                  <div key={item} className="flex items-start gap-3">
+                    <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#13306b] text-white">
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="text-sm font-semibold leading-6 text-[#13306b]">{item}</span>
                   </div>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                className="mt-8 h-12 rounded-md border-[#9fb1d8] px-7 text-[13px] font-bold uppercase text-[#13306b] hover:bg-white"
+                asChild
+              >
+                <Link to="/specialties">Learn More About Us</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1240px] px-4 py-6 lg:px-6">
+          <div className="grid gap-4 rounded-[22px] bg-[#edf3ff] px-6 py-6 md:grid-cols-2 xl:grid-cols-4">
+            {stats.map((item) => (
+              <div key={item.label} className="flex items-center gap-4 border-[#d0dcf4] xl:border-r xl:last:border-r-0">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-[#c4d3ef] bg-white text-[#13306b]">
+                  <item.icon className="h-8 w-8" />
                 </div>
-              </motion.div>
+                <div>
+                  <p className="text-[2rem] font-extrabold leading-none text-[#13306b]">{item.value}</p>
+                  <p className="mt-1 text-lg font-semibold text-[#2a467f]">{item.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-              <div className="max-w-2xl">
-                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Why this homepage feels different
-                </p>
-                <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                  Built like the digital front door of a serious care network.
-                </h2>
-                <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                  Every section connects to a real destination — services, specialties, urgent access, and patient utilities — through a sharper, modern interface that performs beautifully on desktop and mobile.
-                </p>
-
-                <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                  {publicOverviewCards.map((card, index) => (
-                    <motion.article
-                      key={card.title}
-                      initial={{ opacity: 0, y: 18 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-60px" }}
-                      transition={{ duration: 0.4, delay: index * 0.05 }}
-                      className="rounded-[1.5rem] border border-border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-accent/35"
-                    >
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary text-accent">
-                        <card.icon className="h-5 w-5" />
-                      </div>
-                      <h3 className="mt-4 font-display text-lg font-semibold tracking-tight">{card.title}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{card.description}</p>
-                    </motion.article>
+        <section id="resources" className="mx-auto max-w-[1240px] px-4 py-4 lg:px-6">
+          <div className="grid gap-5 lg:grid-cols-3">
+            <article className="rounded-[20px] border border-[#dbe4f4] bg-white p-6 shadow-[0_15px_30px_-26px_rgba(19,48,107,0.35)]">
+              <div className="flex items-center gap-3 text-[#13306b]">
+                <BookOpenText className="h-5 w-5" />
+                <h3 className="font-display text-[1.8rem] font-extrabold uppercase leading-none">Patient Resources</h3>
+              </div>
+              <p className="mt-4 max-w-[320px] text-sm leading-7 text-[#4f6796]">Everything you need to manage your care, all in one place.</p>
+              <div className="mt-5 grid gap-5 md:grid-cols-[1fr_132px] md:items-end">
+                <div className="space-y-2">
+                  {resourceLinks.map((item) => (
+                    <Link key={item} to="/patient-register" className="flex items-center gap-2 text-sm font-semibold text-[#13306b] hover:text-[#ef2027]">
+                      <ChevronRight className="h-4 w-4" />
+                      {item}
+                    </Link>
                   ))}
                 </div>
+                <img src={portraitImage} alt="Patient viewing information on a phone" className="mx-auto h-36 w-full rounded-2xl object-cover" loading="lazy" />
               </div>
-            </div>
-          </div>
-        </section>
+              <Link to="/patient-register" className="mt-6 inline-flex items-center gap-2 text-sm font-extrabold text-[#ef2027]">
+                Explore Resources
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </article>
 
-        <section className="border-y border-border bg-gradient-hero py-16 text-primary-foreground lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="mb-10 max-w-2xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-foreground/70">Locations & access</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                More depth, better structure, clearer public access.
-              </h2>
-            </div>
-            <div className="grid gap-5 lg:grid-cols-3">
-              {locationHighlights.map((location) => (
-                <div key={location.name} className="rounded-[1.75rem] border border-primary-foreground/10 bg-primary-foreground/8 p-6 backdrop-blur-md">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-foreground/12 text-primary-foreground">
-                    <Building2 className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-5 font-display text-2xl font-semibold tracking-tight">{location.name}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-primary-foreground/80">{location.detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="mb-10 max-w-2xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Patient perspective</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                The experience should feel premium before the first appointment.
-              </h2>
-            </div>
-            <div className="grid gap-5 lg:grid-cols-3">
-              {landingTestimonials.map((testimonial) => (
-                <article key={testimonial.name} className="rounded-[1.75rem] border border-border bg-card p-6 shadow-card">
-                  <div className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-accent">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Verified patient feedback
-                  </div>
-                  <p className="mt-5 font-display text-xl leading-relaxed text-foreground">"{testimonial.quote}"</p>
-                  <div className="mt-6">
-                    <p className="font-display text-lg font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-muted/35 py-16 lg:py-20">
-          <div className="container mx-auto grid gap-8 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">Frequently asked questions</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Everything essential stays accessible.</h2>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                The public site should explain the care journey clearly, then let patients decide when to move into booking, registration, or secure account access.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Button className="rounded-full" asChild>
-                  <a href="tel:+1800668463">Call care team</a>
-                </Button>
-                <Button variant="outline" className="rounded-full" asChild>
-                  <a href="mailto:care@ontimemedical.com">Email care team</a>
-                </Button>
+            <article className="rounded-[20px] border border-[#dbe4f4] bg-white p-6 shadow-[0_15px_30px_-26px_rgba(19,48,107,0.35)]">
+              <div className="flex items-center gap-3 text-[#13306b]">
+                <FileText className="h-5 w-5" />
+                <h3 className="font-display text-[1.8rem] font-extrabold uppercase leading-none">Latest From Our Blog</h3>
               </div>
-            </div>
 
-            <div className="space-y-3">
-              {landingFaqs.map((faq, index) => (
-                <div key={faq.question} className="overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-card">
-                  <button type="button"
-                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                    className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left"
-                  >
-                    <span className="font-display text-lg font-semibold tracking-tight">{faq.question}</span>
-                    <ChevronRight className={`h-4 w-4 shrink-0 text-muted-foreground transition ${openFaq === index ? "rotate-90 text-accent" : ""}`} />
-                  </button>
-                  {openFaq === index && (
-                    <div className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">
-                      {faq.answer}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="rounded-[2rem] bg-gradient-brand p-8 text-primary-foreground shadow-elevated lg:p-12">
-              <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-foreground/70">Ready when you are</p>
-                  <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                    Move from discovery into real care without losing the premium feel.
-                  </h2>
-                  <p className="mt-4 max-w-2xl text-sm leading-relaxed text-primary-foreground/85">
-                    Start with service discovery, go deeper into specialties, then continue into patient registration, secure verification, or appointment booking only when needed.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                  <Button className="rounded-full bg-card text-card-foreground hover:bg-card/90" asChild>
-                    <Link to="/services/smart-appointments">
-                      Book appointment
-                      <Calendar className="ml-2 h-4 w-4" />
+              <div className="mt-5 space-y-4">
+                <div className="grid grid-cols-[92px_1fr] gap-4">
+                  <img src={blogWellnessImage} alt="Wellness article" className="h-20 w-full rounded-xl object-cover" loading="lazy" />
+                  <div>
+                    <p className="text-[1.04rem] font-extrabold leading-6 text-[#13306b]">5 Tips for Maintaining Your Mental Wellness</p>
+                    <Link to="/services" className="mt-2 inline-flex items-center gap-2 text-sm font-extrabold text-[#ef2027]">
+                      Read More
+                      <ArrowRight className="h-4 w-4" />
                     </Link>
-                  </Button>
-                  <Button variant="outline" className="rounded-full border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10" asChild>
-                    <Link to="/patient-register">Patient registration</Link>
-                  </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-[92px_1fr] gap-4">
+                  <img src={blogUrgentCareImage} alt="Urgent care article" className="h-20 w-full rounded-xl object-cover" loading="lazy" />
+                  <div>
+                    <p className="text-[1.04rem] font-extrabold leading-6 text-[#13306b]">When to Visit Urgent Care vs. Your PCP</p>
+                    <Link to="/services" className="mt-2 inline-flex items-center gap-2 text-sm font-extrabold text-[#ef2027]">
+                      Read More
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
                 </div>
               </div>
+            </article>
+
+            <article className="rounded-[20px] border border-[#dbe4f4] bg-white p-6 shadow-[0_15px_30px_-26px_rgba(19,48,107,0.35)]">
+              <div className="flex items-center gap-3 text-[#13306b]">
+                <Star className="h-5 w-5 fill-current" />
+                <h3 className="font-display text-[1.8rem] font-extrabold uppercase leading-none">What Our Patients Say</h3>
+              </div>
+              <p className="mt-6 text-base leading-8 text-[#3f598f]">
+                "The staff is so kind and professional. I always feel heard and cared for."
+              </p>
+              <div className="mt-5 flex items-center gap-1 text-[#f7b500]">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star key={index} className="h-5 w-5 fill-current" />
+                ))}
+                <span className="ml-3 text-sm font-semibold text-[#13306b]">Jessica M.</span>
+              </div>
+              <a
+                href="https://www.google.com"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-8 inline-flex items-center gap-2 text-base font-bold text-[#13306b]"
+              >
+                View More Reviews on
+                <span className="text-[#4285F4]">G</span>
+                <span className="text-[#DB4437]">o</span>
+                <span className="text-[#F4B400]">o</span>
+                <span className="text-[#4285F4]">g</span>
+                <span className="text-[#0F9D58]">l</span>
+                <span className="text-[#DB4437]">e</span>
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section id="insurance" className="mx-auto max-w-[1240px] px-4 py-6 lg:px-6">
+          <div className="rounded-[20px] border border-[#dbe4f4] bg-white px-6 py-8 shadow-[0_15px_30px_-26px_rgba(19,48,107,0.35)]">
+            <h3 className="text-center font-display text-[2rem] font-extrabold uppercase text-[#13306b]">We Accept Most Major Insurance Plans</h3>
+            <div className="mt-8 grid gap-6 text-center text-[1.1rem] font-extrabold text-[#365792] sm:grid-cols-2 lg:grid-cols-6">
+              {insuranceLogos.map((name) => (
+                <div key={name} className="flex min-h-[60px] items-center justify-center rounded-xl bg-[#f8fbff] px-4">
+                  {name}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" className="mx-auto max-w-[1240px] px-4 pb-12 pt-2 lg:px-6">
+          <div className="grid overflow-hidden rounded-[24px] bg-[#13306b] text-white lg:grid-cols-[1fr_0.9fr_1fr]">
+            <div className="flex items-center gap-4 border-b border-white/15 px-6 py-7 lg:border-b-0 lg:border-r">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/35">
+                <Calendar className="h-8 w-8" />
+              </div>
+              <div>
+                <p className="text-2xl font-extrabold">Ready to Take the Next Step?</p>
+                <p className="mt-2 text-sm leading-7 text-white/85">We&apos;re here to help you live a healthier, happier life on your time.</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 border-b border-white/15 px-6 py-7 lg:border-b-0 lg:border-r">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/35">
+                <Phone className="h-8 w-8" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.08em] text-white/75">Call Us Today</p>
+                <a href="tel:+14107544343" className="mt-1 block text-[2.3rem] font-extrabold leading-none">410-754-4343</a>
+                <p className="mt-2 text-sm leading-7 text-white/85">Our team is here to help you.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-center px-6 py-7">
+              <Button className="h-14 rounded-md bg-[#ef2027] text-[14px] font-bold uppercase text-white hover:bg-[#d61920]" asChild>
+                <Link to="/services/smart-appointments">
+                  Book Appointment
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <p className="mt-4 text-sm leading-7 text-white/85">Appointments available in-office or via telehealth.</p>
             </div>
           </div>
         </section>
       </main>
 
-      <PublicSiteFooter />
+      <footer className="border-t border-[#d9e1f2] bg-white">
+        <div className="mx-auto flex max-w-[1240px] flex-col items-center justify-between gap-4 px-4 py-6 text-center text-sm text-[#4f6796] lg:flex-row lg:px-6 lg:text-left">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="On Time Medical Group" className="h-12 w-12 object-contain" />
+            <div>
+              <p className="font-bold text-[#13306b]">On Time Medical Group</p>
+              <p>Compassionate care. Clear access. Reliable follow-through.</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-2 lg:items-end">
+            <p>1500 Wellness Avenue, Medical District</p>
+            <div className="flex items-center gap-5">
+              <a href="mailto:care@ontimemedical.com" className="hover:text-[#ef2027]">care@ontimemedical.com</a>
+              <a href="tel:+14107544343" className="hover:text-[#ef2027]">410-754-4343</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <section className="fixed bottom-4 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-[420px] -translate-x-1/2 rounded-2xl border border-[#13306b]/10 bg-white/96 p-3 shadow-[0_18px_40px_-22px_rgba(19,48,107,0.5)] backdrop-blur lg:hidden">
+        <div className="flex items-center gap-3">
+          <Button className="h-12 flex-1 rounded-xl bg-[#ef2027] text-[13px] font-bold uppercase hover:bg-[#d61920]" asChild>
+            <Link to="/services/smart-appointments">Book Appointment</Link>
+          </Button>
+          <Button variant="outline" className="h-12 rounded-xl border-[#9fb1d8] px-4 text-[#13306b]" asChild>
+            <a href="tel:+14107544343">
+              <Phone className="h-4 w-4" />
+            </a>
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
