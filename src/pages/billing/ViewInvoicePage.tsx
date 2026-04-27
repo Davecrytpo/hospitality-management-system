@@ -74,8 +74,8 @@ export default function ViewInvoicePage() {
                   <Building className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-medical-primary">MediCare</h2>
-                  <p className="text-sm text-muted-foreground">General Hospital</p>
+                  <h2 className="text-2xl font-bold text-medical-primary">On Time Medical</h2>
+                  <p className="text-sm text-muted-foreground">Medical Group</p>
                 </div>
               </div>
               <div className="text-right">
@@ -99,7 +99,7 @@ export default function ViewInvoicePage() {
                 <p className="text-sm">123 Healthcare Avenue</p>
                 <p className="text-sm">Medical District, Springfield</p>
                 <p className="text-sm">Phone: +1 234-567-8900</p>
-                <p className="text-sm">Email: accounts@medicare.com</p>
+                <p className="text-sm">Email: accounts@ontimemedical.com</p>
               </div>
             </div>
 
@@ -152,7 +152,7 @@ export default function ViewInvoicePage() {
 
             {/* Footer */}
             <div className="mt-24 pt-8 border-t text-center">
-              <p className="text-sm text-muted-foreground">Thank you for choosing MediCare General Hospital.</p>
+              <p className="text-sm text-muted-foreground">Thank you for choosing On Time Medical Group.</p>
               <p className="text-xs text-muted-foreground mt-1 italic">This is a computer-generated invoice and does not require a physical signature.</p>
             </div>
           </CardContent>

@@ -140,7 +140,7 @@ export default function PrescriptionViewPage() {
             {/* Footer / Signature */}
             <div className="flex justify-between items-end mt-20 pt-8 border-t">
               <div className="text-xs text-muted-foreground space-y-1">
-                <p>Hospital: MediCare General Hospital</p>
+                <p>Hospital: On Time Medical Group</p>
                 <p>Address: 123 Healthcare Avenue, Medical District</p>
                 <p>Phone: +1 234-567-8900</p>
               </div>

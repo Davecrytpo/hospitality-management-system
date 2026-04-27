@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, FileText, Calendar, User, Lock } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { FileText, Loader2, Lock, UserRound } from "lucide-react";
+import { toast } from "sonner";
+
+import { PatientPortalShell } from "@/components/patient-portal/PatientPortalShell";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { getPatientPortalContext, type PatientPortalContext } from "@/lib/patient-portal";
 
 interface MedicalRecord {
   id: string;
@@ -23,49 +26,52 @@ interface MedicalRecord {
   } | null;
 }
 
+const recordTypeClassMap: Record<string, string> = {
+  diagnosis: "bg-[#fff1f1] text-[#ef2027]",
+  lab_result: "bg-[#eef6ff] text-[#1f5fae]",
+  imaging: "bg-[#f2ecff] text-[#7050c8]",
+  procedure: "bg-[#fff6ea] text-[#d27a16]",
+  consultation: "bg-[#eaf8f0] text-[#1d8b55]",
+};
+
 export default function PatientRecordsPage() {
   const navigate = useNavigate();
+  const [portalContext, setPortalContext] = useState<PatientPortalContext | null>(null);
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadRecords = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const context = await getPatientPortalContext();
+      setPortalContext(context);
+
+      const { data, error } = await supabase
+        .from("medical_records")
+        .select(`
+          id,
+          record_type,
+          title,
+          description,
+          diagnosis,
+          treatment,
+          record_date,
+          is_confidential,
+          doctor:doctors(first_name, last_name, specialization)
+        `)
+        .eq("patient_id", context.patient.id)
+        .order("record_date", { ascending: false });
+
+      if (error) throw error;
+      if (data) setRecords(data as MedicalRecord[]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to load medical records.";
+
+      if (message === "AUTH_REQUIRED" || message === "PATIENT_ACCESS_ONLY") {
         navigate("/patient-portal/login");
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (!profile) return;
-
-      const { data: patient } = await supabase
-        .from("patients")
-        .select("id")
-        .eq("profile_id", profile.id)
-        .single();
-
-      if (!patient) return;
-
-      const { data } = await supabase
-        .from("medical_records")
-        .select(`
-          *,
-          doctor:doctors(first_name, last_name, specialization)
-        `)
-        .eq("patient_id", patient.id)
-        .order("record_date", { ascending: false });
-
-      if (data) {
-        setRecords(data as MedicalRecord[]);
-      }
-    } catch (error) {
-      console.error("Error loading records:", error);
+      toast.error("Failed to load medical records.");
     } finally {
       setIsLoading(false);
     }
@@ -75,126 +81,122 @@ export default function PatientRecordsPage() {
     loadRecords();
   }, [loadRecords]);
 
-  const getRecordTypeColor = (type: string) => {
-    switch (type) {
-      case "diagnosis":
-        return "bg-red-500/10 text-red-500";
-      case "lab_result":
-        return "bg-blue-500/10 text-blue-500";
-      case "imaging":
-        return "bg-purple-500/10 text-purple-500";
-      case "procedure":
-        return "bg-orange-500/10 text-orange-500";
-      case "consultation":
-        return "bg-green-500/10 text-green-500";
-      default:
-        return "bg-gray-500/10 text-gray-500";
-    }
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/patient-portal/login");
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f8ff]">
+        <div className="flex items-center gap-3 rounded-2xl border border-[#dbe4f4] bg-white px-5 py-4 text-sm font-semibold text-[#13306b] shadow-[0_18px_40px_-24px_rgba(19,48,107,0.35)]">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading medical records
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" size="icon" asChild>
-            <Link to="/patient-portal">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Medical Records</h1>
-            <p className="text-muted-foreground">Your complete medical history</p>
-          </div>
-        </div>
+  if (!portalContext) {
+    return null;
+  }
 
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Lock className="h-4 w-4" />
-              <p>
-                Your medical records are encrypted and securely stored. Only you and authorized healthcare providers can access this information.
-              </p>
-            </div>
+  const patientName = `${portalContext.patient.first_name} ${portalContext.patient.last_name}`;
+  const patientMeta = portalContext.patient.email || portalContext.profile.email || "Secure patient access";
+
+  return (
+    <PatientPortalShell
+      title="Medical Records"
+      description="Browse diagnoses, consultations, procedures, lab summaries, and treatment notes stored in your chart."
+      patientName={patientName}
+      patientMeta={patientMeta}
+      onLogout={handleLogout}
+    >
+      <Card className="mb-6 rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+        <CardContent className="flex items-start gap-3 p-5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#eef4ff] text-[#13306b]">
+            <Lock className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#6f85af]">Protected Health Information</p>
+            <p className="mt-2 text-sm leading-7 text-[#415b8f]">
+              These records are visible only to you and authorized clinical staff. Confidential records are clearly marked below.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {records.length === 0 ? (
+        <Card className="rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+          <CardContent className="px-6 py-14 text-center">
+            <FileText className="mx-auto h-12 w-12 text-[#97a9cb]" />
+            <p className="mt-4 text-lg font-bold text-[#13306b]">No medical records found</p>
+            <p className="mt-2 text-sm text-[#5f76a3]">As records are added to your chart, they will appear here.</p>
           </CardContent>
         </Card>
-
-        {records.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No medical records found</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {records.map((record) => (
-              <Card key={record.id}>
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
-                    <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${getRecordTypeColor(record.record_type)}`}>
+      ) : (
+        <div className="space-y-4">
+          {records.map((record) => (
+            <Card key={record.id} className="rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+              <CardHeader className="pb-3">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${recordTypeClassMap[record.record_type] || "bg-[#eef4ff] text-[#13306b]"}`}>
                       <FileText className="h-6 w-6" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h3 className="font-semibold">{record.title}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="capitalize">
-                              {record.record_type.replace("_", " ")}
-                            </Badge>
-                            {record.is_confidential && (
-                              <Badge variant="secondary">
-                                <Lock className="h-3 w-3 mr-1" />
-                                Confidential
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {format(new Date(record.record_date), "MMM d, yyyy")}
-                        </span>
+                    <div>
+                      <CardTitle className="text-lg font-extrabold text-[#13306b]">{record.title}</CardTitle>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="rounded-full border-[#c7d6f1] capitalize text-[#13306b]">
+                          {record.record_type.replace("_", " ")}
+                        </Badge>
+                        {record.is_confidential && (
+                          <Badge className="rounded-full bg-[#13306b] text-white hover:bg-[#13306b]">
+                            <Lock className="mr-1 h-3.5 w-3.5" />
+                            Confidential
+                          </Badge>
+                        )}
                       </div>
-
-                      {record.doctor && (
-                        <p className="mt-2 text-sm text-muted-foreground flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          Dr. {record.doctor.first_name} {record.doctor.last_name} ({record.doctor.specialization})
-                        </p>
-                      )}
-
-                      {record.description && (
-                        <p className="mt-3 text-sm">{record.description}</p>
-                      )}
-
-                      {record.diagnosis && (
-                        <div className="mt-3 p-3 bg-muted rounded-lg">
-                          <p className="text-sm font-medium mb-1">Diagnosis</p>
-                          <p className="text-sm text-muted-foreground">{record.diagnosis}</p>
-                        </div>
-                      )}
-
-                      {record.treatment && (
-                        <div className="mt-3 p-3 bg-muted rounded-lg">
-                          <p className="text-sm font-medium mb-1">Treatment</p>
-                          <p className="text-sm text-muted-foreground">{record.treatment}</p>
-                        </div>
-                      )}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+
+                  <p className="text-sm font-semibold text-[#5f76a3]">{format(new Date(record.record_date), "MMM d, yyyy")}</p>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {record.doctor && (
+                  <div className="flex items-center gap-2 rounded-2xl bg-[#f8fbff] px-4 py-3 text-sm text-[#415b8f]">
+                    <UserRound className="h-4 w-4 text-[#13306b]" />
+                    Dr. {record.doctor.first_name} {record.doctor.last_name}
+                    {record.doctor.specialization ? ` · ${record.doctor.specialization}` : ""}
+                  </div>
+                )}
+
+                {record.description && (
+                  <ContentBlock label="Summary" value={record.description} />
+                )}
+
+                {record.diagnosis && (
+                  <ContentBlock label="Diagnosis" value={record.diagnosis} />
+                )}
+
+                {record.treatment && (
+                  <ContentBlock label="Treatment" value={record.treatment} />
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </PatientPortalShell>
+  );
+}
+
+function ContentBlock({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-[#e0e8f7] bg-[#fbfcff] px-4 py-4">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#7e91b8]">{label}</p>
+      <p className="mt-2 text-sm leading-7 text-[#13306b]">{value}</p>
     </div>
   );
 }

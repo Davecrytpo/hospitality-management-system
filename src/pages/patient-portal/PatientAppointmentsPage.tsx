@@ -1,12 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { Calendar, Clock3, Loader2, Stethoscope } from "lucide-react";
+import { toast } from "sonner";
+
+import { PatientPortalShell } from "@/components/patient-portal/PatientPortalShell";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
-import { format } from "date-fns";
+import { getPatientPortalContext, type PatientPortalContext } from "@/lib/patient-portal";
 
 interface Appointment {
   id: string;
@@ -24,47 +27,40 @@ interface Appointment {
 
 export default function PatientAppointmentsPage() {
   const navigate = useNavigate();
+  const [portalContext, setPortalContext] = useState<PatientPortalContext | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadAppointments = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const context = await getPatientPortalContext();
+      setPortalContext(context);
+
+      const { data, error } = await supabase
+        .from("appointments")
+        .select(`
+          id,
+          appointment_date,
+          appointment_time,
+          status,
+          reason,
+          notes,
+          doctor:doctors(first_name, last_name, specialization)
+        `)
+        .eq("patient_id", context.patient.id)
+        .order("appointment_date", { ascending: false });
+
+      if (error) throw error;
+      if (data) setAppointments(data as Appointment[]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to load appointments.";
+
+      if (message === "AUTH_REQUIRED" || message === "PATIENT_ACCESS_ONLY") {
         navigate("/patient-portal/login");
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (!profile) return;
-
-      const { data: patient } = await supabase
-        .from("patients")
-        .select("id")
-        .eq("profile_id", profile.id)
-        .single();
-
-      if (!patient) return;
-
-      const { data } = await supabase
-        .from("appointments")
-        .select(`
-          *,
-          doctor:doctors(first_name, last_name, specialization)
-        `)
-        .eq("patient_id", patient.id)
-        .order("appointment_date", { ascending: false });
-
-      if (data) {
-        setAppointments(data as Appointment[]);
-      }
-    } catch (error) {
-      console.error("Error loading appointments:", error);
+      toast.error("Failed to load appointments.");
     } finally {
       setIsLoading(false);
     }
@@ -74,168 +70,151 @@ export default function PatientAppointmentsPage() {
     loadAppointments();
   }, [loadAppointments]);
 
-  const upcomingAppointments = appointments.filter(
-    (apt) => new Date(apt.appointment_date) >= new Date() && apt.status !== "cancelled"
-  );
-  
-  const pastAppointments = appointments.filter(
-    (apt) => new Date(apt.appointment_date) < new Date() || apt.status === "completed"
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "default";
-      case "scheduled":
-        return "secondary";
-      case "completed":
-        return "outline";
-      case "cancelled":
-        return "destructive";
-      default:
-        return "secondary";
-    }
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/patient-portal/login");
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f8ff]">
+        <div className="flex items-center gap-3 rounded-2xl border border-[#dbe4f4] bg-white px-5 py-4 text-sm font-semibold text-[#13306b] shadow-[0_18px_40px_-24px_rgba(19,48,107,0.35)]">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading appointments
+        </div>
       </div>
     );
   }
 
+  if (!portalContext) {
+    return null;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingAppointments = appointments.filter((appointment) => {
+    const appointmentDate = new Date(appointment.appointment_date);
+    appointmentDate.setHours(0, 0, 0, 0);
+    return appointmentDate >= today && appointment.status !== "cancelled";
+  });
+
+  const pastAppointments = appointments.filter((appointment) => {
+    const appointmentDate = new Date(appointment.appointment_date);
+    appointmentDate.setHours(0, 0, 0, 0);
+    return appointmentDate < today || appointment.status === "completed" || appointment.status === "cancelled";
+  });
+
+  const patientName = `${portalContext.patient.first_name} ${portalContext.patient.last_name}`;
+  const patientMeta = portalContext.patient.email || portalContext.profile.email || "Secure patient access";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" size="icon" asChild>
-            <Link to="/patient-portal">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">My Appointments</h1>
-            <p className="text-muted-foreground">View and manage your appointments</p>
-          </div>
-        </div>
+    <PatientPortalShell
+      title="My Appointments"
+      description="Review upcoming visits, past encounters, and the reasons recorded for each appointment."
+      patientName={patientName}
+      patientMeta={patientMeta}
+      onLogout={handleLogout}
+    >
+      <Tabs defaultValue="upcoming" className="space-y-6">
+        <TabsList className="grid h-auto w-full gap-2 rounded-2xl bg-transparent p-0 sm:w-auto sm:grid-cols-2">
+          <TabsTrigger value="upcoming" className="rounded-xl border border-[#d6e0f3] bg-white px-4 py-3 data-[state=active]:bg-[#13306b] data-[state=active]:text-white">
+            Upcoming ({upcomingAppointments.length})
+          </TabsTrigger>
+          <TabsTrigger value="past" className="rounded-xl border border-[#d6e0f3] bg-white px-4 py-3 data-[state=active]:bg-[#13306b] data-[state=active]:text-white">
+            History ({pastAppointments.length})
+          </TabsTrigger>
+        </TabsList>
 
-        <Tabs defaultValue="upcoming" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="upcoming">
-              Upcoming ({upcomingAppointments.length})
-            </TabsTrigger>
-            <TabsTrigger value="past">
-              Past ({pastAppointments.length})
-            </TabsTrigger>
-          </TabsList>
+        <TabsContent value="upcoming" className="mt-0">
+          <AppointmentSection appointments={upcomingAppointments} emptyTitle="No upcoming appointments" emptyDescription="Scheduled visits will appear here once they are booked." />
+        </TabsContent>
 
-          <TabsContent value="upcoming">
-            {upcomingAppointments.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No upcoming appointments</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {upcomingAppointments.map((apt) => (
-                  <Card key={apt.id}>
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-4">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <User className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
-                            <div>
-                              <h3 className="font-semibold">
-                                Dr. {apt.doctor?.first_name} {apt.doctor?.last_name}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                {apt.doctor?.specialization}
-                              </p>
-                            </div>
-                            <Badge variant={getStatusColor(apt.status)}>
-                              {apt.status}
-                            </Badge>
-                          </div>
-                          <div className="mt-4 flex items-center gap-6 text-sm">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <span>{format(new Date(apt.appointment_date), "MMMM d, yyyy")}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-muted-foreground" />
-                              <span>{apt.appointment_time}</span>
-                            </div>
-                          </div>
-                          {apt.reason && (
-                            <p className="mt-3 text-sm text-muted-foreground">
-                              <strong>Reason:</strong> {apt.reason}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+        <TabsContent value="past" className="mt-0">
+          <AppointmentSection appointments={pastAppointments} emptyTitle="No appointment history" emptyDescription="Completed and previous visits will appear here." dimmed />
+        </TabsContent>
+      </Tabs>
+    </PatientPortalShell>
+  );
+}
+
+function AppointmentSection({
+  appointments,
+  emptyTitle,
+  emptyDescription,
+  dimmed = false,
+}: {
+  appointments: Appointment[];
+  emptyTitle: string;
+  emptyDescription: string;
+  dimmed?: boolean;
+}) {
+  if (appointments.length === 0) {
+    return (
+      <Card className="rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+        <CardContent className="px-6 py-14 text-center">
+          <Calendar className="mx-auto h-12 w-12 text-[#97a9cb]" />
+          <p className="mt-4 text-lg font-bold text-[#13306b]">{emptyTitle}</p>
+          <p className="mt-2 text-sm text-[#5f76a3]">{emptyDescription}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {appointments.map((appointment) => (
+        <Card
+          key={appointment.id}
+          className={`rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)] ${dimmed ? "opacity-90" : ""}`}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#eef4ff] text-[#13306b]">
+                  <Stethoscope className="h-6 w-6" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg font-extrabold text-[#13306b]">
+                    Dr. {appointment.doctor?.first_name} {appointment.doctor?.last_name}
+                  </CardTitle>
+                  <p className="mt-1 text-sm text-[#5f76a3]">{appointment.doctor?.specialization || "Clinical consultation"}</p>
+                </div>
+              </div>
+
+              <Badge className="w-fit rounded-full bg-[#13306b] px-3 py-1 text-white hover:bg-[#13306b]">
+                {appointment.status || "scheduled"}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 text-sm text-[#415b8f] sm:grid-cols-2">
+              <div className="flex items-center gap-2 rounded-2xl bg-[#f8fbff] px-4 py-3">
+                <Calendar className="h-4 w-4 text-[#13306b]" />
+                <span>{format(new Date(appointment.appointment_date), "MMMM d, yyyy")}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl bg-[#f8fbff] px-4 py-3">
+                <Clock3 className="h-4 w-4 text-[#13306b]" />
+                <span>{appointment.appointment_time}</span>
+              </div>
+            </div>
+
+            {appointment.reason && (
+              <div className="rounded-2xl border border-[#e0e8f7] bg-[#fbfcff] px-4 py-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#7e91b8]">Reason for Visit</p>
+                <p className="mt-2 text-sm leading-7 text-[#13306b]">{appointment.reason}</p>
               </div>
             )}
-          </TabsContent>
 
-          <TabsContent value="past">
-            {pastAppointments.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No past appointments</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {pastAppointments.map((apt) => (
-                  <Card key={apt.id} className="opacity-80">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-4">
-                        <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                          <User className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
-                            <div>
-                              <h3 className="font-semibold">
-                                Dr. {apt.doctor?.first_name} {apt.doctor?.last_name}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                {apt.doctor?.specialization}
-                              </p>
-                            </div>
-                            <Badge variant={getStatusColor(apt.status)}>
-                              {apt.status}
-                            </Badge>
-                          </div>
-                          <div className="mt-4 flex items-center gap-6 text-sm">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <span>{format(new Date(apt.appointment_date), "MMMM d, yyyy")}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-muted-foreground" />
-                              <span>{apt.appointment_time}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+            {appointment.notes && (
+              <div className="rounded-2xl border border-[#e0e8f7] bg-[#fbfcff] px-4 py-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#7e91b8]">Notes</p>
+                <p className="mt-2 text-sm leading-7 text-[#13306b]">{appointment.notes}</p>
               </div>
             )}
-          </TabsContent>
-        </Tabs>
-      </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

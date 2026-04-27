@@ -1,31 +1,27 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { 
-  Calendar, 
-  Pill, 
-  FileText, 
-  User, 
-  LogOut, 
-  Heart,
-  Clock,
+import { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import {
   Activity,
-  Bell
+  Calendar,
+  ChevronRight,
+  Clock3,
+  FileText,
+  HeartPulse,
+  Loader2,
+  LogOut,
+  Pill,
+  ShieldCheck,
+  UserRound,
 } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
 
-interface PatientInfo {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  dateOfBirth: string;
-  bloodType?: string;
-}
+import { PatientPortalShell } from "@/components/patient-portal/PatientPortalShell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { getPatientPortalContext, type PatientPortalContext } from "@/lib/patient-portal";
 
 interface Appointment {
   id: string;
@@ -47,299 +43,307 @@ interface Prescription {
   frequency?: string | null;
   status?: string | null;
   start_date: string;
-  end_date?: string | null;
 }
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [patientInfo, setPatientInfo] = useState<PatientInfo | null>(null);
+  const [portalContext, setPortalContext] = useState<PatientPortalContext | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
 
-  const checkAuthAndLoadData = useCallback(async () => {
+  const loadDashboard = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate("/patient-portal/login");
-        return;
-      }
+      const context = await getPatientPortalContext();
+      setPortalContext(context);
 
-      // Get patient info
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (!profile || profile.role !== "patient") {
-        toast.error("Access denied. This portal is for patients only.");
-        await supabase.auth.signOut();
-        navigate("/patient-portal/login");
-        return;
-      }
-
-      const { data: patient } = await supabase
-        .from("patients")
-        .select("*")
-        .eq("profile_id", profile.id)
-        .single();
-
-      if (patient) {
-        setPatientInfo({
-          id: patient.id,
-          firstName: patient.first_name,
-          lastName: patient.last_name,
-          email: patient.email || profile.email,
-          dateOfBirth: patient.date_of_birth,
-          bloodType: patient.blood_type || undefined,
-        });
-
-        // Load appointments
-        const { data: appointmentsData } = await supabase
+      const [appointmentsResult, prescriptionsResult] = await Promise.all([
+        supabase
           .from("appointments")
           .select(`
-            *,
+            id,
+            appointment_date,
+            appointment_time,
+            status,
+            reason,
             doctor:doctors(first_name, last_name, specialization)
           `)
-          .eq("patient_id", patient.id)
+          .eq("patient_id", context.patient.id)
           .gte("appointment_date", new Date().toISOString().split("T")[0])
           .order("appointment_date", { ascending: true })
-          .limit(5);
-
-        if (appointmentsData) {
-          setAppointments(appointmentsData as Appointment[]);
-        }
-
-        // Load prescriptions
-        const { data: prescriptionsData } = await supabase
+          .limit(4),
+        supabase
           .from("prescriptions")
-          .select("*")
-          .eq("patient_id", patient.id)
+          .select("id, medication_name, dosage, frequency, status, start_date")
+          .eq("patient_id", context.patient.id)
           .eq("status", "active")
           .order("start_date", { ascending: false })
-          .limit(5);
+          .limit(4),
+      ]);
 
-        if (prescriptionsData) {
-          setPrescriptions(prescriptionsData);
-        }
+      if (appointmentsResult.data) {
+        setAppointments(appointmentsResult.data as Appointment[]);
+      }
+
+      if (prescriptionsResult.data) {
+        setPrescriptions(prescriptionsResult.data as Prescription[]);
       }
     } catch (error) {
-      console.error("Error loading patient data:", error);
-      toast.error("Failed to load your data");
+      const message = error instanceof Error ? error.message : "Unable to load your portal.";
+
+      if (message === "AUTH_REQUIRED" || message === "PATIENT_ACCESS_ONLY") {
+        navigate("/patient-portal/login");
+        return;
+      }
+
+      toast.error(message === "PATIENT_RECORD_NOT_FOUND" ? "Patient record not found." : "Failed to load your dashboard.");
     } finally {
       setIsLoading(false);
     }
   }, [navigate]);
 
   useEffect(() => {
-    checkAuthAndLoadData();
+    loadDashboard();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         navigate("/patient-portal/login");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [checkAuthAndLoadData, navigate]);
+  }, [loadDashboard, navigate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    toast.success("You have been signed out.");
     navigate("/patient-portal/login");
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f8ff]">
+        <div className="flex items-center gap-3 rounded-2xl border border-[#dbe4f4] bg-white px-5 py-4 text-sm font-semibold text-[#13306b] shadow-[0_18px_40px_-24px_rgba(19,48,107,0.35)]">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading your portal
+        </div>
       </div>
     );
   }
 
+  if (!portalContext) {
+    return null;
+  }
+
+  const patientName = `${portalContext.patient.first_name} ${portalContext.patient.last_name}`;
+  const patientMeta = portalContext.patient.email || portalContext.profile.email || "Secure patient access";
+
+  const summaryCards = [
+    {
+      label: "Upcoming Visits",
+      value: appointments.length,
+      detail: "Appointments ahead",
+      icon: Calendar,
+      iconClass: "bg-[#eef4ff] text-[#13306b]",
+    },
+    {
+      label: "Active Prescriptions",
+      value: prescriptions.length,
+      detail: "Current medications",
+      icon: Pill,
+      iconClass: "bg-[#eaf8f0] text-[#1d8b55]",
+    },
+    {
+      label: "Blood Type",
+      value: portalContext.patient.blood_type || "N/A",
+      detail: "Clinical snapshot",
+      icon: Activity,
+      iconClass: "bg-[#fff3f2] text-[#ef2027]",
+    },
+    {
+      label: "Profile Status",
+      value: "Verified",
+      detail: "Secure access enabled",
+      icon: ShieldCheck,
+      iconClass: "bg-[#edf7ff] text-[#1f5fae]",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="relative overflow-hidden bg-gradient-hero text-white">
-        <div className="absolute inset-0 medical-grid opacity-20" />
-        <div className="ambient-orb -top-24 -right-24 h-72 w-72" />
-        <div className="relative container mx-auto px-4 py-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
-              <Heart className="h-6 w-6 text-white" fill="currentColor" />
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-white/60 font-semibold">Patient Portal</p>
-              <h1 className="font-display text-2xl font-bold">Welcome, {patientInfo?.firstName}</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleLogout} className="text-white hover:bg-white/10">
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
+    <PatientPortalShell
+      title={`Welcome back, ${portalContext.patient.first_name}`}
+      description="Review upcoming visits, current medications, billing, and your medical records through the same clean experience as the main site."
+      patientName={patientName}
+      patientMeta={patientMeta}
+      onLogout={handleLogout}
+      actions={
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <Button className="h-12 rounded-xl bg-[#ef2027] text-sm font-bold uppercase text-white hover:bg-[#d61920]" asChild>
+            <Link to="/services/smart-appointments">Book New Appointment</Link>
+          </Button>
+          <Button variant="outline" className="h-12 rounded-xl border-white/25 bg-white/10 text-sm font-bold uppercase text-white hover:bg-white hover:text-[#13306b]" asChild>
+            <Link to="/patient-portal/appointments">View Appointments</Link>
+          </Button>
+          <Button variant="outline" className="h-12 rounded-xl border-white/25 bg-white/10 text-sm font-bold uppercase text-white hover:bg-white hover:text-[#13306b]" asChild>
+            <Link to="/patient-portal/billing">Review Billing</Link>
+          </Button>
+          <Button variant="outline" className="h-12 rounded-xl border-white/25 bg-white/10 text-sm font-bold uppercase text-white hover:bg-white hover:text-[#13306b]" asChild>
+            <Link to="/patient-portal/profile">Update Profile</Link>
+          </Button>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 -mt-6 relative z-10">
-        {/* Quick Stats */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          {[
-            { icon: Calendar, label: "Upcoming Appointments", value: appointments.length, color: "text-accent", bg: "bg-accent/10" },
-            { icon: Pill, label: "Active Prescriptions", value: prescriptions.length, color: "text-medical-success", bg: "bg-medical-success/10" },
-            { icon: Activity, label: "Blood Type", value: patientInfo?.bloodType || "N/A", color: "text-primary", bg: "bg-primary/10" },
-            { icon: FileText, label: "Medical Records", value: "View", color: "text-medical-warning", bg: "bg-medical-warning/10" },
-          ].map((s) => (
-            <Card key={s.label} className="card-hover border-border/60 shadow-card">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className={`h-12 w-12 rounded-xl ${s.bg} flex items-center justify-center`}>
-                    <s.icon className={`h-6 w-6 ${s.color}`} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-display font-bold">{s.value}</p>
-                    <p className="text-sm text-muted-foreground">{s.label}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Main Grid */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Upcoming Appointments */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Upcoming Appointments</CardTitle>
-                  <CardDescription>Your scheduled visits</CardDescription>
-                </div>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/patient-portal/appointments">View All</Link>
-                </Button>
+      }
+    >
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {summaryCards.map((card) => (
+          <Card key={card.label} className="rounded-[22px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${card.iconClass}`}>
+                <card.icon className="h-7 w-7" />
               </div>
-            </CardHeader>
-            <CardContent>
-              {appointments.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No upcoming appointments
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {appointments.map((apt) => (
-                    <div key={apt.id} className="flex items-center gap-4 p-3 rounded-lg border">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Clock className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">
-                          Dr. {apt.doctor?.first_name} {apt.doctor?.last_name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {apt.doctor?.specialization}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">
-                          {format(new Date(apt.appointment_date), "MMM d, yyyy")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">{apt.appointment_time}</p>
-                      </div>
-                      <Badge variant={apt.status === "confirmed" ? "default" : "secondary"}>
-                        {apt.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#6b7fa8]">{card.label}</p>
+                <p className="mt-2 text-2xl font-extrabold leading-none text-[#13306b]">{card.value}</p>
+                <p className="mt-1 text-sm text-[#4f6796]">{card.detail}</p>
+              </div>
             </CardContent>
           </Card>
+        ))}
+      </section>
 
-          {/* Active Prescriptions */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Active Prescriptions</CardTitle>
-                  <CardDescription>Your current medications</CardDescription>
-                </div>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/patient-portal/prescriptions">View All</Link>
-                </Button>
+      <section className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <Card className="rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-xl font-extrabold text-[#13306b]">Upcoming Appointments</CardTitle>
+              <p className="mt-1 text-sm text-[#5f76a3]">Your next confirmed and scheduled visits.</p>
+            </div>
+            <Button variant="outline" className="rounded-xl border-[#d0dcf4] text-[#13306b]" asChild>
+              <Link to="/patient-portal/appointments">View All</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {appointments.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-[#d6e0f3] bg-[#f8fbff] px-5 py-10 text-center">
+                <Calendar className="mx-auto h-10 w-10 text-[#98a9cb]" />
+                <p className="mt-4 text-base font-semibold text-[#13306b]">No upcoming appointments</p>
+                <p className="mt-1 text-sm text-[#5f76a3]">When you book a new visit, it will appear here.</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              {prescriptions.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No active prescriptions
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {prescriptions.map((rx) => (
-                    <div key={rx.id} className="flex items-center gap-4 p-3 rounded-lg border">
-                      <div className="h-10 w-10 rounded-full bg-medical-success/10 flex items-center justify-center">
-                        <Pill className="h-5 w-5 text-medical-success" />
+            ) : (
+              appointments.map((appointment) => (
+                <div key={appointment.id} className="rounded-2xl border border-[#e0e8f7] bg-[#fbfcff] p-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#eef4ff] text-[#13306b]">
+                        <Clock3 className="h-5 w-5" />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{rx.medication_name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {rx.dosage} - {rx.frequency}
+                      <div>
+                        <p className="text-base font-bold text-[#13306b]">
+                          Dr. {appointment.doctor?.first_name} {appointment.doctor?.last_name}
+                        </p>
+                        <p className="mt-1 text-sm text-[#5f76a3]">{appointment.doctor?.specialization || "Clinical appointment"}</p>
+                        {appointment.reason && <p className="mt-2 text-sm text-[#415b8f]">{appointment.reason}</p>}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                      <div className="text-sm font-semibold text-[#13306b]">
+                        {format(new Date(appointment.appointment_date), "MMM d, yyyy")}
+                        <span className="block text-xs font-medium text-[#6b7fa8]">{appointment.appointment_time}</span>
+                      </div>
+                      <Badge className="rounded-full bg-[#13306b] px-3 py-1 text-white hover:bg-[#13306b]">
+                        {appointment.status || "scheduled"}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="space-y-6">
+          <Card className="rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-extrabold text-[#13306b]">Current Prescriptions</CardTitle>
+              <p className="mt-1 text-sm text-[#5f76a3]">Medications currently active on your record.</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {prescriptions.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[#d6e0f3] bg-[#f8fbff] px-5 py-8 text-center">
+                  <Pill className="mx-auto h-9 w-9 text-[#98a9cb]" />
+                  <p className="mt-4 text-base font-semibold text-[#13306b]">No active prescriptions</p>
+                </div>
+              ) : (
+                prescriptions.map((prescription) => (
+                  <div key={prescription.id} className="rounded-2xl border border-[#e0e8f7] bg-[#fbfcff] p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-base font-bold text-[#13306b]">{prescription.medication_name}</p>
+                        <p className="mt-1 text-sm text-[#5f76a3]">
+                          {prescription.dosage || "Dosage pending"}{prescription.frequency ? ` · ${prescription.frequency}` : ""}
                         </p>
                       </div>
-                      <Badge variant="outline" className="text-medical-success border-medical-success">
+                      <Badge variant="outline" className="rounded-full border-[#1d8b55] text-[#1d8b55]">
                         Active
                       </Badge>
                     </div>
-                  ))}
-                </div>
+                    <p className="mt-3 text-xs font-medium uppercase tracking-[0.12em] text-[#7a8fb8]">
+                      Started {format(new Date(prescription.start_date), "MMM d, yyyy")}
+                    </p>
+                  </div>
+                ))
               )}
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Access your health information</CardDescription>
+          <Card className="rounded-[24px] border border-[#dbe4f4] bg-white shadow-[0_18px_40px_-28px_rgba(19,48,107,0.28)]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-extrabold text-[#13306b]">Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <Button variant="outline" className="h-24 flex-col gap-2" asChild>
-                  <Link to="/patient-portal/appointments">
-                    <Calendar className="h-6 w-6" />
-                    <span>My Appointments</span>
+            <CardContent className="grid gap-3 sm:grid-cols-2">
+              {[
+                { label: "Medical Records", href: "/patient-portal/records", icon: FileText },
+                { label: "Billing & Payments", href: "/patient-portal/billing", icon: HeartPulse },
+                { label: "Profile Settings", href: "/patient-portal/profile", icon: UserRound },
+                { label: "Sign Out", action: handleLogout, icon: LogOut },
+              ].map((action) => (
+                action.href ? (
+                  <Link
+                    key={action.label}
+                    to={action.href}
+                    className="flex items-center justify-between rounded-2xl border border-[#e0e8f7] bg-[#fbfcff] px-4 py-4 transition hover:border-[#bfd0ef] hover:bg-[#f3f7ff]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef4ff] text-[#13306b]">
+                        <action.icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-sm font-bold text-[#13306b]">{action.label}</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[#7e91b8]" />
                   </Link>
-                </Button>
-                <Button variant="outline" className="h-24 flex-col gap-2" asChild>
-                  <Link to="/patient-portal/prescriptions">
-                    <Pill className="h-6 w-6" />
-                    <span>My Prescriptions</span>
-                  </Link>
-                </Button>
-                <Button variant="outline" className="h-24 flex-col gap-2" asChild>
-                  <Link to="/patient-portal/records">
-                    <FileText className="h-6 w-6" />
-                    <span>Medical Records</span>
-                  </Link>
-                </Button>
-                <Button variant="outline" className="h-24 flex-col gap-2" asChild>
-                  <Link to="/patient-portal/profile">
-                    <User className="h-6 w-6" />
-                    <span>My Profile</span>
-                  </Link>
-                </Button>
-              </div>
+                ) : (
+                  <button
+                    type="button"
+                    key={action.label}
+                    onClick={action.action}
+                    className="flex items-center justify-between rounded-2xl border border-[#e0e8f7] bg-[#fbfcff] px-4 py-4 text-left transition hover:border-[#bfd0ef] hover:bg-[#f3f7ff]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fff1f1] text-[#ef2027]">
+                        <action.icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-sm font-bold text-[#13306b]">{action.label}</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[#7e91b8]" />
+                  </button>
+                )
+              ))}
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+      </section>
+    </PatientPortalShell>
   );
 }

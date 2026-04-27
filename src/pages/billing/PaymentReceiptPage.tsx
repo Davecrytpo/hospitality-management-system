@@ -56,7 +56,7 @@ export default function PaymentReceiptPage() {
                 <div className="flex justify-between items-center pb-4 border-b">
                   <div className="flex items-center gap-2">
                     <Building className="h-5 w-5 text-medical-primary" />
-                    <span className="font-bold text-lg text-medical-primary">MediCare Hospital</span>
+                    <span className="font-bold text-lg text-medical-primary">On Time Medical Group</span>
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-bold text-muted-foreground">RECEIPT NO</p>
@@ -92,7 +92,7 @@ export default function PaymentReceiptPage() {
 
                 <div className="pt-8 text-center">
                   <p className="text-xs text-muted-foreground">This is an automated receipt for your payment. Please keep it for your records.</p>
-                  <p className="text-xs font-bold mt-4 text-medical-primary">www.medicare-hospital.com</p>
+                  <p className="text-xs font-bold mt-4 text-medical-primary">www.ontimemedical.com</p>
                 </div>
               </div>
             </CardContent>

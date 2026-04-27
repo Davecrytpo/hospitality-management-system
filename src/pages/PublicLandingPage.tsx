@@ -118,7 +118,14 @@ const stats = [
 
 const resourceLinks = ["New Patient Forms", "Patient Portal", "FAQs", "Health Tips"];
 
-const insuranceLogos = ["aetna", "United Healthcare", "CareFirst", "Cigna", "BlueCross BlueShield", "Medicare.gov"];
+const insuranceLogos = [
+  { name: "aetna", className: "text-[#7a3eb1] lowercase tracking-tight" },
+  { name: "United Healthcare", className: "text-[#1b4697]" },
+  { name: "CareFirst", className: "text-[#1d2d52]" },
+  { name: "Cigna", className: "text-[#1792d0]" },
+  { name: "BlueCross BlueShield", className: "text-[#14539a]" },
+  { name: "Medicare.gov", className: "text-[#1a6d47]" },
+];
 
 export default function PublicLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -232,9 +239,9 @@ export default function PublicLandingPage() {
         )}
       </header>
 
-      <main>
+      <main className="pb-24 lg:pb-0">
         <section className="mx-auto max-w-[1240px] px-4 pb-6 pt-8 lg:px-6">
-          <div className="mb-6 flex justify-end">
+          <div className="mb-6 flex justify-center sm:justify-end">
             <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-xl font-extrabold text-[#13306b] sm:text-2xl">
               <Phone className="h-5 w-5" />
               410-754-4343
@@ -302,7 +309,7 @@ export default function PublicLandingPage() {
             </motion.div>
           </div>
 
-          <div className="-mt-3 grid rounded-[24px] bg-[#13306b] text-white shadow-[0_24px_48px_-28px_rgba(19,48,107,0.55)] md:grid-cols-3 xl:grid-cols-5">
+          <div className="-mt-3 grid rounded-[24px] bg-[#13306b] text-white shadow-[0_24px_48px_-28px_rgba(19,48,107,0.55)] sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
             {trustHighlights.map((item, index) => (
               <div
                 key={item.title}
@@ -422,7 +429,11 @@ export default function PublicLandingPage() {
               <div className="mt-5 grid gap-5 md:grid-cols-[1fr_132px] md:items-end">
                 <div className="space-y-2">
                   {resourceLinks.map((item) => (
-                    <Link key={item} to="/patient-register" className="flex items-center gap-2 text-sm font-semibold text-[#13306b] hover:text-[#ef2027]">
+                    <Link
+                      key={item}
+                      to={item === "Patient Portal" ? "/patient-portal/login" : "/patient-register"}
+                      className="flex items-center gap-2 text-sm font-semibold text-[#13306b] hover:text-[#ef2027]"
+                    >
                       <ChevronRight className="h-4 w-4" />
                       {item}
                     </Link>
@@ -502,10 +513,10 @@ export default function PublicLandingPage() {
         <section id="insurance" className="mx-auto max-w-[1240px] px-4 py-6 lg:px-6">
           <div className="rounded-[20px] border border-[#dbe4f4] bg-white px-6 py-8 shadow-[0_15px_30px_-26px_rgba(19,48,107,0.35)]">
             <h3 className="text-center font-display text-[2rem] font-extrabold uppercase text-[#13306b]">We Accept Most Major Insurance Plans</h3>
-            <div className="mt-8 grid gap-6 text-center text-[1.1rem] font-extrabold text-[#365792] sm:grid-cols-2 lg:grid-cols-6">
-              {insuranceLogos.map((name) => (
-                <div key={name} className="flex min-h-[60px] items-center justify-center rounded-xl bg-[#f8fbff] px-4">
-                  {name}
+            <div className="mt-8 grid gap-4 text-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+              {insuranceLogos.map((insurance) => (
+                <div key={insurance.name} className="flex min-h-[88px] items-center justify-center rounded-2xl border border-[#e1e8f5] bg-[#f8fbff] px-4 py-4 shadow-[0_12px_30px_-24px_rgba(19,48,107,0.28)]">
+                  <span className={`text-[1.15rem] font-extrabold leading-tight ${insurance.className}`}>{insurance.name}</span>
                 </div>
               ))}
             </div>

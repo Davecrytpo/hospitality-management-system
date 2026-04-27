@@ -27,7 +27,7 @@ export default function KioskCheckinPage() {
             <Building2 className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-primary tracking-tight">MediCare</h1>
+            <h1 className="text-xl font-bold text-primary tracking-tight">On Time Medical</h1>
             <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Self-Service Kiosk</p>
           </div>
         </div>
@@ -41,7 +41,7 @@ export default function KioskCheckinPage() {
         <div className="w-full max-w-4xl">
           {step === 1 && (
             <div className="grid md:grid-cols-2 gap-8">
-              <button 
+              <button type="button" 
                 onClick={() => setStep(2)}
                 className="group p-10 bg-white rounded-3xl border-4 border-transparent hover:border-primary hover:shadow-2xl transition-all text-center space-y-6"
               >
@@ -54,7 +54,7 @@ export default function KioskCheckinPage() {
                 </div>
               </button>
 
-              <button 
+              <button type="button" 
                 onClick={() => navigate("/patient-register")}
                 className="group p-10 bg-white rounded-3xl border-4 border-transparent hover:border-medical-secondary hover:shadow-2xl transition-all text-center space-y-6"
               >
