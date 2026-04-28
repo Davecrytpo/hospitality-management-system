@@ -35,6 +35,7 @@ import insuranceCareFirst from "@/assets/insurance-carefirst.svg";
 import insuranceCigna from "@/assets/insurance-cigna.svg";
 import insuranceBcbs from "@/assets/insurance-bcbs.svg";
 import insuranceMedicare from "@/assets/insurance-medicare.svg";
+import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -125,6 +126,7 @@ const insuranceLogos = [
 
 export default function PublicLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
   const shellClassName = "mx-auto w-full max-w-[1240px] px-4 sm:px-6";
 
   const heroTitle = useMemo(
@@ -167,11 +169,11 @@ export default function PublicLandingPage() {
                 Patient Portal Login
               </Link>
             </Button>
-            <Button className="btn-mock-red h-12 px-5 text-[12px] uppercase" asChild>
-              <Link to="/services/smart-appointments">
+            <Button className="btn-mock-red h-12 px-5 text-[12px] uppercase" onClick={() => setAppointmentOpen(true)}>
+              <span className="inline-flex items-center">
                 <Calendar className="mr-2 h-4 w-4" />
                 Book Appointment
-              </Link>
+              </span>
             </Button>
           </div>
 
@@ -206,10 +208,14 @@ export default function PublicLandingPage() {
                     Patient Portal Login
                   </Link>
                 </Button>
-                <Button className="btn-mock-red h-12 text-[13px] uppercase" asChild>
-                  <Link to="/services/smart-appointments" onClick={() => setMobileMenuOpen(false)}>
-                    Book Appointment
-                  </Link>
+                <Button
+                  className="btn-mock-red h-12 text-[13px] uppercase"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setAppointmentOpen(true);
+                  }}
+                >
+                  <span>Book Appointment</span>
                 </Button>
               </div>
             </div>
@@ -220,23 +226,23 @@ export default function PublicLandingPage() {
       <main className="overflow-hidden bg-white">
         <section className="border-b border-[#edf2fb]">
           <div className={`${shellClassName} pt-4 sm:pt-6 lg:pt-2`}>
-            <div className="grid items-stretch gap-0 lg:grid-cols-[1.03fr_1.22fr]">
-              <div className="flex flex-col justify-center py-10 lg:py-16 xl:py-20">
-                <div className="max-w-[560px]">
-                  <h1 className="hero-mock-title text-[3.65rem] font-black leading-[0.92] tracking-[-0.05em] text-[#113178] sm:text-[4.6rem] lg:max-w-[640px] lg:text-[5.45rem] xl:text-[6.05rem]">
+            <div className="grid items-center gap-0 lg:grid-cols-[1.02fr_1.18fr]">
+              <div className="flex flex-col justify-center py-10 lg:py-12 xl:py-16">
+                <div className="max-w-[542px]">
+                  <h1 className="hero-mock-title text-[3.35rem] font-black leading-[0.94] tracking-[-0.05em] text-[#113178] sm:text-[4.4rem] lg:max-w-[620px] lg:text-[5.4rem] xl:text-[5.85rem]">
                     {heroTitle}
                   </h1>
-                  <p className="mt-6 max-w-[520px] text-[1.05rem] leading-8 text-[#3f588c]">
+                  <p className="mt-5 max-w-[500px] text-[1.02rem] leading-8 text-[#3f588c]">
                     On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment
                     with compassion, convenience, and a commitment to your well-being.
                   </p>
 
-                  <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                    <Button className="btn-mock-red h-14 min-w-[232px] px-7 text-[13px] uppercase" asChild>
-                      <Link to="/services/smart-appointments">
+                  <div className="mt-7 flex flex-col gap-4 sm:flex-row">
+                    <Button className="btn-mock-red h-14 min-w-[232px] px-7 text-[13px] uppercase" onClick={() => setAppointmentOpen(true)}>
+                      <span className="inline-flex items-center">
                         Book Appointment
                         <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
+                      </span>
                     </Button>
                     <Button variant="outline" className="btn-mock-outline h-14 min-w-[232px] px-7 text-[13px] uppercase" asChild>
                       <a href="tel:+14107544343">
@@ -260,11 +266,11 @@ export default function PublicLandingPage() {
               </div>
 
               <div className="relative flex items-end justify-end lg:-mr-8 xl:-mr-12">
-                <div className="relative w-full overflow-hidden rounded-[22px] bg-[#f5f7fc] lg:rounded-b-none lg:rounded-tl-[22px]">
+                <div className="relative w-full overflow-hidden rounded-[22px] bg-[#f5f7fc]">
                   <img
                     src={heroImage}
                     alt="Doctor discussing care plan with a patient"
-                    className="h-full min-h-[360px] w-full object-cover object-center"
+                    className="h-full min-h-[390px] w-full object-cover object-center"
                     loading="eager"
                   />
                 </div>
@@ -513,11 +519,11 @@ export default function PublicLandingPage() {
             </div>
 
             <div className="flex flex-col justify-center px-6 py-7">
-              <Button className="btn-mock-red h-14 text-[14px] uppercase" asChild>
-                <Link to="/services/smart-appointments">
+              <Button className="btn-mock-red h-14 text-[14px] uppercase" onClick={() => setAppointmentOpen(true)}>
+                <span className="inline-flex items-center">
                   Book Appointment
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+                </span>
               </Button>
               <p className="mt-4 text-sm leading-7 text-white/85">Appointments available in-office or via telehealth.</p>
             </div>
@@ -550,8 +556,8 @@ export default function PublicLandingPage() {
 
       <section className="fixed bottom-4 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-[420px] -translate-x-1/2 rounded-2xl border border-[#13306b]/10 bg-white/96 p-3 shadow-[0_18px_40px_-22px_rgba(19,48,107,0.5)] backdrop-blur lg:hidden">
         <div className="flex items-center gap-3">
-          <Button className="btn-mock-red h-12 flex-1 rounded-xl text-[13px] uppercase" asChild>
-            <Link to="/services/smart-appointments">Book Appointment</Link>
+          <Button className="btn-mock-red h-12 flex-1 rounded-xl text-[13px] uppercase" onClick={() => setAppointmentOpen(true)}>
+            <span>Book Appointment</span>
           </Button>
           <Button variant="outline" className="btn-mock-outline h-12 rounded-xl px-4" asChild>
             <a href="tel:+14107544343">
@@ -560,6 +566,8 @@ export default function PublicLandingPage() {
           </Button>
         </div>
       </section>
+
+      <AppointmentRequestDialog open={appointmentOpen} onOpenChange={setAppointmentOpen} />
     </div>
   );
 }
