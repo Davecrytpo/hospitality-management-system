@@ -4,6 +4,7 @@ import { Calendar, Lock, Menu, Phone, X } from "lucide-react";
 
 import logo from "@/assets/logo-ontime.png";
 import { Button } from "@/components/ui/button";
+import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -17,14 +18,16 @@ const navItems = [
 
 export function PublicSiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
   const location = useLocation();
 
   const openAppointment = () => {
     setMobileOpen(false);
-    window.dispatchEvent(new CustomEvent("open-appointment-request"));
+    setAppointmentOpen(true);
   };
 
   return (
+    <>
     <header className="relative z-50 bg-card shadow-sm">
       <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 lg:px-6">
         <Link to="/" aria-label="On Time Medical Group home" className="inline-flex">
@@ -88,5 +91,7 @@ export function PublicSiteHeader() {
         </div>
       )}
     </header>
+    <AppointmentRequestDialog open={appointmentOpen} onOpenChange={setAppointmentOpen} />
+    </>
   );
 }
