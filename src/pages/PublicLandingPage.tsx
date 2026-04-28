@@ -7,7 +7,6 @@ import {
   Calendar,
   Check,
   ChevronRight,
-  ClipboardPlus,
   FileText,
   HeartHandshake,
   HeartPulse,
@@ -161,19 +160,19 @@ export default function PublicLandingPage() {
       </header>
 
       <main>
-        <section className="mx-auto max-w-[1240px] px-4 pb-5 pt-0 xl:px-6">
-          <div className="grid overflow-hidden bg-card shadow-mock md:grid-cols-[0.44fr_0.56fr]">
-            <div className="relative z-10 flex flex-col justify-center px-0 py-8 pr-5 sm:py-9 md:min-h-[360px] md:py-6 md:pr-4 lg:min-h-[410px] lg:pr-6 xl:min-h-[440px] xl:py-8">
-              <h1 className="hero-mock-title max-w-[535px] text-[2.75rem] font-extrabold uppercase leading-[1.02] text-otmg-navy sm:text-[3.4rem] md:text-[3.15rem] lg:text-[4.05rem] xl:text-[4.75rem]">
-                <span className="block">Comprehensive</span>
-                <span className="block">Healthcare That&apos;s</span>
-                <span className="block whitespace-nowrap"><span className="text-brand-red">On Time.</span> Every Time.</span>
+        <section className="mx-auto max-w-[1200px] px-5 pb-5 pt-0">
+          <div className="grid items-stretch overflow-hidden bg-card shadow-mock md:min-h-[430px] md:grid-cols-[0.46fr_0.54fr] lg:min-h-[470px]">
+            <div className="relative z-10 flex h-full flex-col justify-center py-8 pr-5 md:py-7 md:pr-6 lg:pr-8">
+              <h1 className="hero-mock-title max-w-[500px] text-[2.7rem] font-extrabold uppercase leading-[0.96] text-otmg-navy sm:text-[3.35rem] md:text-[3.1rem] lg:text-[4.05rem] xl:text-[4.65rem]">
+                <span className="block whitespace-nowrap">COMPREHENSIVE</span>
+                <span className="block whitespace-nowrap">HEALTHCARE THAT’S</span>
+                <span className="block whitespace-nowrap"><span className="text-brand-red">ON TIME.</span> EVERY TIME.</span>
               </h1>
-              <p className="mt-4 max-w-[455px] text-[15px] font-medium leading-8 text-otmg-navy">
+              <p className="mt-4 max-w-[455px] text-[15px] font-medium leading-7 text-otmg-navy">
                 On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion, convenience, and a commitment to your well-being.
               </p>
 
-              <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Button className="btn-mock-red h-12 min-w-[188px] px-7 text-[13px] uppercase" type="button" onClick={openAppointment}>
                   Book Appointment <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -181,21 +180,10 @@ export default function PublicLandingPage() {
                   <a href="tel:+14107544343"><Phone className="mr-2 h-4 w-4" /><span>Call Us<br className="hidden sm:block" />410-754-4343</span></a>
                 </Button>
               </div>
-
-              <div className="mt-6 flex items-center gap-4 rounded-md bg-otmg-soft p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-otmg-navy bg-card text-otmg-navy">
-                  <ClipboardPlus className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-base font-extrabold text-otmg-navy">Telehealth available for eligible services.</p>
-                  <p className="mt-1 text-sm font-medium leading-6 text-otmg-navy">Connect with your care team from the comfort of your home.</p>
-                </div>
-              </div>
             </div>
 
-            <div className="relative flex min-h-[290px] items-stretch bg-card sm:min-h-[330px] md:min-h-[360px] lg:min-h-[410px] xl:min-h-[440px]">
-              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-cover object-center" loading="eager" width={1160} height={704} />
-              <div className="absolute inset-y-0 left-0 hidden w-20 bg-gradient-to-r from-card to-transparent md:block" />
+            <div className="relative flex min-h-[300px] h-full items-stretch bg-card sm:min-h-[340px] md:min-h-0">
+              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-contain object-center" loading="eager" width={1160} height={704} />
             </div>
           </div>
 
