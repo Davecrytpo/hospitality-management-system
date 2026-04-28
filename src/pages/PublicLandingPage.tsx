@@ -383,6 +383,31 @@ export default function PublicLandingPage() {
       <section className="fixed bottom-4 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-[420px] -translate-x-1/2 rounded-md border border-otmg-border bg-card/96 p-3 shadow-mock backdrop-blur lg:hidden">
         <div className="flex items-center gap-3"><Button className="btn-mock-red h-12 flex-1 text-[13px] uppercase" type="button" onClick={openAppointment}>Book Appointment</Button><Button variant="outline" className="btn-mock-outline h-12 px-4" asChild><a href="tel:+14107544343"><Phone className="h-4 w-4" /></a></Button></div>
       </section>
+
+      <Dialog open={appointmentOpen} onOpenChange={setAppointmentOpen}>
+        <DialogContent className="max-h-[92vh] overflow-y-auto rounded-md border-otmg-border bg-card p-0 sm:max-w-[620px]">
+          <div className="bg-otmg-navy px-6 py-5 text-primary-foreground">
+            <DialogHeader>
+              <DialogTitle className="font-display text-2xl font-extrabold uppercase">Book Appointment</DialogTitle>
+              <DialogDescription className="text-primary-foreground/80">Tell us what you need and our care team will confirm the best available time.</DialogDescription>
+            </DialogHeader>
+          </div>
+          <form onSubmit={handleAppointmentSubmit} className="space-y-5 px-6 py-6">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2"><Label htmlFor="appointment-name">Full Name</Label><Input id="appointment-name" value={appointmentForm.name} onChange={(event) => updateAppointmentField("name", event.target.value)} placeholder="Your full name" required /></div>
+              <div className="space-y-2"><Label htmlFor="appointment-phone">Phone Number</Label><Input id="appointment-phone" value={appointmentForm.phone} onChange={(event) => updateAppointmentField("phone", event.target.value)} placeholder="410-754-4343" required /></div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2"><Label htmlFor="appointment-email">Email Address</Label><Input id="appointment-email" type="email" value={appointmentForm.email} onChange={(event) => updateAppointmentField("email", event.target.value)} placeholder="you@example.com" /></div>
+              <div className="space-y-2"><Label>Service Needed</Label><Select value={appointmentForm.service} onValueChange={(value) => updateAppointmentField("service", value)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="primary-care">Primary Care</SelectItem><SelectItem value="preventive-care">Preventive Care</SelectItem><SelectItem value="mental-health">Mental Health Services</SelectItem><SelectItem value="substance-use">Substance Use Treatment</SelectItem><SelectItem value="telehealth">Telehealth Visit</SelectItem></SelectContent></Select></div>
+            </div>
+            <div className="space-y-2"><Label>Preferred Timing</Label><Select value={appointmentForm.preference} onValueChange={(value) => updateAppointmentField("preference", value)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="same-day">Same Day</SelectItem><SelectItem value="this-week">This Week</SelectItem><SelectItem value="morning">Morning</SelectItem><SelectItem value="afternoon">Afternoon</SelectItem><SelectItem value="telehealth-first">Telehealth First</SelectItem></SelectContent></Select></div>
+            <div className="space-y-2"><Label htmlFor="appointment-notes">Reason for Visit</Label><Textarea id="appointment-notes" value={appointmentForm.notes} onChange={(event) => updateAppointmentField("notes", event.target.value)} placeholder="Briefly describe what you need help with" /></div>
+            <div className="rounded-md bg-otmg-soft px-4 py-3 text-sm font-bold text-otmg-navy">Request summary: {appointmentSummary}</div>
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center"><p className="text-sm font-medium leading-6 text-otmg-blue-soft">For urgent care needs, call 410-754-4343 so the team can guide you immediately.</p><Button className="btn-mock-red h-12 px-7 text-[13px] uppercase" type="submit">Submit Request</Button></div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
