@@ -68,7 +68,7 @@ export default function SettingsPage() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Hospital Name</Label>
-                    <Input defaultValue="MediCare General Hospital" />
+                    <Input defaultValue="On Time Medical Group" />
                   </div>
                   <div className="space-y-2">
                     <Label>Registration Number</Label>
@@ -80,7 +80,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Email</Label>
-                    <Input defaultValue="contact@medicare.com" />
+                    <Input defaultValue="care@ontimemedical.com" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -105,7 +105,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Email</Label>
-                    <Input defaultValue="admin@medicare.com" />
+                    <Input defaultValue="admin@ontimemedical.com" />
                   </div>
                   <div className="space-y-2">
                     <Label>Role</Label>
@@ -135,7 +135,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-muted-foreground mb-4">Select your preferred color theme for the application</p>
                   
                   <div className="grid grid-cols-3 gap-4">
-                    <button
+                    <button type="button"
                       onClick={() => {
                         setTheme("light");
                         toast.success("Light theme activated");
@@ -149,7 +149,7 @@ export default function SettingsPage() {
                       {theme === "light" && <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />}
                     </button>
                     
-                    <button
+                    <button type="button"
                       onClick={() => {
                         setTheme("dark");
                         toast.success("Dark theme activated");
@@ -163,7 +163,7 @@ export default function SettingsPage() {
                       {theme === "dark" && <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />}
                     </button>
                     
-                    <button
+                    <button type="button"
                       onClick={() => {
                         setTheme("system");
                         toast.success("System theme activated");

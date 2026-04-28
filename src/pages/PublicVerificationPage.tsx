@@ -33,7 +33,7 @@ export default function PublicVerificationPage() {
         <div className="container mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-primary tracking-tight">MediCare</span>
+            <span className="text-xl font-bold text-primary tracking-tight">On Time Medical</span>
           </Link>
           <Button variant="ghost" asChild>
             <Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Home</Link>

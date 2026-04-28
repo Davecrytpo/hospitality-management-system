@@ -178,11 +178,11 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
           </Link>
           
           {!collapsed && (
-            <button onClick={onToggle} className="lg:hidden h-7 w-7 flex items-center justify-center rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
+            <button type="button" onClick={onToggle} className="lg:hidden h-7 w-7 flex items-center justify-center rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
               <X className="h-4 w-4" />
             </button>
           )}
-          <button onClick={onToggle} className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
+          <button type="button" onClick={onToggle} className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
             {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
           </button>
         </div>
@@ -194,7 +194,7 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
               <li key={item.title}>
                 {item.children ? (
                   <div>
-                    <button
+                    <button type="button"
                       onClick={() => !collapsed && toggleExpand(item.title)}
                       className={cn(
                         "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200",

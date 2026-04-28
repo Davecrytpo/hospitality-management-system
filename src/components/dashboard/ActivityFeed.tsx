@@ -106,7 +106,7 @@ export function ActivityFeed() {
     <div className="rounded-xl border bg-card p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-card-foreground">Recent Activity</h3>
-        <button 
+        <button type="button" 
           onClick={() => navigate("/support")}
           className="text-sm text-medical-primary hover:underline"
         >

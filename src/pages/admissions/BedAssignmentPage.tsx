@@ -56,7 +56,7 @@ export default function BedAssignmentPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {wards.map((ward) => (
-                <button
+                <button type="button"
                   key={ward.id}
                   onClick={() => setSelectedWard(ward.id)}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${
@@ -105,7 +105,7 @@ export default function BedAssignmentPage() {
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {beds.map((bed) => (
-                  <button
+                  <button type="button"
                     key={bed.id}
                     disabled={bed.status === "occupied"}
                     onClick={() => handleAssign(bed.id)}

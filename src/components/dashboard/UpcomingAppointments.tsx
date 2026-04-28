@@ -97,7 +97,7 @@ export function UpcomingAppointments() {
             </p>
           </div>
         </div>
-        <button 
+        <button type="button" 
           onClick={() => navigate("/appointments/calendar")}
           className="text-sm font-medium text-medical-primary hover:underline"
         >
@@ -147,7 +147,7 @@ export function UpcomingAppointments() {
       </div>
       
       <div className="border-t p-4 text-center">
-        <button 
+        <button type="button" 
           onClick={() => navigate("/appointments")}
           className="text-sm font-medium text-medical-primary hover:underline"
         >

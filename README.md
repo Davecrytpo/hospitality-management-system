@@ -1,59 +1,57 @@
-# MediCare Enterprise HMS
+# On Time Medical Group HMS
 
 ## Advanced Hospital Management Ecosystem
 
-MediCare Enterprise HMS is a high-performance, institutional-grade Hospital Management System designed for large-scale medical facilities. It provides a seamless, integrated environment for staff, clinicians, and patients, ensuring data-driven precision in every medical interaction.
+On Time Medical Group HMS is a hospital management platform designed for operational teams, clinicians, and patients. It brings staff workflows, patient access, diagnostics, billing, and care coordination into one integrated system.
 
-### 🧬 Core Modules & Dashboards
+### Core Modules
 
-The system is comprised of **64 integrated pages** across 8 specialized dashboards:
+The product includes public, staff, and patient-facing experiences across the hospital:
 
-*   **Institutional Command Center (Admin):** Full-scale oversight of hospital throughput, staff management, and financial streams.
-*   **Clinical Portal (Doctor):** High-intensity Consultation Room interface with real-time biometric feeds, medical history archives, and E-Prescribing.
-*   **Care Management (Nurse):** Visual ward mapping, real-time vital monitoring, and Medication Administration Records (MAR).
-*   **Diagnostic Core (Lab & Imaging):** Real-time test ordering and result entry with AI-ready diagnostic interpretation workspaces.
-*   **Pharmacy Hub:** Automated dispensing queues, inventory management with expiry tracking, and drug interaction verification.
-*   **Revenue & Finance:** Comprehensive billing, insurance claim management, and institutional financial analytics.
-*   **Front Office:** High-speed reception desk, kiosk check-in synchronization, and patient feedback systems.  
-*   **Patient Portal:** Secure, invitation-only access to personal medical records, active prescriptions, and billing.
+- Admin command center for operational oversight and staff workflows
+- Doctor portal for consultations, prescriptions, and patient review
+- Nurse tooling for wards, medication administration, and handover
+- Lab and diagnostics workspaces for tests, imaging, and reporting
+- Pharmacy operations for dispensing, stock, and interaction review
+- Billing and finance for invoices, payments, and insurance workflows
+- Front office tools for reception, kiosk check-in, and queue management
+- Patient portal for secure access to records, prescriptions, appointments, and billing
 
-### 🛡️ Enterprise Security
+### Security
 
-*   **Role-Based Access Control (RBAC):** Strict permission layering ensuring data is only accessible to authorized personnel.
-*   **Two-Factor Authentication (2FA):** Mandatory security protocols for patient access to sensitive medical data.
-*   **Encrypted Data Core:** Powered by Supabase with Row-Level Security (RLS) enabled on all medical tables.   
-*   **Invitation-Only Onboarding:** Secure patient registration via 30-minute time-locked verification codes.   
+- Role-based access control for staff and patient routes
+- Two-factor verification for patient portal access
+- Supabase-backed authentication and protected data access
+- Invitation-based patient onboarding
 
-### ⚡ Technology Stack
+### Technology
 
-*   **Frontend:** React 18, TypeScript, Vite
-*   **UI/UX:** Tailwind CSS, Shadcn UI, Framer Motion (for medical animations)
-*   **Backend & Security:** Supabase (PostgreSQL, Auth, Realtime, Edge Functions)
-*   **Communication:** Resend API for institutional email branding.
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
+- Framer Motion
+- Supabase
 
-### 🚀 Deployment & Installation
+### Local Setup
 
-1.  **Clone & Install:**
-    ```sh
-    git clone <repository-url>
-    cd hospitality-management-system
-    npm install
-    ```
+1. Clone the repository and install dependencies.
+   ```sh
+   git clone <repository-url>
+   cd hospitality-management-system
+   npm install
+   ```
 
-2.  **Environment Setup:**
-    Create a `.env` file with your Supabase credentials:
-    ```env
-    VITE_SUPABASE_URL=your_url
-    VITE_SUPABASE_ANON_KEY=your_key
-    ```
+2. Create a `.env` file with your Supabase credentials.
+   ```env
+   VITE_SUPABASE_URL=your_url
+   VITE_SUPABASE_ANON_KEY=your_key
+   ```
 
-3.  **Database Configuration:**
-    Execute the provided production setup scripts located in `supabase/setup_production.sql` within your Supabase SQL editor to initialize roles and triggers.
+3. Run the provided SQL setup in `supabase/setup_production.sql` if you need the full backend structure.
 
-4.  **Launch:**
-    ```sh
-    npm run dev
-    ```
-
----
-*Developed for excellence in modern healthcare delivery.*
+4. Start the app.
+   ```sh
+   npm run dev
+   ```

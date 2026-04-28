@@ -24,7 +24,7 @@ export function DepartmentStats() {
     <div className="rounded-xl border bg-card p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-card-foreground">Department Occupancy</h3>
-        <button 
+        <button type="button" 
           onClick={() => navigate("/departments")}
           className="text-sm text-medical-primary hover:underline"
         >
