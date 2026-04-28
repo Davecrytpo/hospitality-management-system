@@ -245,7 +245,8 @@ export default function PublicLandingPage() {
             </div>
 
             <div className="relative overflow-hidden px-1 py-4">
-              <div className="absolute right-0 top-1/2 hidden h-72 w-72 -translate-y-1/2 rounded-full border-[18px] border-otmg-soft xl:block" />
+              <div className="pointer-events-none absolute right-0 top-1/2 hidden h-72 w-72 -translate-y-1/2 rounded-full border-[18px] border-otmg-soft opacity-55 xl:block" />
+              <div className="relative z-10">
               <p className="text-sm font-extrabold uppercase tracking-[0.08em] text-brand-red">About On Time Medical Group</p>
               <h2 className="mt-3 max-w-[420px] font-display text-[3rem] font-extrabold leading-none text-otmg-navy">Why Choose Us?</h2>
               <p className="mt-5 max-w-[560px] text-base font-medium leading-8 text-otmg-navy">We&apos;re more than a healthcare provider—we&apos;re your partner in health. Our patient-centered approach ensures you get the right care, at the right time, every time.</p>
@@ -260,6 +261,7 @@ export default function PublicLandingPage() {
               </div>
 
               <Button variant="outline" className="btn-mock-outline mt-7 h-12 px-7 text-[13px] uppercase" asChild><Link to="/specialties">Learn More About Us</Link></Button>
+              </div>
             </div>
           </div>
         </section>
