@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -24,6 +24,12 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import logo from "@/assets/logo-ontime.png";
 import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
 import campusImage from "@/assets/mockup-building.jpg";
@@ -72,20 +78,68 @@ const stats = [
 ];
 
 const resourceLinks = ["New Patient Forms", "Patient Portal", "FAQs", "Health Tips"];
-const insuranceLogos = ["aetna", "United Healthcare", "CareFirst", "Cigna", "BlueCross BlueShield", "Medicare.gov"];
+const insuranceLogos = [
+  { name: "aetna", mark: "♥", className: "text-insurance-aetna" },
+  { name: "United Healthcare", mark: "▮", className: "text-insurance-united" },
+  { name: "CareFirst", mark: "✦", className: "text-insurance-carefirst" },
+  { name: "Cigna", mark: "✺", className: "text-insurance-cigna" },
+  { name: "BlueCross BlueShield", mark: "✚", className: "text-insurance-bcbs" },
+  { name: "Medicare.gov", mark: "M", className: "text-insurance-medicare" },
+];
+
+type AppointmentForm = {
+  name: string;
+  phone: string;
+  email: string;
+  service: string;
+  preference: string;
+  notes: string;
+};
+
+const defaultAppointmentForm: AppointmentForm = {
+  name: "",
+  phone: "",
+  email: "",
+  service: "primary-care",
+  preference: "same-day",
+  notes: "",
+};
 
 export default function PublicLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
+  const [appointmentForm, setAppointmentForm] = useState<AppointmentForm>(defaultAppointmentForm);
+
+  const appointmentSummary = useMemo(() => {
+    const service = appointmentForm.service.replace(/-/g, " ");
+    return `${service} • ${appointmentForm.preference.replace(/-/g, " ")}`;
+  }, [appointmentForm.preference, appointmentForm.service]);
+
+  const openAppointment = () => {
+    setMobileMenuOpen(false);
+    setAppointmentOpen(true);
+  };
+
+  const handleAppointmentSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    toast.success("Appointment request received. Our care team will contact you shortly.");
+    setAppointmentOpen(false);
+    setAppointmentForm(defaultAppointmentForm);
+  };
+
+  const updateAppointmentField = (field: keyof AppointmentForm, value: string) => {
+    setAppointmentForm((current) => ({ ...current, [field]: value }));
+  };
 
   return (
     <div className="min-h-screen bg-otmg-page text-otmg-navy">
-      <header className="sticky top-0 z-50 bg-card/98 shadow-sm backdrop-blur">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 lg:px-6">
+      <header className="relative z-50 bg-card shadow-sm">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 xl:px-6">
           <Link to="/" className="flex items-center" aria-label="On Time Medical Group home">
-            <img src={logo} alt="On Time Medical Group" className="h-[92px] w-[92px] object-contain lg:h-[104px] lg:w-[104px]" width={104} height={104} />
+            <img src={logo} alt="On Time Medical Group" className="h-[74px] w-[74px] object-contain sm:h-[86px] sm:w-[86px] xl:h-[104px] xl:w-[104px]" width={104} height={104} />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-7 xl:gap-10 lg:flex">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 xl:gap-10 lg:flex">
             {navItems.map((item) =>
               item.href.startsWith("#") ? (
                 <a key={item.label} href={item.href} className="nav-mock-link whitespace-nowrap">
@@ -106,11 +160,9 @@ export default function PublicLandingPage() {
                 Patient Portal Login
               </Link>
             </Button>
-            <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" asChild>
-              <Link to="/services/smart-appointments">
+            <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" type="button" onClick={openAppointment}>
                 <Calendar className="mr-2 h-4 w-4" />
                 Book Appointment
-              </Link>
             </Button>
           </div>
 
@@ -140,8 +192,8 @@ export default function PublicLandingPage() {
                   </Link>
                 ),
               )}
-              <Button className="btn-mock-red h-12 text-[13px] uppercase" asChild>
-                <Link to="/services/smart-appointments" onClick={() => setMobileMenuOpen(false)}>Book Appointment</Link>
+              <Button className="btn-mock-red h-12 text-[13px] uppercase" type="button" onClick={openAppointment}>
+                Book Appointment
               </Button>
             </div>
           </div>
