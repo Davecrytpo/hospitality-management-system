@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import logo from "@/assets/logo-ontime.png";
 import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
 import campusImage from "@/assets/mockup-building.jpg";
@@ -72,20 +73,33 @@ const stats = [
 ];
 
 const resourceLinks = ["New Patient Forms", "Patient Portal", "FAQs", "Health Tips"];
-const insuranceLogos = ["aetna", "United Healthcare", "CareFirst", "Cigna", "BlueCross BlueShield", "Medicare.gov"];
+const insuranceLogos = [
+  { name: "aetna", mark: "♥", className: "text-insurance-aetna" },
+  { name: "United Healthcare", mark: "▮", className: "text-insurance-united" },
+  { name: "CareFirst", mark: "✦", className: "text-insurance-carefirst" },
+  { name: "Cigna", mark: "✺", className: "text-insurance-cigna" },
+  { name: "BlueCross BlueShield", mark: "✚", className: "text-insurance-bcbs" },
+  { name: "Medicare.gov", mark: "M", className: "text-insurance-medicare" },
+];
 
 export default function PublicLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
+
+  const openAppointment = () => {
+    setMobileMenuOpen(false);
+    setAppointmentOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-otmg-page text-otmg-navy">
-      <header className="sticky top-0 z-50 bg-card/98 shadow-sm backdrop-blur">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 lg:px-6">
+      <header className="relative z-50 bg-card shadow-sm">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 xl:px-6">
           <Link to="/" className="flex items-center" aria-label="On Time Medical Group home">
-            <img src={logo} alt="On Time Medical Group" className="h-[92px] w-[92px] object-contain lg:h-[104px] lg:w-[104px]" width={104} height={104} />
+            <img src={logo} alt="On Time Medical Group" className="h-[74px] w-[74px] object-contain sm:h-[86px] sm:w-[86px] xl:h-[104px] xl:w-[104px]" width={104} height={104} />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-7 xl:gap-10 lg:flex">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 min-[900px]:flex xl:gap-10">
             {navItems.map((item) =>
               item.href.startsWith("#") ? (
                 <a key={item.label} href={item.href} className="nav-mock-link whitespace-nowrap">
@@ -99,27 +113,25 @@ export default function PublicLandingPage() {
             )}
           </nav>
 
-          <div className="hidden shrink-0 items-center gap-3 lg:flex">
+          <div className="hidden shrink-0 items-center gap-3 min-[900px]:flex">
             <Button variant="outline" className="btn-mock-outline h-12 px-4 text-[12px] uppercase" asChild>
               <Link to="/patient-portal/login">
                 <Lock className="mr-2 h-4 w-4" />
                 Patient Portal Login
               </Link>
             </Button>
-            <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" asChild>
-              <Link to="/services/smart-appointments">
+            <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" type="button" onClick={openAppointment}>
                 <Calendar className="mr-2 h-4 w-4" />
                 Book Appointment
-              </Link>
             </Button>
           </div>
 
-          <Button variant="outline" size="icon" className="btn-mock-outline h-12 w-12 lg:hidden" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="Toggle menu">
+          <Button variant="outline" size="icon" className="btn-mock-outline h-12 w-12 min-[900px]:hidden" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="Toggle menu">
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
 
-        <div className="mx-auto hidden max-w-[1240px] justify-end px-4 pb-3 lg:flex lg:px-6">
+        <div className="mx-auto hidden max-w-[1240px] justify-end px-4 pb-3 min-[900px]:flex lg:px-6">
           <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-2xl font-extrabold text-otmg-navy">
             <Phone className="h-5 w-5" />
             410-754-4343
@@ -127,7 +139,7 @@ export default function PublicLandingPage() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-otmg-border bg-card lg:hidden">
+          <div className="border-t border-otmg-border bg-card min-[900px]:hidden">
             <div className="mx-auto flex max-w-[1240px] flex-col gap-3 px-4 py-4">
               {navItems.map((item) =>
                 item.href.startsWith("#") ? (
@@ -140,8 +152,8 @@ export default function PublicLandingPage() {
                   </Link>
                 ),
               )}
-              <Button className="btn-mock-red h-12 text-[13px] uppercase" asChild>
-                <Link to="/services/smart-appointments" onClick={() => setMobileMenuOpen(false)}>Book Appointment</Link>
+              <Button className="btn-mock-red h-12 text-[13px] uppercase" type="button" onClick={openAppointment}>
+                Book Appointment
               </Button>
             </div>
           </div>
@@ -149,19 +161,21 @@ export default function PublicLandingPage() {
       </header>
 
       <main>
-        <section className="mx-auto max-w-[1240px] px-4 pb-5 pt-0 lg:px-6">
-          <div className="grid overflow-hidden bg-card shadow-mock lg:grid-cols-[0.42fr_0.58fr]">
-            <div className="relative z-10 flex flex-col justify-center px-1 py-8 sm:px-0 lg:py-6">
-              <h1 className="max-w-[470px] font-display text-[2.65rem] font-extrabold uppercase leading-[1.05] text-otmg-navy sm:text-[3.55rem] lg:text-[3.65rem]">
-                Comprehensive Healthcare That&apos;s <span className="text-brand-red">On Time.</span> Every Time.
+        <section className="mx-auto max-w-[1240px] px-4 pb-5 pt-0 xl:px-6">
+          <div className="grid overflow-hidden bg-card shadow-mock md:grid-cols-[0.42fr_0.58fr]">
+            <div className="relative z-10 flex flex-col justify-center px-1 py-8 sm:px-5 md:px-1 md:py-6 lg:px-0 xl:py-8">
+              <h1 className="max-w-[500px] font-display text-[2.35rem] font-extrabold uppercase leading-[1.04] text-otmg-navy sm:text-[3.05rem] md:text-[2.55rem] lg:text-[3.15rem] xl:text-[3.7rem]">
+                <span className="block">Comprehensive</span>
+                <span className="block">Healthcare That&apos;s</span>
+                <span className="block"><span className="text-brand-red">On Time.</span> Every Time.</span>
               </h1>
               <p className="mt-4 max-w-[455px] text-[15px] font-medium leading-8 text-otmg-navy">
                 On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion, convenience, and a commitment to your well-being.
               </p>
 
               <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-                <Button className="btn-mock-red h-12 min-w-[188px] px-7 text-[13px] uppercase" asChild>
-                  <Link to="/services/smart-appointments">Book Appointment <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Button className="btn-mock-red h-12 min-w-[188px] px-7 text-[13px] uppercase" type="button" onClick={openAppointment}>
+                  Book Appointment <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button variant="outline" className="btn-mock-outline h-12 min-w-[188px] px-7 text-[13px] uppercase" asChild>
                   <a href="tel:+14107544343"><Phone className="mr-2 h-4 w-4" /><span>Call Us<br className="hidden sm:block" />410-754-4343</span></a>
@@ -179,19 +193,19 @@ export default function PublicLandingPage() {
               </div>
             </div>
 
-            <div className="relative min-h-[315px] lg:min-h-[440px]">
-              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-cover object-center" loading="eager" width={1160} height={704} />
-              <div className="absolute inset-y-0 left-0 hidden w-24 bg-gradient-to-r from-card to-transparent lg:block" />
+            <div className="relative flex min-h-[290px] items-center bg-card sm:min-h-[330px] md:min-h-[365px] lg:min-h-[405px] xl:min-h-[440px]">
+              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-contain object-center" loading="eager" width={1160} height={704} />
+              <div className="absolute inset-y-0 left-0 hidden w-20 bg-gradient-to-r from-card to-transparent md:block" />
             </div>
           </div>
 
-          <div className="relative z-20 -mt-1 grid overflow-hidden rounded-md bg-otmg-navy text-primary-foreground shadow-mock md:grid-cols-3 xl:grid-cols-5">
+          <div className="relative z-20 -mt-1 grid overflow-hidden rounded-md bg-otmg-navy text-primary-foreground shadow-mock sm:grid-cols-2 md:grid-cols-3 min-[900px]:grid-cols-5">
             {trustHighlights.map((item) => (
-              <div key={item.title} className="flex items-center gap-4 px-6 py-5 xl:border-r xl:border-primary-foreground/25 xl:last:border-r-0">
+              <div key={item.title} className="flex items-center gap-3 px-5 py-5 min-[900px]:border-r min-[900px]:border-primary-foreground/25 min-[900px]:last:border-r-0 xl:gap-4 xl:px-6">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-primary-foreground/70">
                   <item.icon className="h-7 w-7" />
                 </div>
-                <p className="max-w-[145px] text-[15px] font-extrabold leading-7">{item.title}</p>
+                <p className="max-w-[145px] text-[13px] font-extrabold leading-6 xl:text-[15px] xl:leading-7">{item.title}</p>
               </div>
             ))}
           </div>
@@ -299,8 +313,13 @@ export default function PublicLandingPage() {
         <section id="insurance" className="mx-auto max-w-[1240px] px-4 py-4 lg:px-6">
           <div className="rounded-md bg-card px-6 py-6 shadow-card">
             <h3 className="text-center font-display text-[1.45rem] font-extrabold uppercase text-otmg-navy">We Accept Most Major Insurance Plans</h3>
-            <div className="mt-5 grid gap-5 text-center text-[1.05rem] font-extrabold text-otmg-blue-soft sm:grid-cols-2 lg:grid-cols-6">
-              {insuranceLogos.map((name) => (<div key={name} className="flex min-h-[52px] items-center justify-center rounded-md bg-otmg-soft px-4">{name}</div>))}
+            <div className="mt-5 grid gap-4 text-center sm:grid-cols-2 lg:grid-cols-6">
+              {insuranceLogos.map((logoItem) => (
+                <div key={logoItem.name} className="flex min-h-[68px] items-center justify-center gap-2 rounded-md bg-otmg-soft px-4 shadow-card">
+                  <span className={`text-2xl font-extrabold ${logoItem.className}`}>{logoItem.mark}</span>
+                  <span className={`text-[1.05rem] font-extrabold leading-tight ${logoItem.className}`}>{logoItem.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -309,7 +328,7 @@ export default function PublicLandingPage() {
           <div className="grid overflow-hidden rounded-md bg-otmg-navy text-primary-foreground lg:grid-cols-[1fr_0.9fr_1fr]">
             <div className="flex items-center gap-4 border-b border-primary-foreground/15 px-6 py-6 lg:border-b-0 lg:border-r"><div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-primary-foreground/35"><Calendar className="h-8 w-8" /></div><div><p className="text-2xl font-extrabold">Ready to Take the Next Step?</p><p className="mt-2 text-sm leading-7 text-primary-foreground/85">We&apos;re here to help you live a healthier, happier life—on your time.</p></div></div>
             <div className="flex items-center gap-4 border-b border-primary-foreground/15 px-6 py-6 lg:border-b-0 lg:border-r"><div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-primary-foreground/35"><Phone className="h-8 w-8" /></div><div><p className="text-sm font-semibold uppercase tracking-[0.08em] text-primary-foreground/75">Call Us Today</p><a href="tel:+14107544343" className="mt-1 block text-[2.15rem] font-extrabold leading-none">410-754-4343</a><p className="mt-2 text-sm leading-7 text-primary-foreground/85">Our team is here to help you.</p></div></div>
-            <div className="flex flex-col justify-center px-6 py-6"><Button className="btn-mock-red h-14 text-[14px] uppercase" asChild><Link to="/services/smart-appointments">Book Appointment <ArrowRight className="ml-2 h-4 w-4" /></Link></Button><p className="mt-4 text-sm leading-7 text-primary-foreground/85">Appointments available in-office or via telehealth.</p></div>
+            <div className="flex flex-col justify-center px-6 py-6"><Button className="btn-mock-red h-14 text-[14px] uppercase" type="button" onClick={openAppointment}>Book Appointment <ArrowRight className="ml-2 h-4 w-4" /></Button><p className="mt-4 text-sm leading-7 text-primary-foreground/85">Appointments available in-office or via telehealth.</p></div>
           </div>
         </section>
       </main>
@@ -322,8 +341,10 @@ export default function PublicLandingPage() {
       </footer>
 
       <section className="fixed bottom-4 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-[420px] -translate-x-1/2 rounded-md border border-otmg-border bg-card/96 p-3 shadow-mock backdrop-blur lg:hidden">
-        <div className="flex items-center gap-3"><Button className="btn-mock-red h-12 flex-1 text-[13px] uppercase" asChild><Link to="/services/smart-appointments">Book Appointment</Link></Button><Button variant="outline" className="btn-mock-outline h-12 px-4" asChild><a href="tel:+14107544343"><Phone className="h-4 w-4" /></a></Button></div>
+        <div className="flex items-center gap-3"><Button className="btn-mock-red h-12 flex-1 text-[13px] uppercase" type="button" onClick={openAppointment}>Book Appointment</Button><Button variant="outline" className="btn-mock-outline h-12 px-4" asChild><a href="tel:+14107544343"><Phone className="h-4 w-4" /></a></Button></div>
       </section>
+
+      <AppointmentRequestDialog open={appointmentOpen} onOpenChange={setAppointmentOpen} />
     </div>
   );
 }

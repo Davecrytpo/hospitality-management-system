@@ -4,6 +4,7 @@ import { Calendar, Lock, Menu, Phone, X } from "lucide-react";
 
 import logo from "@/assets/logo-ontime.png";
 import { Button } from "@/components/ui/button";
+import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -17,13 +18,20 @@ const navItems = [
 
 export function PublicSiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
   const location = useLocation();
 
+  const openAppointment = () => {
+    setMobileOpen(false);
+    setAppointmentOpen(true);
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-card/98 shadow-sm backdrop-blur">
+    <>
+    <header className="relative z-50 bg-card shadow-sm">
       <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 lg:px-6">
         <Link to="/" aria-label="On Time Medical Group home" className="inline-flex">
-          <img src={logo} alt="On Time Medical Group" className="h-[92px] w-[92px] object-contain lg:h-[104px] lg:w-[104px]" width={104} height={104} />
+          <img src={logo} alt="On Time Medical Group" className="h-[74px] w-[74px] object-contain sm:h-[86px] sm:w-[86px] xl:h-[104px] xl:w-[104px]" width={104} height={104} />
         </Link>
 
         <nav className="hidden min-w-0 flex-1 items-center justify-center gap-7 xl:gap-10 lg:flex">
@@ -45,11 +53,9 @@ export function PublicSiteHeader() {
               Patient Portal Login
             </Link>
           </Button>
-          <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" asChild>
-            <Link to="/services/smart-appointments">
+          <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" type="button" onClick={openAppointment}>
               <Calendar className="mr-2 h-4 w-4" />
               Book Appointment
-            </Link>
           </Button>
         </div>
 
@@ -77,13 +83,15 @@ export function PublicSiteHeader() {
               <Button variant="outline" className="btn-mock-outline h-12 text-[13px] uppercase" asChild>
                 <Link to="/patient-portal/login" onClick={() => setMobileOpen(false)}>Patient Portal Login</Link>
               </Button>
-              <Button className="btn-mock-red h-12 text-[13px] uppercase" asChild>
-                <Link to="/services/smart-appointments" onClick={() => setMobileOpen(false)}>Book Appointment</Link>
+              <Button className="btn-mock-red h-12 text-[13px] uppercase" type="button" onClick={openAppointment}>
+                Book Appointment
               </Button>
             </div>
           </div>
         </div>
       )}
     </header>
+    <AppointmentRequestDialog open={appointmentOpen} onOpenChange={setAppointmentOpen} />
+    </>
   );
 }

@@ -32,6 +32,7 @@ export default function PatientRegisterPage() {
   const [verificationCode, setVerificationCode] = useState(codeFromUrl);
   const [patientData, setPatientData] = useState<PatientData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [needsSupport, setNeedsSupport] = useState(false);
 
   // Form fields
   const [email, setEmail] = useState("");
@@ -71,6 +72,7 @@ export default function PatientRegisterPage() {
   }, [invitationId, codeFromUrl]);
 
   const handleVerify = async () => {
+    setNeedsSupport(false);
     if (!invitationId) {
       setError("Please enter your Invitation ID.");
       return;
@@ -94,10 +96,11 @@ export default function PatientRegisterPage() {
       
       if (data.error) {
         if (data.error.includes("expired")) {
-          setError("Your secure verification code has expired (30-minute limit). For your protection, please contact MediCare Hospital administration to regenerate a new invitation link.");
+          setError("Your secure verification code has expired. Please contact On Time Medical Group support to request a new invitation link.");
         } else {
-          setError(data.error);
+          setError(`${data.error}. If you do not have the correct invitation details, please contact support at 410-754-4343.`);
         }
+        setNeedsSupport(true);
         return;
       }
 
@@ -118,7 +121,8 @@ export default function PatientRegisterPage() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error("Verification error detail:", err);
-      setError(message || "Connection failed. Please check your internet and try again.");
+      setError(message ? `${message}. If this was not expected, please contact support at 410-754-4343.` : "Connection failed. Please contact support if the problem continues.");
+      setNeedsSupport(true);
     } finally {
       setIsLoading(false);
     }
@@ -291,7 +295,13 @@ export default function PatientRegisterPage() {
           {error && (
             <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm flex items-center gap-2">
               <AlertCircle className="h-4 w-4" />
-              {error}
+              <span>{error}</span>
+            </div>
+          )}
+
+          {needsSupport && (
+            <div className="mb-4 rounded-md border border-otmg-border bg-otmg-soft p-4 text-sm font-medium text-otmg-navy">
+              Don&apos;t have the correct invitation ID or verification code? Call <a href="tel:+14107544343" className="font-extrabold text-brand-red">410-754-4343</a> or contact support so the team can verify your details securely.
             </div>
           )}
 
