@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { Calendar, Phone } from "lucide-react";
 import { toast } from "sonner";
 
@@ -44,7 +44,7 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
     setAppointmentForm((current) => ({ ...current, [field]: value }));
   };
 
-  const handleAppointmentSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleAppointmentSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     toast.success("Appointment request received. Our care team will contact you shortly.");
     onOpenChange(false);
