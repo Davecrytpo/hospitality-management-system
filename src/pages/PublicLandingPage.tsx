@@ -93,7 +93,7 @@ export default function PublicLandingPage() {
 
   return (
     <div className="min-h-screen bg-otmg-page text-otmg-navy">
-      <header className="relative z-50 bg-card shadow-sm">
+      <header className="sticky top-0 z-50 bg-card shadow-sm">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 xl:px-6">
           <Link to="/" className="flex items-center" aria-label="On Time Medical Group home">
             <img src={logo} alt="On Time Medical Group" className="h-[74px] w-[74px] object-contain sm:h-[86px] sm:w-[86px] xl:h-[104px] xl:w-[104px]" width={104} height={104} />
@@ -162,12 +162,12 @@ export default function PublicLandingPage() {
 
       <main>
         <section className="mx-auto max-w-[1240px] px-4 pb-5 pt-0 xl:px-6">
-          <div className="grid overflow-hidden bg-card shadow-mock md:grid-cols-[0.42fr_0.58fr]">
-            <div className="relative z-10 flex flex-col justify-center px-1 py-8 sm:px-5 md:px-1 md:py-6 lg:px-0 xl:py-8">
-              <h1 className="max-w-[500px] font-display text-[2.35rem] font-extrabold uppercase leading-[1.04] text-otmg-navy sm:text-[3.05rem] md:text-[2.55rem] lg:text-[3.15rem] xl:text-[3.7rem]">
+          <div className="grid overflow-hidden bg-card shadow-mock md:grid-cols-[0.44fr_0.56fr]">
+            <div className="relative z-10 flex flex-col justify-center px-0 py-8 pr-5 sm:py-9 md:min-h-[360px] md:py-6 md:pr-4 lg:min-h-[410px] lg:pr-6 xl:min-h-[440px] xl:py-8">
+              <h1 className="hero-mock-title max-w-[535px] text-[2.75rem] font-extrabold uppercase leading-[1.02] text-otmg-navy sm:text-[3.4rem] md:text-[3.15rem] lg:text-[4.05rem] xl:text-[4.75rem]">
                 <span className="block">Comprehensive</span>
                 <span className="block">Healthcare That&apos;s</span>
-                <span className="block"><span className="text-brand-red">On Time.</span> Every Time.</span>
+                <span className="block whitespace-nowrap"><span className="text-brand-red">On Time.</span> Every Time.</span>
               </h1>
               <p className="mt-4 max-w-[455px] text-[15px] font-medium leading-8 text-otmg-navy">
                 On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion, convenience, and a commitment to your well-being.
@@ -193,8 +193,8 @@ export default function PublicLandingPage() {
               </div>
             </div>
 
-            <div className="relative flex min-h-[290px] items-center bg-card sm:min-h-[330px] md:min-h-[365px] lg:min-h-[405px] xl:min-h-[440px]">
-              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-contain object-center" loading="eager" width={1160} height={704} />
+            <div className="relative flex min-h-[290px] items-stretch bg-card sm:min-h-[330px] md:min-h-[360px] lg:min-h-[410px] xl:min-h-[440px]">
+              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-cover object-center" loading="eager" width={1160} height={704} />
               <div className="absolute inset-y-0 left-0 hidden w-20 bg-gradient-to-r from-card to-transparent md:block" />
             </div>
           </div>
