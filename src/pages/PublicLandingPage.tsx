@@ -201,19 +201,21 @@ export default function PublicLandingPage() {
       </header>
 
       <main>
-        <section className="mx-auto max-w-[1240px] px-4 pb-5 pt-0 lg:px-6">
-          <div className="grid overflow-hidden bg-card shadow-mock lg:grid-cols-[0.42fr_0.58fr]">
-            <div className="relative z-10 flex flex-col justify-center px-1 py-8 sm:px-0 lg:py-6">
-              <h1 className="max-w-[470px] font-display text-[2.65rem] font-extrabold uppercase leading-[1.05] text-otmg-navy sm:text-[3.55rem] lg:text-[3.65rem]">
-                Comprehensive Healthcare That&apos;s <span className="text-brand-red">On Time.</span> Every Time.
+        <section className="mx-auto max-w-[1240px] px-4 pb-5 pt-0 xl:px-6">
+          <div className="grid overflow-hidden bg-card shadow-mock md:grid-cols-[0.42fr_0.58fr]">
+            <div className="relative z-10 flex flex-col justify-center px-1 py-8 sm:px-5 md:px-1 md:py-6 lg:px-0 xl:py-8">
+              <h1 className="max-w-[500px] font-display text-[2.35rem] font-extrabold uppercase leading-[1.04] text-otmg-navy sm:text-[3.05rem] md:text-[2.55rem] lg:text-[3.15rem] xl:text-[3.7rem]">
+                <span className="block">Comprehensive</span>
+                <span className="block">Healthcare That&apos;s</span>
+                <span className="block"><span className="text-brand-red">On Time.</span> Every Time.</span>
               </h1>
               <p className="mt-4 max-w-[455px] text-[15px] font-medium leading-8 text-otmg-navy">
                 On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion, convenience, and a commitment to your well-being.
               </p>
 
               <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-                <Button className="btn-mock-red h-12 min-w-[188px] px-7 text-[13px] uppercase" asChild>
-                  <Link to="/services/smart-appointments">Book Appointment <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Button className="btn-mock-red h-12 min-w-[188px] px-7 text-[13px] uppercase" type="button" onClick={openAppointment}>
+                  Book Appointment <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button variant="outline" className="btn-mock-outline h-12 min-w-[188px] px-7 text-[13px] uppercase" asChild>
                   <a href="tel:+14107544343"><Phone className="mr-2 h-4 w-4" /><span>Call Us<br className="hidden sm:block" />410-754-4343</span></a>
@@ -231,19 +233,19 @@ export default function PublicLandingPage() {
               </div>
             </div>
 
-            <div className="relative min-h-[315px] lg:min-h-[440px]">
-              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-cover object-center" loading="eager" width={1160} height={704} />
-              <div className="absolute inset-y-0 left-0 hidden w-24 bg-gradient-to-r from-card to-transparent lg:block" />
+            <div className="relative flex min-h-[290px] items-center bg-card sm:min-h-[330px] md:min-h-[365px] lg:min-h-[405px] xl:min-h-[440px]">
+              <img src={heroImage} alt="Doctor reviewing care options with an older patient" className="h-full w-full object-contain object-center" loading="eager" width={1160} height={704} />
+              <div className="absolute inset-y-0 left-0 hidden w-20 bg-gradient-to-r from-card to-transparent md:block" />
             </div>
           </div>
 
-          <div className="relative z-20 -mt-1 grid overflow-hidden rounded-md bg-otmg-navy text-primary-foreground shadow-mock md:grid-cols-3 xl:grid-cols-5">
+          <div className="relative z-20 -mt-1 grid overflow-hidden rounded-md bg-otmg-navy text-primary-foreground shadow-mock sm:grid-cols-2 md:grid-cols-3 min-[900px]:grid-cols-5">
             {trustHighlights.map((item) => (
-              <div key={item.title} className="flex items-center gap-4 px-6 py-5 xl:border-r xl:border-primary-foreground/25 xl:last:border-r-0">
+              <div key={item.title} className="flex items-center gap-3 px-5 py-5 min-[900px]:border-r min-[900px]:border-primary-foreground/25 min-[900px]:last:border-r-0 xl:gap-4 xl:px-6">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-primary-foreground/70">
                   <item.icon className="h-7 w-7" />
                 </div>
-                <p className="max-w-[145px] text-[15px] font-extrabold leading-7">{item.title}</p>
+                <p className="max-w-[145px] text-[13px] font-extrabold leading-6 xl:text-[15px] xl:leading-7">{item.title}</p>
               </div>
             ))}
           </div>
