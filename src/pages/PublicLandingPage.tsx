@@ -353,8 +353,13 @@ export default function PublicLandingPage() {
         <section id="insurance" className="mx-auto max-w-[1240px] px-4 py-4 lg:px-6">
           <div className="rounded-md bg-card px-6 py-6 shadow-card">
             <h3 className="text-center font-display text-[1.45rem] font-extrabold uppercase text-otmg-navy">We Accept Most Major Insurance Plans</h3>
-            <div className="mt-5 grid gap-5 text-center text-[1.05rem] font-extrabold text-otmg-blue-soft sm:grid-cols-2 lg:grid-cols-6">
-              {insuranceLogos.map((name) => (<div key={name} className="flex min-h-[52px] items-center justify-center rounded-md bg-otmg-soft px-4">{name}</div>))}
+            <div className="mt-5 grid gap-4 text-center sm:grid-cols-2 lg:grid-cols-6">
+              {insuranceLogos.map((logoItem) => (
+                <div key={logoItem.name} className="flex min-h-[68px] items-center justify-center gap-2 rounded-md bg-otmg-soft px-4 shadow-card">
+                  <span className={`text-2xl font-extrabold ${logoItem.className}`}>{logoItem.mark}</span>
+                  <span className={`text-[1.05rem] font-extrabold leading-tight ${logoItem.className}`}>{logoItem.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -363,7 +368,7 @@ export default function PublicLandingPage() {
           <div className="grid overflow-hidden rounded-md bg-otmg-navy text-primary-foreground lg:grid-cols-[1fr_0.9fr_1fr]">
             <div className="flex items-center gap-4 border-b border-primary-foreground/15 px-6 py-6 lg:border-b-0 lg:border-r"><div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-primary-foreground/35"><Calendar className="h-8 w-8" /></div><div><p className="text-2xl font-extrabold">Ready to Take the Next Step?</p><p className="mt-2 text-sm leading-7 text-primary-foreground/85">We&apos;re here to help you live a healthier, happier life—on your time.</p></div></div>
             <div className="flex items-center gap-4 border-b border-primary-foreground/15 px-6 py-6 lg:border-b-0 lg:border-r"><div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-primary-foreground/35"><Phone className="h-8 w-8" /></div><div><p className="text-sm font-semibold uppercase tracking-[0.08em] text-primary-foreground/75">Call Us Today</p><a href="tel:+14107544343" className="mt-1 block text-[2.15rem] font-extrabold leading-none">410-754-4343</a><p className="mt-2 text-sm leading-7 text-primary-foreground/85">Our team is here to help you.</p></div></div>
-            <div className="flex flex-col justify-center px-6 py-6"><Button className="btn-mock-red h-14 text-[14px] uppercase" asChild><Link to="/services/smart-appointments">Book Appointment <ArrowRight className="ml-2 h-4 w-4" /></Link></Button><p className="mt-4 text-sm leading-7 text-primary-foreground/85">Appointments available in-office or via telehealth.</p></div>
+            <div className="flex flex-col justify-center px-6 py-6"><Button className="btn-mock-red h-14 text-[14px] uppercase" type="button" onClick={openAppointment}>Book Appointment <ArrowRight className="ml-2 h-4 w-4" /></Button><p className="mt-4 text-sm leading-7 text-primary-foreground/85">Appointments available in-office or via telehealth.</p></div>
           </div>
         </section>
       </main>
@@ -376,7 +381,7 @@ export default function PublicLandingPage() {
       </footer>
 
       <section className="fixed bottom-4 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-[420px] -translate-x-1/2 rounded-md border border-otmg-border bg-card/96 p-3 shadow-mock backdrop-blur lg:hidden">
-        <div className="flex items-center gap-3"><Button className="btn-mock-red h-12 flex-1 text-[13px] uppercase" asChild><Link to="/services/smart-appointments">Book Appointment</Link></Button><Button variant="outline" className="btn-mock-outline h-12 px-4" asChild><a href="tel:+14107544343"><Phone className="h-4 w-4" /></a></Button></div>
+        <div className="flex items-center gap-3"><Button className="btn-mock-red h-12 flex-1 text-[13px] uppercase" type="button" onClick={openAppointment}>Book Appointment</Button><Button variant="outline" className="btn-mock-outline h-12 px-4" asChild><a href="tel:+14107544343"><Phone className="h-4 w-4" /></a></Button></div>
       </section>
     </div>
   );
