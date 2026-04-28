@@ -119,21 +119,22 @@ const stats = [
 const resourceLinks = ["New Patient Forms", "Patient Portal", "FAQs", "Health Tips"];
 
 const insuranceLogos = [
-  { name: "aetna", className: "text-[#7a3eb1] lowercase tracking-tight" },
-  { name: "United Healthcare", className: "text-[#1b4697]" },
-  { name: "CareFirst", className: "text-[#1d2d52]" },
-  { name: "Cigna", className: "text-[#1792d0]" },
-  { name: "BlueCross BlueShield", className: "text-[#14539a]" },
-  { name: "Medicare.gov", className: "text-[#1a6d47]" },
+  { name: "Aetna", src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Aetna_logo.svg" },
+  { name: "United Healthcare", src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/UnitedHealthcare_%28logo%29.svg" },
+  { name: "CareFirst", src: "https://www.pngkit.com/png/detail/64-640301_silver-hmo-brochure-carefirst-bluecross-blueshield-carefirst-blue.png" },
+  { name: "Cigna", src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cigna_Logo.png" },
+  { name: "Blue Cross Blue Shield", src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Blue_Cross_Blue_Shield_Association_logo.svg" },
+  { name: "Medicare", src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Medicare_logo.svg" },
 ];
 
 export default function PublicLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const shellClassName = "mx-auto max-w-[1200px] px-6";
 
   return (
     <div className="min-h-screen bg-[#f7f9ff] text-[#13306b]">
       <header className="sticky top-0 z-50 border-b border-[#d9e1f2] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-6 px-4 py-4 lg:px-6">
+        <div className={`${shellClassName} flex items-center justify-between gap-6 py-4`}>
           <Link to="/" className="flex items-center gap-3">
             <img src={logo} alt="On Time Medical Group" className="h-16 w-16 object-contain lg:h-20 lg:w-20" />
           </Link>
@@ -193,7 +194,7 @@ export default function PublicLandingPage() {
 
         {mobileMenuOpen && (
           <div className="border-t border-[#d9e1f2] bg-white lg:hidden">
-            <div className="mx-auto flex max-w-[1240px] flex-col gap-3 px-4 py-4">
+            <div className={`${shellClassName} flex flex-col gap-3 py-4`}>
               {navItems.map((item) => (
                 item.href.startsWith("#") ? (
                   <a
@@ -240,7 +241,7 @@ export default function PublicLandingPage() {
       </header>
 
       <main className="pb-24 lg:pb-0">
-        <section className="mx-auto max-w-[1240px] px-4 pb-6 pt-8 lg:px-6">
+        <section className={`${shellClassName} pb-6 pt-8`}>
           <div className="mb-6 flex justify-center sm:justify-end">
             <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-xl font-extrabold text-[#13306b] sm:text-2xl">
               <Phone className="h-5 w-5" />
@@ -248,47 +249,53 @@ export default function PublicLandingPage() {
             </a>
           </div>
 
-          <div className="grid overflow-hidden rounded-[28px] bg-white shadow-[0_30px_80px_-45px_rgba(19,48,107,0.35)] lg:grid-cols-[0.92fr_1.08fr]">
+          <div className="flex flex-col gap-8 overflow-hidden rounded-[28px] bg-white shadow-[0_30px_80px_-45px_rgba(19,48,107,0.35)] lg:flex-row lg:items-center lg:gap-10">
             <motion.div
               initial={{ opacity: 0, x: -22 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.45 }}
-              className="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-12"
+              className="flex flex-col justify-center px-6 py-10 sm:px-10 lg:flex-[0_0_52%] lg:px-0 lg:py-12"
             >
-              <h1 className="max-w-[760px] text-balance font-display text-[2.8rem] font-extrabold uppercase leading-[0.94] text-[#13306b] sm:text-[3.8rem]">
-                Comprehensive Healthcare That&apos;s <span className="text-[#ef2027]">On Time.</span> Every Time.
-              </h1>
-              <p className="mt-6 max-w-[510px] text-base leading-8 text-[#334e86]">
-                On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion,
-                convenience, and a commitment to your well-being.
-              </p>
+              <div className="lg:pl-0">
+                <h1 className="max-w-[520px] font-display text-[2.8rem] font-extrabold uppercase leading-[1.1] text-[#13306b] sm:text-[3.8rem]">
+                  <span className="block">COMPREHENSIVE</span>
+                  <span className="block">HEALTHCARE THAT&apos;S</span>
+                  <span className="block">
+                    <span className="text-[#ef2027]">ON TIME.</span> EVERY TIME.
+                  </span>
+                </h1>
+                <p className="mt-4 max-w-[510px] text-base leading-8 text-[#334e86]">
+                  On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion,
+                  convenience, and a commitment to your well-being.
+                </p>
 
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                <Button className="h-14 rounded-md bg-[#ef2027] px-7 text-[14px] font-bold uppercase text-white hover:bg-[#d61920]" asChild>
-                  <Link to="/services/smart-appointments">
-                    Book Appointment
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-14 rounded-md border-[#9fb1d8] px-7 text-[14px] font-bold uppercase text-[#13306b] hover:bg-[#f3f6fd]"
-                  asChild
-                >
-                  <a href="tel:+14107544343">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Call Us 410-754-4343
-                  </a>
-                </Button>
-              </div>
-
-              <div className="mt-8 flex items-start gap-4 rounded-2xl border border-[#dfe7f6] bg-[#f8fbff] p-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#edf2fb] text-[#13306b]">
-                  <HousePlus className="h-6 w-6" />
+                <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+                  <Button className="h-14 rounded-md bg-[#ef2027] px-7 text-[14px] font-bold uppercase text-white hover:bg-[#d61920]" asChild>
+                    <Link to="/services/smart-appointments">
+                      Book Appointment
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-14 rounded-md border-[#9fb1d8] px-7 text-[14px] font-bold uppercase text-[#13306b] hover:bg-[#f3f6fd]"
+                    asChild
+                  >
+                    <a href="tel:+14107544343">
+                      <Phone className="mr-2 h-4 w-4" />
+                      Call Us 410-754-4343
+                    </a>
+                  </Button>
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-[#13306b]">Telehealth available for eligible services.</p>
-                  <p className="mt-1 text-sm leading-6 text-[#516997]">Connect with your care team from the comfort of your home.</p>
+
+                <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#dfe7f6] bg-[#f8fbff] p-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#edf2fb] text-[#13306b]">
+                    <HousePlus className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-[#13306b]">Telehealth available for eligible services.</p>
+                    <p className="mt-1 text-sm leading-6 text-[#516997]">Connect with your care team from the comfort of your home.</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -297,15 +304,16 @@ export default function PublicLandingPage() {
               initial={{ opacity: 0, x: 22 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.45, delay: 0.08 }}
-              className="relative min-h-[420px] lg:min-h-[640px]"
+              className="px-6 pb-6 sm:px-10 sm:pb-10 lg:flex-[0_0_48%] lg:px-0 lg:pb-0"
             >
-              <img
-                src={heroImage}
-                alt="Doctor discussing care with a patient"
-                className="h-full w-full object-contain"
-                loading="eager"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-transparent" />
+              <div className="h-full w-full">
+                <img
+                  src={heroImage}
+                  alt="Doctor discussing care with a patient"
+                  className="h-auto w-full rounded-[12px]"
+                  loading="eager"
+                />
+              </div>
             </motion.div>
           </div>
 
@@ -513,10 +521,16 @@ export default function PublicLandingPage() {
         <section id="insurance" className="mx-auto max-w-[1240px] px-4 py-6 lg:px-6">
           <div className="rounded-[20px] border border-[#dbe4f4] bg-white px-6 py-8 shadow-[0_15px_30px_-26px_rgba(19,48,107,0.35)]">
             <h3 className="text-center font-display text-[2rem] font-extrabold uppercase text-[#13306b]">We Accept Most Major Insurance Plans</h3>
-            <div className="mt-8 grid gap-4 text-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-x-8 gap-y-6">
               {insuranceLogos.map((insurance) => (
-                <div key={insurance.name} className="flex min-h-[88px] items-center justify-center rounded-2xl border border-[#e1e8f5] bg-[#f8fbff] px-4 py-4 shadow-[0_12px_30px_-24px_rgba(19,48,107,0.28)]">
-                  <span className={`text-[1.15rem] font-extrabold leading-tight ${insurance.className}`}>{insurance.name}</span>
+                <div key={insurance.name} className="flex min-h-10 min-w-[140px] flex-1 items-center justify-center">
+                  <img
+                    src={insurance.src}
+                    alt={`${insurance.name} logo`}
+                    className="h-10 w-auto max-w-full object-contain"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
               ))}
             </div>

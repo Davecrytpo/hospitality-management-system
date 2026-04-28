@@ -78,7 +78,7 @@ export function QuickActions() {
       
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {actions.map((action) => (
-          <button
+          <button type="button"
             key={action.label}
             onClick={() => navigate(action.path)}
             className={`flex flex-col items-center justify-center rounded-xl p-4 text-white transition-all hover:scale-105 active:scale-95 cursor-pointer ${action.color}`}

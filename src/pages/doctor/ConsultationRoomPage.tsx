@@ -384,7 +384,7 @@ export default function ConsultationRoomPage() {
                       <h3 className="font-bold text-lg">Order Laboratory Tests</h3>
                       <div className="grid grid-cols-2 gap-4">
                         {["Complete Blood Count", "Lipid Profile", "Renal Function", "Liver Function", "Urinalysis", "Blood Glucose"].map(test => (
-                          <button
+                          <button type="button"
                             key={test}
                             onClick={() => toggleLabTest(test)}
                             className={`p-4 rounded-xl border-2 text-left transition-all ${
