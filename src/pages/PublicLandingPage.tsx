@@ -99,7 +99,7 @@ export default function PublicLandingPage() {
             <img src={logo} alt="On Time Medical Group" className="h-[74px] w-[74px] object-contain sm:h-[86px] sm:w-[86px] xl:h-[104px] xl:w-[104px]" width={104} height={104} />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 xl:gap-10 lg:flex">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 min-[900px]:flex xl:gap-10">
             {navItems.map((item) =>
               item.href.startsWith("#") ? (
                 <a key={item.label} href={item.href} className="nav-mock-link whitespace-nowrap">
@@ -113,7 +113,7 @@ export default function PublicLandingPage() {
             )}
           </nav>
 
-          <div className="hidden shrink-0 items-center gap-3 lg:flex">
+          <div className="hidden shrink-0 items-center gap-3 min-[900px]:flex">
             <Button variant="outline" className="btn-mock-outline h-12 px-4 text-[12px] uppercase" asChild>
               <Link to="/patient-portal/login">
                 <Lock className="mr-2 h-4 w-4" />
@@ -126,12 +126,12 @@ export default function PublicLandingPage() {
             </Button>
           </div>
 
-          <Button variant="outline" size="icon" className="btn-mock-outline h-12 w-12 lg:hidden" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="Toggle menu">
+          <Button variant="outline" size="icon" className="btn-mock-outline h-12 w-12 min-[900px]:hidden" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="Toggle menu">
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
 
-        <div className="mx-auto hidden max-w-[1240px] justify-end px-4 pb-3 lg:flex lg:px-6">
+        <div className="mx-auto hidden max-w-[1240px] justify-end px-4 pb-3 min-[900px]:flex lg:px-6">
           <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-2xl font-extrabold text-otmg-navy">
             <Phone className="h-5 w-5" />
             410-754-4343
@@ -139,7 +139,7 @@ export default function PublicLandingPage() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-otmg-border bg-card lg:hidden">
+          <div className="border-t border-otmg-border bg-card min-[900px]:hidden">
             <div className="mx-auto flex max-w-[1240px] flex-col gap-3 px-4 py-4">
               {navItems.map((item) =>
                 item.href.startsWith("#") ? (
