@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -24,12 +24,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import logo from "@/assets/logo-ontime.png";
 import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
 import campusImage from "@/assets/mockup-building.jpg";
@@ -87,48 +82,13 @@ const insuranceLogos = [
   { name: "Medicare.gov", mark: "M", className: "text-insurance-medicare" },
 ];
 
-type AppointmentForm = {
-  name: string;
-  phone: string;
-  email: string;
-  service: string;
-  preference: string;
-  notes: string;
-};
-
-const defaultAppointmentForm: AppointmentForm = {
-  name: "",
-  phone: "",
-  email: "",
-  service: "primary-care",
-  preference: "same-day",
-  notes: "",
-};
-
 export default function PublicLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [appointmentOpen, setAppointmentOpen] = useState(false);
-  const [appointmentForm, setAppointmentForm] = useState<AppointmentForm>(defaultAppointmentForm);
-
-  const appointmentSummary = useMemo(() => {
-    const service = appointmentForm.service.replace(/-/g, " ");
-    return `${service} • ${appointmentForm.preference.replace(/-/g, " ")}`;
-  }, [appointmentForm.preference, appointmentForm.service]);
 
   const openAppointment = () => {
     setMobileMenuOpen(false);
     setAppointmentOpen(true);
-  };
-
-  const handleAppointmentSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    toast.success("Appointment request received. Our care team will contact you shortly.");
-    setAppointmentOpen(false);
-    setAppointmentForm(defaultAppointmentForm);
-  };
-
-  const updateAppointmentField = (field: keyof AppointmentForm, value: string) => {
-    setAppointmentForm((current) => ({ ...current, [field]: value }));
   };
 
   return (
