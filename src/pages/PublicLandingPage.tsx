@@ -127,7 +127,7 @@ const insuranceLogos = [
 export default function PublicLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [appointmentOpen, setAppointmentOpen] = useState(false);
-  const shellClassName = "mx-auto w-full max-w-[1240px] px-4 sm:px-6";
+  const shellClassName = "mx-auto w-full max-w-[1580px] px-6 sm:px-10 xl:px-14";
 
   const heroTitle = useMemo(
     () => (
@@ -145,33 +145,33 @@ export default function PublicLandingPage() {
   return (
     <div className="min-h-screen bg-white text-[#13306b]">
       <header className="sticky top-0 z-50 border-b border-[#dde5f4] bg-white/95 backdrop-blur">
-        <div className={`${shellClassName} flex items-center justify-between gap-6 py-4`}>
+        <div className={`${shellClassName} flex items-center justify-between gap-4 py-4 lg:py-7`}>
           <Link to="/" className="inline-flex shrink-0 items-center" aria-label="On Time Medical Group home">
-            <img src={logo} alt="On Time Medical Group" className="h-[72px] w-[72px] object-contain sm:h-[88px] sm:w-[88px]" />
+            <img src={logo} alt="On Time Medical Group" className="h-[76px] w-[76px] object-contain sm:h-[96px] sm:w-[96px] xl:h-[114px] xl:w-[114px]" />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-7 lg:flex xl:gap-10">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-10 lg:flex xl:gap-14">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`nav-mock-link whitespace-nowrap ${item.label === "Home" ? "nav-mock-link-active" : ""}`}
+                className={`text-[1rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] ${item.label === "Home" ? "text-[#ef2027] border-b-2 border-[#ef2027]" : ""}`}
               >
                 {item.label}
               </a>
             ))}
           </nav>
 
-          <div className="hidden shrink-0 items-center gap-3 lg:flex">
-            <Button variant="outline" className="btn-mock-outline h-12 px-5 text-[12px] uppercase" asChild>
+          <div className="hidden shrink-0 items-center gap-5 lg:flex">
+            <Button variant="outline" className="btn-mock-outline h-[52px] px-7 text-[13px] font-bold uppercase border-2 border-[#13306b]/20" asChild>
               <Link to="/patient-portal/login">
-                <Lock className="mr-2 h-4 w-4" />
+                <Lock className="mr-2 h-4.5 w-4.5" />
                 Patient Portal Login
               </Link>
             </Button>
-            <Button className="btn-mock-red h-12 px-5 text-[12px] uppercase" onClick={() => setAppointmentOpen(true)}>
+            <Button className="btn-mock-red h-[52px] px-7 text-[13px] font-bold uppercase shadow-md shadow-[#ef2027]/15" onClick={() => setAppointmentOpen(true)}>
               <span className="inline-flex items-center">
-                <Calendar className="mr-2 h-4 w-4" />
+                <Calendar className="mr-2 h-4.5 w-4.5" />
                 Book Appointment
               </span>
             </Button>
@@ -188,8 +188,8 @@ export default function PublicLandingPage() {
         </div>
 
         <div className={`${shellClassName} hidden justify-end pb-4 lg:flex`}>
-          <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-[2rem] font-black tracking-[-0.03em] text-[#13306b]">
-            <Phone className="h-5 w-5" />
+          <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-[2.4rem] font-black tracking-tighter text-[#13306b]">
+            <Phone className="h-7 w-7 text-[#13306b]" />
             410-754-4343
           </a>
         </div>
@@ -224,70 +224,72 @@ export default function PublicLandingPage() {
       </header>
 
       <main className="overflow-hidden bg-white">
-        <section className="border-b border-[#edf2fb]">
-          <div className={`${shellClassName} py-6 lg:py-8`}>
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6">
+        <section className="relative pt-12 lg:pt-20">
+          <div className={`${shellClassName}`}>
+            <div className="grid items-start gap-12 lg:grid-cols-[48%_52%] lg:gap-10">
               <div className="flex flex-col justify-start">
-                <div className="max-w-[520px]">
-                  <h1 className="hero-mock-title text-[3.45rem] font-extrabold leading-[0.95] tracking-[-0.035em] text-[#113178] sm:text-[4.3rem] lg:text-[5.1rem] xl:text-[5.55rem]">
+                <div className="max-w-[760px]">
+                  <h1 className="hero-mock-title text-[4rem] font-black leading-[0.85] tracking-[-0.04em] text-[#13306b] sm:text-[5.2rem] lg:text-[6.4rem] xl:text-[7.2rem]">
                     {heroTitle}
                   </h1>
-                  <p className="mt-5 max-w-[500px] text-base leading-8 text-[#5f6b7a]">
+                  <p className="mt-10 max-w-[620px] text-[1.15rem] leading-[1.8] text-[#5f6b7a]">
                     On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment
                     with compassion, convenience, and a commitment to your well-being.
                   </p>
 
-                  <div className="mt-7 flex flex-col gap-4 sm:flex-row">
-                    <Button className="btn-mock-red h-14 min-w-[232px] px-7 text-[13px] uppercase" onClick={() => setAppointmentOpen(true)}>
+                  <div className="mt-12 flex flex-col gap-6 sm:flex-row">
+                    <Button className="btn-mock-red h-[72px] min-w-[280px] px-9 text-[15px] font-bold uppercase shadow-xl shadow-[#ef2027]/25" onClick={() => setAppointmentOpen(true)}>
                       <span className="inline-flex items-center">
                         Book Appointment
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        <ArrowRight className="ml-3 h-5 w-5" />
                       </span>
                     </Button>
-                    <Button variant="outline" className="btn-mock-outline h-14 min-w-[232px] px-7 text-[13px] uppercase" asChild>
-                      <a href="tel:+14107544343">
-                        <Phone className="mr-2 h-4 w-4" />
-                        Call Us
-                        <span className="ml-2 text-[1.35rem] font-black normal-case tracking-[-0.03em]">410-754-4343</span>
+                    <Button variant="outline" className="btn-mock-outline h-[72px] min-w-[280px] px-8 text-[15px] font-bold uppercase border-2 border-[#13306b]/20 bg-white" asChild>
+                      <a href="tel:+14107544343" className="flex items-center justify-center">
+                        <Phone className="mr-3 h-6 w-6 text-[#13306b]" />
+                        <div className="flex flex-col items-start leading-none">
+                          <span className="text-[10px] tracking-wider text-[#4f6796]">CALL US</span>
+                          <span className="text-[1.65rem] font-black tracking-tighter text-[#13306b]">410-754-4343</span>
+                        </div>
                       </a>
                     </Button>
                   </div>
 
-                  <div className="mt-6 flex items-start gap-4 rounded-2xl border border-[#dce6f5] bg-white p-4 shadow-[0_16px_40px_-36px_rgba(19,48,107,0.5)]">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f1f5fd] text-[#13306b]">
-                      <BookOpenText className="h-6 w-6" />
+                  <div className="mt-12 flex items-start gap-6 rounded-2xl border border-[#dce6f5] bg-white p-6 shadow-[0_24px_50px_-20px_rgba(19,48,107,0.25)]">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#f1f5fd] text-[#13306b]">
+                      <BookOpenText className="h-8 w-8" />
                     </div>
                     <div>
-                      <p className="text-[1.05rem] font-extrabold text-[#13306b]">Telehealth available for eligible services.</p>
-                      <p className="mt-1 text-sm leading-6 text-[#4f6796]">Connect with your care team from the comfort of your home.</p>
+                      <p className="text-[1.2rem] font-black text-[#13306b]">Telehealth available for eligible services.</p>
+                      <p className="mt-2 text-[1.05rem] leading-7 text-[#4f6796]">Connect with your care team from the comfort of your home.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="relative">
+              <div className="relative lg:-mr-20 xl:-mr-32">
                 <img
                   src={heroImage}
                   alt="Doctor discussing care plan with a patient"
-                  className="block w-full rounded-[18px] shadow-[0_20px_40px_rgba(0,0,0,0.08)]"
+                  className="relative z-0 block w-full rounded-[32px] object-cover shadow-[0_40px_80px_rgba(0,0,0,0.15)] lg:min-h-[740px]"
                   loading="eager"
                 />
               </div>
             </div>
 
-            <div className="relative z-10 -mt-1 rounded-[22px] bg-[#13306b] text-white shadow-[0_30px_56px_-32px_rgba(19,48,107,0.68)]">
+            <div className="relative z-10 -mt-24 mb-[-60px] rounded-[32px] bg-[#13306b] px-4 py-2 text-white shadow-[0_50px_100px_-20px_rgba(19,48,107,0.8)]">
               <div className="grid sm:grid-cols-2 lg:grid-cols-5">
                 {trustHighlights.map((item, index) => (
                   <div
                     key={item.title}
-                    className={`flex items-center gap-4 px-5 py-5 ${
-                      index < trustHighlights.length - 1 ? "border-b border-white/15 lg:border-b-0 lg:border-r" : ""
+                    className={`flex items-center gap-5 px-6 py-10 ${
+                      index < trustHighlights.length - 1 ? "border-b border-white/10 lg:border-b-0 lg:border-r" : ""
                     }`}
                   >
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/45">
-                      <item.icon className="h-6 w-6" />
+                    <div className="flex h-18 w-18 shrink-0 items-center justify-center rounded-full border-2 border-white/40 bg-white/5">
+                      <item.icon className="h-8 w-8" />
                     </div>
-                    <p className="text-[1rem] font-semibold leading-7 text-white">{item.title}</p>
+                    <p className="text-[1.1rem] font-bold leading-tight text-white">{item.title}</p>
                   </div>
                 ))}
               </div>
@@ -295,33 +297,35 @@ export default function PublicLandingPage() {
           </div>
         </section>
 
-        <section id="services" className={`${shellClassName} pt-20 pb-10 lg:pt-28 lg:pb-12`}>
+        <div className="h-32 bg-white" />
+
+        <section id="services" className={`${shellClassName} pt-24 pb-12 lg:pt-32 lg:pb-16`}>
           <div className="text-center">
-            <h2 className="hero-mock-title text-[2.7rem] font-black uppercase leading-none tracking-[-0.04em] text-[#13306b] sm:text-[3rem]">
+            <h2 className="hero-mock-title text-[2.8rem] font-black uppercase leading-none tracking-[-0.04em] text-[#13306b] sm:text-[3.2rem]">
               Our Services
             </h2>
-            <div className="mx-auto mt-2 h-[4px] w-14 rounded-full bg-[#ef2027]" />
-            <p className="mt-3 text-[1.12rem] text-[#4f6796]">Comprehensive care for you and your family at every stage of life.</p>
+            <div className="mx-auto mt-4 h-[5px] w-20 rounded-full bg-[#ef2027]" />
+            <p className="mt-4 text-[1.2rem] font-medium text-[#4f6796]">Comprehensive care for you and your family—at every stage of life.</p>
           </div>
 
-          <div className="mt-9 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-6">
             {serviceCards.map((service) => (
               <article
                 key={service.title}
-                className="flex min-h-[290px] flex-col rounded-[18px] border border-[#dbe4f4] bg-white px-6 py-7 text-center shadow-[0_18px_35px_-32px_rgba(19,48,107,0.55)]"
+                className="flex min-h-[320px] flex-col rounded-[24px] border border-[#dbe4f4] bg-white px-7 py-9 text-center shadow-[0_20px_40px_-32px_rgba(19,48,107,0.4)] transition-transform hover:-translate-y-1"
               >
                 <div
-                  className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full ${
+                  className={`mx-auto flex h-24 w-24 items-center justify-center rounded-full ${
                     service.accent === "red" ? "bg-[#fff2f2] text-[#ef2027]" : "bg-[#edf3ff] text-[#13306b]"
                   }`}
                 >
-                  <service.icon className="h-10 w-10" strokeWidth={1.7} />
+                  <service.icon className="h-12 w-12" strokeWidth={1.8} />
                 </div>
-                <h3 className="mt-6 text-[1.1rem] font-extrabold leading-7 text-[#13306b]">
+                <h3 className="mt-8 text-[1.15rem] font-black leading-7 text-[#13306b]">
                   {service.number} {service.title}
                 </h3>
-                <p className="mt-4 text-sm leading-7 text-[#4f6796]">{service.description}</p>
-                <Link to="/services" className="mt-auto inline-flex items-center justify-center gap-2 pt-8 text-sm font-extrabold text-[#ef2027]">
+                <p className="mt-4 text-[0.95rem] leading-7 text-[#4f6796]">{service.description}</p>
+                <Link to="/services" className="mt-auto inline-flex items-center justify-center gap-2 pt-8 text-sm font-black uppercase text-[#ef2027]">
                   Learn More
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -329,46 +333,46 @@ export default function PublicLandingPage() {
             ))}
           </div>
 
-          <div className="mt-8 flex justify-center">
-            <Button className="btn-mock-navy h-12 px-10 text-[13px] uppercase" asChild>
+          <div className="mt-12 flex justify-center">
+            <Button className="btn-mock-navy h-14 px-12 text-[14px] font-bold uppercase shadow-lg shadow-[#13306b]/20" asChild>
               <Link to="/services">View All Services</Link>
             </Button>
           </div>
         </section>
 
-        <section id="about" className={`${shellClassName} py-2 lg:py-4`}>
-          <div className="grid gap-7 lg:grid-cols-[1.02fr_1fr] lg:items-center">
-            <div className="overflow-hidden rounded-[18px]">
-              <img src={buildingImage} alt="On Time Medical Group building exterior" className="h-full w-full object-cover" loading="lazy" />
+        <section id="about" className={`${shellClassName} py-8 lg:py-12`}>
+          <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+            <div className="overflow-hidden rounded-[28px] shadow-2xl">
+              <img src={buildingImage} alt="On Time Medical Group building exterior" className="h-full w-full object-cover lg:min-h-[500px]" loading="lazy" />
             </div>
 
-            <div className="relative overflow-hidden rounded-[18px] bg-white px-2 py-4 lg:py-5">
-              <div className="absolute bottom-[-3.5rem] right-[-2rem] hidden h-[260px] w-[260px] rounded-full border-[16px] border-[#eef3fc] xl:block" />
-              <div className="absolute bottom-[5.8rem] right-[4.7rem] hidden h-[88px] w-[88px] rounded-full border-[9px] border-[#f3f7fd] xl:block" />
-              <div className="absolute bottom-[4.5rem] right-[6.55rem] hidden h-[115px] w-[3px] rounded-full bg-[#eef3fc] xl:block" />
-              <div className="absolute bottom-[9.65rem] right-[5.1rem] hidden h-[3px] w-[32px] rounded-full bg-[#eef3fc] xl:block" />
+            <div className="relative overflow-hidden rounded-[28px] bg-white px-2 py-6 lg:py-8">
+              <div className="absolute bottom-[-4rem] right-[-2.5rem] hidden h-[320px] w-[320px] rounded-full border-[20px] border-[#eef3fc] xl:block opacity-60" />
+              <div className="absolute bottom-[6.5rem] right-[5.5rem] hidden h-[100px] w-[100px] rounded-full border-[11px] border-[#f3f7fd] xl:block opacity-60" />
+              <div className="absolute bottom-[5rem] right-[7.5rem] hidden h-[130px] w-[4px] rounded-full bg-[#eef3fc] xl:block opacity-60" />
+              <div className="absolute bottom-[10.5rem] right-[6rem] hidden h-[4px] w-[36px] rounded-full bg-[#eef3fc] xl:block opacity-60" />
 
-              <p className="text-sm font-bold uppercase tracking-[0.06em] text-[#ef2027]">About On Time Medical Group</p>
-              <h2 className="mt-3 hero-mock-title text-[3.1rem] font-black leading-none tracking-[-0.04em] text-[#13306b]">
+              <p className="text-base font-bold uppercase tracking-[0.1em] text-[#ef2027]">About On Time Medical Group</p>
+              <h2 className="mt-4 hero-mock-title text-[3.4rem] font-black leading-none tracking-[-0.04em] text-[#13306b] lg:text-[4rem]">
                 Why Choose Us?
               </h2>
-              <p className="mt-5 max-w-[580px] text-base leading-8 text-[#4f6796]">
+              <p className="mt-6 max-w-[620px] text-[1.1rem] leading-[1.9] text-[#4f6796]">
                 We&apos;re more than a healthcare provider, we&apos;re your partner in health. Our patient-centered approach ensures you get
                 the right care, at the right time, every time.
               </p>
 
-              <div className="mt-7 grid gap-4 sm:grid-cols-2">
+              <div className="mt-10 grid gap-5 sm:grid-cols-2">
                 {whyChooseUs.map((item) => (
-                  <div key={item} className="flex items-start gap-3">
-                    <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#13306b] text-white">
-                      <Check className="h-3.5 w-3.5" />
+                  <div key={item} className="flex items-start gap-4">
+                    <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-[#13306b] bg-white text-[#13306b]">
+                      <Check className="h-4 w-4" strokeWidth={3} />
                     </span>
-                    <span className="text-sm font-semibold leading-6 text-[#13306b]">{item}</span>
+                    <span className="text-[1.05rem] font-bold leading-7 text-[#13306b]">{item}</span>
                   </div>
                 ))}
               </div>
 
-              <Button variant="outline" className="btn-mock-outline mt-8 h-12 px-7 text-[13px] uppercase" asChild>
+              <Button variant="outline" className="btn-mock-outline mt-10 h-14 px-10 text-[14px] font-bold uppercase border-2 shadow-lg shadow-[#13306b]/5" asChild>
                 <Link to="/specialties">Learn More About Us</Link>
               </Button>
             </div>

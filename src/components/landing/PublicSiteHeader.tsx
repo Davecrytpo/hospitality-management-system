@@ -20,6 +20,7 @@ export function PublicSiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [appointmentOpen, setAppointmentOpen] = useState(false);
   const location = useLocation();
+  const shellClassName = "mx-auto w-full max-w-[1580px] px-6 sm:px-10 xl:px-14";
 
   const openAppointment = () => {
     setMobileOpen(false);
@@ -28,33 +29,36 @@ export function PublicSiteHeader() {
 
   return (
     <>
-    <header className="relative z-50 bg-card shadow-sm">
-      <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 lg:px-6">
+    <header className="relative z-50 bg-card shadow-sm border-b border-[#dde5f4]">
+      <div className={`${shellClassName} flex items-center justify-between gap-4 py-4 lg:py-7`}>
         <Link to="/" aria-label="On Time Medical Group home" className="inline-flex">
-          <img src={logo} alt="On Time Medical Group" className="h-[74px] w-[74px] object-contain sm:h-[86px] sm:w-[86px] xl:h-[104px] xl:w-[104px]" width={104} height={104} />
+          <img src={logo} alt="On Time Medical Group" className="h-[76px] w-[76px] object-contain sm:h-[96px] sm:w-[96px] xl:h-[114px] xl:w-[114px]" width={114} height={114} />
         </Link>
 
-        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-7 xl:gap-10 lg:flex">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-10 lg:flex xl:gap-14">
           {navItems.map((item) => (
             <Link
               key={item.label}
               to={item.href}
-              className={cn("nav-mock-link whitespace-nowrap", location.pathname === item.href && "nav-mock-link-active")}
+              className={cn(
+                "text-[1rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap",
+                location.pathname === item.href && "text-[#ef2027] border-b-2 border-[#ef2027]"
+              )}
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden shrink-0 items-center gap-3 lg:flex">
-          <Button variant="outline" className="btn-mock-outline h-12 px-4 text-[12px] uppercase" asChild>
+        <div className="hidden shrink-0 items-center gap-5 lg:flex">
+          <Button variant="outline" className="btn-mock-outline h-[52px] px-7 text-[13px] font-bold uppercase border-2 border-[#13306b]/20" asChild>
             <Link to="/patient-portal/login">
-              <Lock className="mr-2 h-4 w-4" />
+              <Lock className="mr-2 h-4.5 w-4.5" />
               Patient Portal Login
             </Link>
           </Button>
-          <Button className="btn-mock-red h-12 px-4 text-[12px] uppercase" type="button" onClick={openAppointment}>
-              <Calendar className="mr-2 h-4 w-4" />
+          <Button className="btn-mock-red h-[52px] px-7 text-[13px] font-bold uppercase shadow-md shadow-[#ef2027]/15" type="button" onClick={openAppointment}>
+              <Calendar className="mr-2 h-4.5 w-4.5" />
               Book Appointment
           </Button>
         </div>
@@ -64,9 +68,9 @@ export function PublicSiteHeader() {
         </Button>
       </div>
 
-      <div className="mx-auto hidden max-w-[1240px] justify-end px-4 pb-3 lg:flex lg:px-6">
-        <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-xl font-extrabold text-otmg-navy">
-          <Phone className="h-5 w-5" />
+      <div className={`${shellClassName} hidden justify-end pb-4 lg:flex`}>
+        <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-[2.4rem] font-black tracking-tighter text-[#13306b]">
+          <Phone className="h-7 w-7 text-[#13306b]" />
           410-754-4343
         </a>
       </div>
