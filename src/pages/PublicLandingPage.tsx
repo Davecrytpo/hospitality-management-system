@@ -150,12 +150,12 @@ export default function PublicLandingPage() {
             <img src={logo} alt="On Time Medical Group" className="h-[76px] w-[76px] object-contain sm:h-[96px] sm:w-[96px] xl:h-[114px] xl:w-[114px]" />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-10 lg:flex xl:gap-14">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex xl:gap-10">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`text-[1rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] ${item.label === "Home" ? "text-[#ef2027] border-b-2 border-[#ef2027]" : ""}`}
+                className={`text-[0.95rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap ${item.label === "Home" ? "text-[#ef2027] border-b-2 border-[#ef2027]" : ""}`}
               >
                 {item.label}
               </a>
@@ -224,72 +224,72 @@ export default function PublicLandingPage() {
       </header>
 
       <main className="overflow-hidden bg-white">
-        <section className="relative pt-12 lg:pt-20">
+        <section className="relative pt-10 lg:pt-16">
           <div className={`${shellClassName}`}>
-            <div className="grid items-start gap-12 lg:grid-cols-[48%_52%] lg:gap-10">
-              <div className="flex flex-col justify-start">
-                <div className="max-w-[760px]">
-                  <h1 className="hero-mock-title text-[4rem] font-black leading-[0.85] tracking-[-0.04em] text-[#13306b] sm:text-[5.2rem] lg:text-[6.4rem] xl:text-[7.2rem]">
+            <div className="grid items-center gap-10 lg:grid-cols-[45%_55%] lg:gap-12">
+              <div className="flex flex-col justify-start py-6 lg:py-10">
+                <div className="max-w-[700px]">
+                  <h1 className="hero-mock-title text-[3.4rem] font-black leading-[1.02] tracking-[-0.03em] text-[#13306b] sm:text-[4.2rem] lg:text-[4.8rem] xl:text-[5.4rem]">
                     {heroTitle}
                   </h1>
-                  <p className="mt-10 max-w-[620px] text-[1.15rem] leading-[1.8] text-[#5f6b7a]">
+                  <p className="mt-8 max-w-[580px] text-[1.1rem] leading-[1.8] text-[#5f6b7a]">
                     On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment
                     with compassion, convenience, and a commitment to your well-being.
                   </p>
 
-                  <div className="mt-12 flex flex-col gap-6 sm:flex-row">
-                    <Button className="btn-mock-red h-[72px] min-w-[280px] px-9 text-[15px] font-bold uppercase shadow-xl shadow-[#ef2027]/25" onClick={() => setAppointmentOpen(true)}>
+                  <div className="mt-10 flex flex-col gap-5 sm:flex-row">
+                    <Button className="btn-mock-red h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase shadow-lg shadow-[#ef2027]/20" onClick={() => setAppointmentOpen(true)}>
                       <span className="inline-flex items-center">
                         Book Appointment
                         <ArrowRight className="ml-3 h-5 w-5" />
                       </span>
                     </Button>
-                    <Button variant="outline" className="btn-mock-outline h-[72px] min-w-[280px] px-8 text-[15px] font-bold uppercase border-2 border-[#13306b]/20 bg-white" asChild>
+                    <Button variant="outline" className="btn-mock-outline h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase border-2 border-[#13306b]/15 bg-white" asChild>
                       <a href="tel:+14107544343" className="flex items-center justify-center">
-                        <Phone className="mr-3 h-6 w-6 text-[#13306b]" />
-                        <div className="flex flex-col items-start leading-none">
-                          <span className="text-[10px] tracking-wider text-[#4f6796]">CALL US</span>
-                          <span className="text-[1.65rem] font-black tracking-tighter text-[#13306b]">410-754-4343</span>
+                        <Phone className="mr-3 h-5 w-5 text-[#13306b]" />
+                        <div className="flex flex-col items-start leading-tight">
+                          <span className="text-[9px] tracking-widest text-[#4f6796]">CALL US</span>
+                          <span className="text-[1.45rem] font-black tracking-tighter text-[#13306b]">410-754-4343</span>
                         </div>
                       </a>
                     </Button>
                   </div>
 
-                  <div className="mt-12 flex items-start gap-6 rounded-2xl border border-[#dce6f5] bg-white p-6 shadow-[0_24px_50px_-20px_rgba(19,48,107,0.25)]">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#f1f5fd] text-[#13306b]">
-                      <BookOpenText className="h-8 w-8" />
+                  <div className="mt-10 flex items-start gap-5 rounded-2xl border border-[#dce6f5] bg-white p-5 shadow-[0_20px_45px_-20px_rgba(19,48,107,0.2)]">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f1f5fd] text-[#13306b]">
+                      <BookOpenText className="h-7 w-7" />
                     </div>
                     <div>
-                      <p className="text-[1.2rem] font-black text-[#13306b]">Telehealth available for eligible services.</p>
-                      <p className="mt-2 text-[1.05rem] leading-7 text-[#4f6796]">Connect with your care team from the comfort of your home.</p>
+                      <p className="text-[1.1rem] font-black text-[#13306b]">Telehealth available for eligible services.</p>
+                      <p className="mt-1 text-sm leading-6 text-[#4f6796]">Connect with your care team from the comfort of your home.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="relative lg:-mr-20 xl:-mr-32">
+              <div className="relative lg:-mr-16 xl:-mr-24">
                 <img
                   src={heroImage}
                   alt="Doctor discussing care plan with a patient"
-                  className="relative z-0 block w-full rounded-[32px] object-cover shadow-[0_40px_80px_rgba(0,0,0,0.15)] lg:min-h-[740px]"
+                  className="relative z-0 block w-full rounded-[32px] object-cover object-right shadow-[0_40px_80px_rgba(0,0,0,0.12)] lg:h-[680px] xl:h-[720px]"
                   loading="eager"
                 />
               </div>
             </div>
 
-            <div className="relative z-10 -mt-24 mb-[-60px] rounded-[32px] bg-[#13306b] px-4 py-2 text-white shadow-[0_50px_100px_-20px_rgba(19,48,107,0.8)]">
+            <div className="relative z-10 -mt-20 mb-[-40px] rounded-[28px] bg-[#13306b] px-4 py-1 text-white shadow-[0_40px_80px_-20px_rgba(19,48,107,0.75)]">
               <div className="grid sm:grid-cols-2 lg:grid-cols-5">
                 {trustHighlights.map((item, index) => (
                   <div
                     key={item.title}
-                    className={`flex items-center gap-5 px-6 py-10 ${
+                    className={`flex items-center gap-4 px-5 py-8 ${
                       index < trustHighlights.length - 1 ? "border-b border-white/10 lg:border-b-0 lg:border-r" : ""
                     }`}
                   >
-                    <div className="flex h-18 w-18 shrink-0 items-center justify-center rounded-full border-2 border-white/40 bg-white/5">
-                      <item.icon className="h-8 w-8" />
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-white/30 bg-white/5">
+                      <item.icon className="h-7 w-7" />
                     </div>
-                    <p className="text-[1.1rem] font-bold leading-tight text-white">{item.title}</p>
+                    <p className="text-[1rem] font-bold leading-snug text-white">{item.title}</p>
                   </div>
                 ))}
               </div>
