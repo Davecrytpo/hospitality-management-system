@@ -150,12 +150,12 @@ export default function PublicLandingPage() {
             <img src={logo} alt="On Time Medical Group" className="h-[76px] w-[76px] object-contain sm:h-[96px] sm:w-[96px] xl:h-[114px] xl:w-[114px]" />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-8">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-3 lg:flex xl:gap-6">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`text-[0.85rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap ${item.label === "Home" ? "text-[#ef2027] border-b-2 border-[#ef2027]" : ""}`}
+                className={`text-[0.8rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap lg:text-[0.85rem] xl:text-[0.9rem] ${item.label === "Home" ? "text-[#ef2027] border-b-2 border-[#ef2027]" : ""}`}
               >
                 {item.label}
               </a>
@@ -225,12 +225,12 @@ export default function PublicLandingPage() {
       </header>
 
       <main className="overflow-hidden bg-white">
-        <section className="relative pt-10 lg:pt-16">
+        <section className="relative pt-6 lg:pt-10">
           <div className={`${shellClassName}`}>
-            <div className="grid items-center gap-10 lg:grid-cols-[45%_55%] lg:gap-12">
-              <div className="flex flex-col justify-start py-4 lg:py-6">
-                <div className="max-w-[700px]">
-                  <h1 className="hero-mock-title text-[2.6rem] font-black leading-[1.1] tracking-[-0.03em] text-[#13306b] sm:text-[3.2rem] lg:text-[3.8rem] xl:text-[4.4rem]">
+            <div className="grid items-center gap-8 lg:grid-cols-[42%_58%] lg:gap-10">
+              <div className="flex flex-col justify-start py-4">
+                <div className="max-w-[650px]">
+                  <h1 className="hero-mock-title text-[2.2rem] font-black leading-[1.05] tracking-[-0.03em] text-[#13306b] sm:text-[3rem] lg:text-[3.4rem] xl:text-[4rem]">
                     {heroTitle}
                   </h1>
                   <p className="mt-8 max-w-[580px] text-[1.1rem] leading-[1.8] text-[#5f6b7a]">
@@ -238,19 +238,19 @@ export default function PublicLandingPage() {
                     with compassion, convenience, and a commitment to your well-being.
                   </p>
 
-                  <div className="mt-10 flex flex-col gap-5 sm:flex-row">
-                    <Button className="btn-mock-red h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase shadow-lg shadow-[#ef2027]/20" onClick={() => setAppointmentOpen(true)}>
+                  <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                    <Button className="btn-mock-red h-14 sm:h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase shadow-lg shadow-[#ef2027]/20" onClick={() => setAppointmentOpen(true)}>
                       <span className="inline-flex items-center">
                         Book Appointment
                         <ArrowRight className="ml-3 h-5 w-5" />
                       </span>
                     </Button>
-                    <Button variant="outline" className="btn-mock-outline h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase border-2 border-[#13306b]/15 bg-white" asChild>
+                    <Button variant="outline" className="btn-mock-outline h-14 sm:h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase border-2 border-[#13306b]/15 bg-white" asChild>
                       <a href="tel:+14107544343" className="flex items-center justify-center">
                         <Phone className="mr-3 h-5 w-5 text-[#13306b]" />
                         <div className="flex flex-col items-start leading-tight">
                           <span className="text-[9px] tracking-widest text-[#4f6796]">CALL US</span>
-                          <span className="text-[1.45rem] font-black tracking-tighter text-[#13306b]">410-754-4343</span>
+                          <span className="text-[1.2rem] sm:text-[1.45rem] font-black tracking-tighter text-[#13306b]">410-754-4343</span>
                         </div>
                       </a>
                     </Button>
@@ -268,17 +268,17 @@ export default function PublicLandingPage() {
                 </div>
               </div>
 
-              <div className="relative lg:-mr-12 xl:-mr-16">
+              <div className="relative lg:-mr-10 xl:-mr-14">
                 <img
                   src={heroImage}
                   alt="Doctor discussing care plan with a patient"
-                  className="relative z-0 block w-full rounded-[32px] object-cover object-center shadow-[0_40px_80px_rgba(0,0,0,0.12)] lg:h-[620px] xl:h-[700px]"
+                  className="relative z-0 block w-full rounded-[32px] object-cover object-center shadow-[0_40px_80px_rgba(0,0,0,0.12)] lg:h-[600px] xl:h-[680px]"
                   loading="eager"
                 />
               </div>
             </div>
 
-            <div className="relative z-10 -mt-20 mb-[-40px] rounded-[28px] bg-[#13306b] px-4 py-1 text-white shadow-[0_40px_80px_-20px_rgba(19,48,107,0.75)]">
+            <div className="relative z-10 -mt-24 mb-[-40px] rounded-[28px] bg-[#13306b] px-4 py-1 text-white shadow-[0_40px_80px_-20px_rgba(19,48,107,0.75)]">
               <div className="grid sm:grid-cols-2 lg:grid-cols-5">
                 {trustHighlights.map((item, index) => (
                   <div

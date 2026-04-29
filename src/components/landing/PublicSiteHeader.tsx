@@ -35,13 +35,13 @@ export function PublicSiteHeader() {
           <img src={logo} alt="On Time Medical Group" className="h-[76px] w-[76px] object-contain sm:h-[96px] sm:w-[96px] xl:h-[114px] xl:w-[114px]" width={114} height={114} />
         </Link>
 
-        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-8">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-3 lg:flex xl:gap-6">
           {navItems.map((item) => (
             <Link
               key={item.label}
               to={item.href}
               className={cn(
-                "text-[0.85rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap",
+                "text-[0.8rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap lg:text-[0.85rem] xl:text-[0.9rem]",
                 location.pathname === item.href && "text-[#ef2027] border-b-2 border-[#ef2027]"
               )}
             >

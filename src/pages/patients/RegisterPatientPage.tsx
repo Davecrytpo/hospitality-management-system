@@ -380,11 +380,11 @@ export default function RegisterPatientPage() {
           </Card>
         </div>
 
-        <div className="flex justify-end gap-4">
-          <Button variant="outline" asChild>
+        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
+          <Button variant="outline" asChild className="w-full sm:w-auto">
             <Link to="/patients">Cancel</Link>
           </Button>
-          <Button onClick={handleRegister} disabled={isLoading}>
+          <Button onClick={handleRegister} disabled={isLoading} className="w-full sm:w-auto">
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
