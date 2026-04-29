@@ -227,52 +227,52 @@ export default function PublicLandingPage() {
       <main className="overflow-hidden bg-white">
         <section className="relative pt-6 lg:pt-10">
           <div className={`${shellClassName}`}>
-            <div className="grid items-center gap-8 lg:grid-cols-[42%_58%] lg:gap-10">
+            <div className="grid items-center gap-8 lg:grid-cols-[40%_60%] lg:gap-12">
               <div className="flex flex-col justify-start py-4">
-                <div className="max-w-[650px]">
-                  <h1 className="hero-mock-title text-[2.2rem] font-black leading-[1.05] tracking-[-0.03em] text-[#13306b] sm:text-[3rem] lg:text-[3.4rem] xl:text-[4rem]">
+                <div className="max-w-[700px]">
+                  <h1 className="hero-mock-title text-[2.2rem] font-black leading-[1.05] tracking-[-0.03em] text-[#13306b] sm:text-[3.2rem] lg:text-[3.8rem] xl:text-[4.5rem]">
                     {heroTitle}
                   </h1>
-                  <p className="mt-8 max-w-[580px] text-[1.1rem] leading-[1.8] text-[#5f6b7a]">
+                  <p className="mt-8 max-w-[620px] text-[1.15rem] leading-[1.8] text-[#5f6b7a]">
                     On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment
                     with compassion, convenience, and a commitment to your well-being.
                   </p>
 
                   <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                    <Button className="btn-mock-red h-14 sm:h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase shadow-lg shadow-[#ef2027]/20" onClick={() => setAppointmentOpen(true)}>
+                    <Button className="btn-mock-red h-16 min-w-[260px] px-8 text-[14px] font-bold uppercase shadow-lg shadow-[#ef2027]/20" onClick={() => setAppointmentOpen(true)}>
                       <span className="inline-flex items-center">
                         Book Appointment
                         <ArrowRight className="ml-3 h-5 w-5" />
                       </span>
                     </Button>
-                    <Button variant="outline" className="btn-mock-outline h-14 sm:h-16 min-w-[240px] px-8 text-[14px] font-bold uppercase border-2 border-[#13306b]/15 bg-white" asChild>
+                    <Button variant="outline" className="btn-mock-outline h-16 min-w-[260px] px-8 text-[14px] font-bold uppercase border-2 border-[#13306b]/15 bg-white" asChild>
                       <a href="tel:+14107544343" className="flex items-center justify-center">
                         <Phone className="mr-3 h-5 w-5 text-[#13306b]" />
                         <div className="flex flex-col items-start leading-tight">
                           <span className="text-[9px] tracking-widest text-[#4f6796]">CALL US</span>
-                          <span className="text-[1.2rem] sm:text-[1.45rem] font-black tracking-tighter text-[#13306b]">410-754-4343</span>
+                          <span className="text-[1.35rem] sm:text-[1.6rem] font-black tracking-tighter text-[#13306b]">410-754-4343</span>
                         </div>
                       </a>
                     </Button>
                   </div>
 
                   <div className="mt-10 flex items-start gap-5 rounded-2xl border border-[#dce6f5] bg-white p-5 shadow-[0_20px_45px_-20px_rgba(19,48,107,0.2)]">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f1f5fd] text-[#13306b]">
-                      <BookOpenText className="h-7 w-7" />
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#f1f5fd] text-[#13306b]">
+                      <BookOpenText className="h-8 w-8" />
                     </div>
                     <div>
-                      <p className="text-[1.1rem] font-black text-[#13306b]">Telehealth available for eligible services.</p>
+                      <p className="text-[1.15rem] font-black text-[#13306b]">Telehealth available for eligible services.</p>
                       <p className="mt-1 text-sm leading-6 text-[#4f6796]">Connect with your care team from the comfort of your home.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="relative lg:-mr-10 xl:-mr-14">
+              <div className="relative">
                 <img
                   src={heroImage}
                   alt="Doctor discussing care plan with a patient"
-                  className="relative z-0 block w-full rounded-[32px] object-cover object-center shadow-[0_40px_80px_rgba(0,0,0,0.12)] lg:h-[600px] xl:h-[680px]"
+                  className="relative z-0 block w-full rounded-[32px] object-cover object-center shadow-[0_40px_80px_rgba(0,0,0,0.12)] lg:h-[650px] xl:h-[750px]"
                   loading="eager"
                 />
               </div>
