@@ -150,17 +150,18 @@ export default function PublicLandingPage() {
             <img src={logo} alt="On Time Medical Group" className="h-[76px] w-[76px] object-contain sm:h-[96px] sm:w-[96px] xl:h-[114px] xl:w-[114px]" />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex xl:gap-10">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-8">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`text-[0.95rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap ${item.label === "Home" ? "text-[#ef2027] border-b-2 border-[#ef2027]" : ""}`}
+                className={`text-[0.85rem] font-bold tracking-tight text-[#13306b] uppercase transition-colors hover:text-[#ef2027] whitespace-nowrap ${item.label === "Home" ? "text-[#ef2027] border-b-2 border-[#ef2027]" : ""}`}
               >
                 {item.label}
               </a>
             ))}
           </nav>
+
 
           <div className="hidden shrink-0 items-center gap-5 lg:flex">
             <Button variant="outline" className="btn-mock-outline h-[52px] px-7 text-[13px] font-bold uppercase border-2 border-[#13306b]/20" asChild>
@@ -227,9 +228,9 @@ export default function PublicLandingPage() {
         <section className="relative pt-10 lg:pt-16">
           <div className={`${shellClassName}`}>
             <div className="grid items-center gap-10 lg:grid-cols-[45%_55%] lg:gap-12">
-              <div className="flex flex-col justify-start py-6 lg:py-10">
+              <div className="flex flex-col justify-start py-4 lg:py-6">
                 <div className="max-w-[700px]">
-                  <h1 className="hero-mock-title text-[3.4rem] font-black leading-[1.02] tracking-[-0.03em] text-[#13306b] sm:text-[4.2rem] lg:text-[4.8rem] xl:text-[5.4rem]">
+                  <h1 className="hero-mock-title text-[2.6rem] font-black leading-[1.1] tracking-[-0.03em] text-[#13306b] sm:text-[3.2rem] lg:text-[3.8rem] xl:text-[4.4rem]">
                     {heroTitle}
                   </h1>
                   <p className="mt-8 max-w-[580px] text-[1.1rem] leading-[1.8] text-[#5f6b7a]">
@@ -267,11 +268,11 @@ export default function PublicLandingPage() {
                 </div>
               </div>
 
-              <div className="relative lg:-mr-16 xl:-mr-24">
+              <div className="relative lg:-mr-12 xl:-mr-16">
                 <img
                   src={heroImage}
                   alt="Doctor discussing care plan with a patient"
-                  className="relative z-0 block w-full rounded-[32px] object-cover object-right shadow-[0_40px_80px_rgba(0,0,0,0.12)] lg:h-[680px] xl:h-[720px]"
+                  className="relative z-0 block w-full rounded-[32px] object-cover object-center shadow-[0_40px_80px_rgba(0,0,0,0.12)] lg:h-[620px] xl:h-[700px]"
                   loading="eager"
                 />
               </div>
