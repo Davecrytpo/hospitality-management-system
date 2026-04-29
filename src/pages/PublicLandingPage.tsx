@@ -225,14 +225,14 @@ export default function PublicLandingPage() {
 
       <main className="overflow-hidden bg-white">
         <section className="border-b border-[#edf2fb]">
-          <div className="mx-auto w-full max-w-[1240px] px-4 pt-4 sm:px-6 sm:pt-6 lg:px-6 lg:pt-2">
-            <div className="grid items-stretch gap-0 lg:grid-cols-12">
-              <div className="flex flex-col justify-center py-10 lg:col-span-5 lg:py-10 xl:py-12">
-                <div className="pr-0 lg:pr-4">
-                  <h1 className="hero-mock-title text-[3.35rem] font-black leading-[0.94] tracking-[-0.05em] text-[#113178] sm:text-[4.4rem] lg:text-[5.2rem] xl:text-[5.7rem]">
+          <div className="mx-auto w-full max-w-[1240px] px-4 py-8 sm:px-6 lg:px-6 lg:py-10">
+            <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10">
+              <div className="flex flex-col justify-center">
+                <div className="max-w-[480px] lg:pr-2">
+                  <h1 className="hero-mock-title text-[3.35rem] font-black leading-[0.98] tracking-[-0.04em] text-[#113178] sm:text-[4.15rem] lg:text-[4.9rem] xl:text-[5.35rem]">
                     {heroTitle}
                   </h1>
-                  <p className="mt-5 max-w-[96%] text-[1.02rem] leading-8 text-[#3f588c]">
+                  <p className="mt-5 max-w-[480px] text-base leading-8 text-[#5f6b7a]">
                     On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment
                     with compassion, convenience, and a commitment to your well-being.
                   </p>
@@ -265,12 +265,12 @@ export default function PublicLandingPage() {
                 </div>
               </div>
 
-              <div className="relative flex items-stretch justify-end lg:col-span-7">
-                <div className="relative w-full overflow-hidden rounded-[22px] bg-[#f5f7fc]">
+              <div className="relative">
+                <div className="rounded-[20px] bg-[#f5f7fb] p-4 shadow-[0_20px_40px_rgba(0,0,0,0.08)] sm:p-5">
                   <img
                     src={heroImage}
                     alt="Doctor discussing care plan with a patient"
-                    className="h-full min-h-[390px] w-full object-cover object-center lg:min-h-[620px]"
+                    className="block w-full rounded-[16px] shadow-[0_20px_40px_rgba(0,0,0,0.08)]"
                     loading="eager"
                   />
                 </div>
@@ -297,7 +297,7 @@ export default function PublicLandingPage() {
           </div>
         </section>
 
-        <section id="services" className={`${shellClassName} pt-14 pb-10 lg:pt-20 lg:pb-12`}>
+        <section id="services" className={`${shellClassName} pt-16 pb-10 lg:pt-24 lg:pb-12`}>
           <div className="text-center">
             <h2 className="hero-mock-title text-[2.7rem] font-black uppercase leading-none tracking-[-0.04em] text-[#13306b] sm:text-[3rem]">
               Our Services
