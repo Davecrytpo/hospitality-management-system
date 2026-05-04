@@ -256,7 +256,7 @@ export default function PublicLandingPage() {
                     </Button>
                   </div>
 
-                  <div className="mt-10 flex items-start gap-5 rounded-2xl border border-[#dce6f5] bg-white p-5 shadow-[0_20px_45px_-20px_rgba(19,48,107,0.2)]">
+                  <div className="mt-10 mb-10 flex items-start gap-5 rounded-2xl border border-[#dce6f5] bg-white p-5 shadow-[0_20px_45px_-20px_rgba(19,48,107,0.2)]">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#f1f5fd] text-[#13306b]">
                       <BookOpenText className="h-8 w-8" />
                     </div>
@@ -278,7 +278,7 @@ export default function PublicLandingPage() {
               </div>
             </div>
 
-            <div className="relative z-10 -mt-24 mb-[-40px] rounded-[28px] bg-[#13306b] px-4 py-1 text-white shadow-[0_40px_80px_-20px_rgba(19,48,107,0.75)]">
+            <div className="relative z-10 -mt-24 mb-[-80px] rounded-[28px] bg-[#13306b] px-4 py-1 text-white shadow-[0_40px_80px_-20px_rgba(19,48,107,0.75)]">
               <div className="grid sm:grid-cols-2 lg:grid-cols-5">
                 {trustHighlights.map((item, index) => (
                   <div
