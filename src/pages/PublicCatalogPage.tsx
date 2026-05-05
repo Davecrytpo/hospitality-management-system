@@ -173,14 +173,18 @@ export default function PublicCatalogPage() {
                 <ArrowLeft className="h-4 w-4" />
                 Back to {label.toLowerCase()}
               </Link>
-              <h1 className="hero-mock-title text-[2.8rem] font-black uppercase leading-tight text-[#13306b] mb-6">{item.title}</h1>
-              <p className="text-[1.1rem] leading-[1.8] text-[#5f6b7a] mb-8">{item.summary}</p>
+              <h1 className="hero-mock-title text-[2.8rem] font-black uppercase leading-tight text-[#13306b] mb-6">{item?.title}</h1>
+              <p className="text-[1.1rem] leading-[1.8] text-[#5f6b7a] mb-8">{item?.summary || item?.excerpt}</p>
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Button className="btn-mock-red h-14 px-8" asChild><Link to={item.primaryAction.href}>{item.primaryAction.label}</Link></Button>
+                {item?.primaryAction?.href && (
+                  <Button className="btn-mock-red h-14 px-8" asChild>
+                    <Link to={item.primaryAction.href}>{item.primaryAction.label}</Link>
+                  </Button>
+                )}
               </div>
             </div>
             <div className="relative min-h-[400px]">
-              <img src={item.image} alt={item.title} className="w-full h-full object-contain" />
+              <img src={item?.image} alt={item?.title} className="w-full h-full object-contain" />
             </div>
           </div>
         </section>
@@ -194,7 +198,7 @@ function ServiceCard({ title, icon: Icon, number, desc, accent, badge }: any) {
   return (
     <article className="flex flex-col rounded-[24px] border border-[#dbe4f4] bg-white p-8 text-center shadow-sm hover:shadow-mock transition-all">
       <div className={cn("mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-6", accent === "red" ? "bg-[#fff2f2] text-[#ef2027]" : "bg-[#edf3ff] text-[#13306b]")}>
-        <Icon className="h-8 w-8" />
+        {Icon && <Icon className="h-8 w-8" />}
       </div>
       <h3 className="text-[1.1rem] font-black leading-tight text-[#13306b] mb-4">{number} {title}</h3>
       {badge && <div className="mb-4"><span className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider", accent === "red" ? "bg-[#fff2f2] text-[#ef2027]" : "bg-[#edf3ff] text-[#13306b]")}>{badge}</span></div>}
