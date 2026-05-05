@@ -59,45 +59,50 @@ export function PublicSiteFooter() {
           </div>
         </div>
 
-        <div className="mt-4 grid overflow-hidden rounded-[20px] bg-[#13306b] text-white lg:grid-cols-[1.14fr_1.02fr_0.94fr_0.9fr]">
-          <div className="flex items-center gap-5 border-b border-white/10 px-7 py-8 lg:border-b-0 lg:border-r">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/25">
-              <Calendar className="h-7 w-7" />
+        <div className="mt-4 grid overflow-hidden rounded-[18px] bg-[#103066] text-white shadow-[0_22px_44px_-36px_rgba(16,48,102,0.58)] lg:grid-cols-[0.92fr_0.9fr_0.98fr_1.06fr]">
+          <div className="flex items-center gap-4 border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25">
+              <Calendar className="h-6 w-6" />
             </div>
-            <div>
-              <p className="text-[1.18rem] font-black leading-tight lg:whitespace-nowrap xl:text-[1.35rem]">Ready to Take the Next Step?</p>
-              <p className="mt-2 text-sm leading-6 text-white/75">We&apos;re here to help you live a healthier, happier life.</p>
+            <div className="min-w-0">
+              <p className="text-[1.04rem] font-black leading-tight xl:text-[1.12rem]">Ready to Take the Next Step?</p>
+              <p className="mt-1.5 text-[0.92rem] leading-6 text-white/76">We&apos;re here to help you live a healthier, happier life.</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-5 border-b border-white/10 px-7 py-8 lg:border-b-0 lg:border-r">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/25">
-              <Phone className="h-7 w-7" />
+          <div className="flex items-center gap-4 border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25">
+              <Phone className="h-6 w-6" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="whitespace-nowrap text-xs font-bold uppercase tracking-[0.14em] text-white/55">Call Us Today</p>
-              <a href="tel:+14107544343" className="mt-1 block whitespace-nowrap text-[1.78rem] font-black leading-none tracking-tight xl:text-[1.95rem]">
+              <a href="tel:+14107544343" className="mt-1 block whitespace-nowrap text-[1.56rem] font-black leading-none tracking-tight xl:text-[1.74rem]">
                 410-754-4343
               </a>
-              <p className="mt-2 text-sm leading-6 text-white/75">Our team is here to help you.</p>
+              <p className="mt-1.5 text-[0.92rem] leading-6 text-white/76">Our team is here to help you.</p>
             </div>
           </div>
 
-          <div className="flex flex-col justify-center border-b border-white/10 px-7 py-8 lg:border-b-0 lg:border-r">
-            <Button className="btn-mock-red h-12 rounded-md text-[13px] uppercase" asChild>
+          <div className="flex flex-col justify-center border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
+            <Button className="btn-mock-red h-11 rounded-md text-[12px] uppercase tracking-[0.04em]" asChild>
               <Link to="/services/smart-appointments">Book Appointment Now</Link>
             </Button>
-            <p className="mt-3 text-sm leading-6 text-white/75">Appointments available in-office or via telehealth.</p>
+            <p className="mt-2.5 text-[0.92rem] leading-6 text-white/76">Appointments available in-office or via telehealth.</p>
           </div>
 
-          <div className="flex items-center gap-5 px-7 py-8">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/25">
-              <Lock className="h-7 w-7" />
+          <div className="flex items-center gap-4 px-6 py-6">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25">
+              <Lock className="h-6 w-6" />
             </div>
-            <div>
-              <p className="text-[1.1rem] font-black leading-tight">Patient Portal Login</p>
-              <p className="mt-2 text-sm leading-6 text-white/75">Access your health information, appointments, and more.</p>
-              <Link to="/patient-portal/login" className="mt-3 inline-flex items-center text-sm font-black uppercase tracking-wide text-white">
+            <div className="min-w-0">
+              <p className="text-[1.02rem] font-black leading-tight xl:text-[1.08rem]">Patient Portal Login</p>
+              <p className="mt-1.5 max-w-[240px] text-[0.92rem] leading-6 text-white/76">
+                Access your health information, appointments, and more.
+              </p>
+              <Link
+                to="/patient-portal/login"
+                className="mt-2.5 inline-flex items-center text-[0.82rem] font-black uppercase tracking-[0.08em] text-white transition-colors hover:text-white/80"
+              >
                 Login Now
               </Link>
             </div>
