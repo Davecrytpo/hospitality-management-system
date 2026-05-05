@@ -36,6 +36,7 @@ import insuranceCigna from "@/assets/insurance-cigna.svg";
 import insuranceBcbs from "@/assets/insurance-bcbs.svg";
 import insuranceMedicare from "@/assets/insurance-medicare.svg";
 import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Home", href: "/" },

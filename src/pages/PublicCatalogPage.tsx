@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PublicSiteFooter } from "@/components/landing/PublicSiteFooter";
 import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
 import { getCatalogItem, getCatalogItems, getCatalogLabel, type PublicCatalogKind } from "@/data/publicSiteContent";
+import { cn } from "@/lib/utils";
 
 import insuranceAetna from "@/assets/insurance-aetna.svg";
 import insuranceUnited from "@/assets/insurance-unitedhealthcare.svg";
@@ -33,7 +34,7 @@ const trustHighlights = [
   { title: "Compassionate Care, Every Step of the Way", icon: HeartHandshake },
 ];
 
-const serviceList = [
+const serviceList: ServiceCardProps[] = [
   { title: "Primary Care", icon: Stethoscope, number: "1.", desc: "Personalized care for your everyday health needs.", accent: "blue" },
   { title: "Preventive Care", icon: ShieldCheck, number: "2.", desc: "Stay ahead with screenings and preventive services.", accent: "red" },
   { title: "Chronic Disease Management", icon: HeartPulse, number: "3.", desc: "Ongoing care to help you manage chronic conditions.", accent: "blue" },
@@ -44,6 +45,15 @@ const serviceList = [
   { title: "Geriatric Care", icon: Users, number: "8.", desc: "Comprehensive care designed for healthy aging.", accent: "blue" },
   { title: "Urgent Care", icon: Plus, number: "9.", desc: "Care for minor illnesses and injuries when you need it.", accent: "red" },
 ];
+
+type ServiceCardProps = {
+  title: string;
+  icon: typeof Stethoscope;
+  number: string;
+  desc: string;
+  accent: "blue" | "red";
+  badge?: string;
+};
 
 export default function PublicCatalogPage() {
   const { slug } = useParams();
@@ -194,7 +204,7 @@ export default function PublicCatalogPage() {
   );
 }
 
-function ServiceCard({ title, icon: Icon, number, desc, accent, badge }: any) {
+function ServiceCard({ title, icon: Icon, number, desc, accent, badge }: ServiceCardProps) {
   return (
     <article className="flex flex-col rounded-[24px] border border-[#dbe4f4] bg-white p-8 text-center shadow-sm hover:shadow-mock transition-all">
       <div className={cn("mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-6", accent === "red" ? "bg-[#fff2f2] text-[#ef2027]" : "bg-[#edf3ff] text-[#13306b]")}>
