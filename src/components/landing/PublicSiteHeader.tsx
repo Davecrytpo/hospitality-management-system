@@ -20,7 +20,7 @@ export function PublicSiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [appointmentOpen, setAppointmentOpen] = useState(false);
   const location = useLocation();
-  const shellClassName = "mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-7";
+  const shellClassName = "mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8";
 
   const openAppointment = () => {
     setMobileOpen(false);
@@ -28,28 +28,40 @@ export function PublicSiteHeader() {
   };
 
   const isNavItemActive = (label: string, href: string) => {
-    if (label === "Home") return location.pathname === "/";
     if (label === "Services") return location.pathname.startsWith("/services");
-    return location.pathname === href;
+
+    const [pathname, hash] = href.split("#");
+    if (hash) {
+      return location.pathname === pathname && location.hash === `#${hash}`;
+    }
+
+    return location.pathname === href && location.hash.length === 0;
   };
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[#dde5f4] bg-white/95 shadow-[0_1px_0_rgba(19,48,107,0.08)] backdrop-blur">
-        <div className={`${shellClassName} flex h-[68px] items-center justify-between gap-4`}>
+      <header className="sticky top-0 z-50 border-b border-[#dde5f4] bg-white shadow-[0_14px_34px_-30px_rgba(19,48,107,0.42)]">
+        <div className={`${shellClassName} flex min-h-[82px] items-center justify-between gap-4 py-2 lg:min-h-[90px]`}>
           <Link to="/" aria-label="On Time Medical Group home" className="inline-flex shrink-0">
-            <img src={logo} alt="On Time Medical Group" className="h-[50px] w-auto object-contain" width={50} height={50} />
+            <img
+              src={logo}
+              alt="On Time Medical Group"
+              className="h-[60px] w-[60px] object-contain sm:h-[68px] sm:w-[68px] lg:h-[76px] lg:w-[76px]"
+              width={76}
+              height={76}
+            />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 lg:flex xl:gap-8">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex xl:gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.label}
                 to={item.href}
                 className={cn(
-                  "border-b-2 border-transparent pb-1 text-[0.74rem] font-black uppercase tracking-tight text-[#13306b] transition-colors hover:text-[#ef2027] whitespace-nowrap",
+                  "border-b-2 border-transparent pb-1.5 text-[0.8rem] font-black uppercase tracking-[0.04em] text-[#13306b] transition-colors hover:text-[#ef2027] whitespace-nowrap xl:text-[0.84rem]",
                   isNavItemActive(item.label, item.href) && "border-[#ef2027] text-[#ef2027]",
                 )}
+                aria-current={isNavItemActive(item.label, item.href) ? "page" : undefined}
               >
                 {item.label}
               </Link>
@@ -57,20 +69,24 @@ export function PublicSiteHeader() {
           </nav>
 
           <div className="hidden shrink-0 items-center gap-3 lg:flex">
-            <Button variant="outline" className="h-9 rounded-md border-2 border-[#13306b]/20 px-4 text-[10.5px] font-bold uppercase text-[#13306b]" asChild>
+            <Button
+              variant="outline"
+              className="h-11 rounded-md border-2 border-[#13306b]/16 bg-white px-5 text-[11.5px] font-black uppercase tracking-[0.04em] text-[#13306b] shadow-[0_18px_30px_-28px_rgba(19,48,107,0.35)]"
+              asChild
+            >
               <Link to="/patient-portal/login">
                 <Lock className="mr-2 h-4 w-4" />
                 Patient Portal Login
               </Link>
             </Button>
-            <Button className="btn-mock-red h-9 rounded-md px-4 text-[10.5px] font-bold uppercase shadow-sm" type="button" onClick={openAppointment}>
+            <Button
+              className="btn-mock-red h-11 rounded-md px-5 text-[11.5px] font-black uppercase tracking-[0.04em] shadow-[0_18px_30px_-22px_rgba(239,32,39,0.42)]"
+              type="button"
+              onClick={openAppointment}
+            >
               <Calendar className="mr-2 h-4 w-4" />
               Book Appointment
             </Button>
-            <a href="tel:+14107544343" className="ml-1 inline-flex items-center gap-2 whitespace-nowrap text-[#13306b] transition-colors hover:text-[#ef2027]">
-              <Phone className="h-4 w-4" />
-              <span className="text-[0.98rem] font-black tracking-tight">410-754-4343</span>
-            </a>
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
@@ -81,7 +97,7 @@ export function PublicSiteHeader() {
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-md border-[#13306b]/15"
+              className="h-10 w-10 rounded-md border-[#13306b]/15"
               onClick={() => setMobileOpen((open) => !open)}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

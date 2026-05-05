@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -19,8 +19,6 @@ import {
   UserRound,
 } from "lucide-react";
 
-import blogUrgentImage from "@/assets/home-blog-urgent-care.jpg";
-import heroImage from "@/assets/home-hero-doctor-patient.jpg";
 import insuranceAetna from "@/assets/insurance-aetna.svg";
 import insuranceBcbs from "@/assets/insurance-bcbs.svg";
 import insuranceCareFirst from "@/assets/insurance-carefirst.svg";
@@ -28,8 +26,10 @@ import insuranceCigna from "@/assets/insurance-cigna.svg";
 import insuranceMedicare from "@/assets/insurance-medicare.svg";
 import insuranceUnited from "@/assets/insurance-unitedhealthcare.svg";
 import logo from "@/assets/logo-ontime.png";
+import blogUrgentImage from "@/assets/mockup-blog-urgent.jpg";
 import blogWellnessImage from "@/assets/mockup-blog-wellness.jpg";
 import buildingImage from "@/assets/mockup-building.jpg";
+import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
 import resourcesImage from "@/assets/mockup-resources-woman.jpg";
 import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
 
 const trustHighlights = [
   { title: "Same-Day Appointments Available", icon: Calendar },
-  { title: "Most Insurance Plans Accepted", icon: ShieldCheck },
+  { title: "Most Insurance Plans Accepted", icon: ShieldCheck, isAccent: true },
   { title: "All-in-One Care Mind, Body, You.", icon: UserRound },
   { title: "Convenient Locations Near You", icon: MapPin },
   { title: "Compassionate Care, Every Step of the Way", icon: HeartHandshake },
@@ -116,35 +116,33 @@ const insuranceLogos = [
 
 export default function PublicLandingPage() {
   const [appointmentOpen, setAppointmentOpen] = useState(false);
-  const shellClassName = "mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-7";
-
-  const heroTitle = useMemo(
-    () => (
-      <>
-        <span className="block">COMPREHENSIVE</span>
-        <span className="block">HEALTHCARE THAT&apos;S</span>
-        <span className="block">
-          <span className="text-[#ef2027]">ON TIME.</span> EVERY TIME.
-        </span>
-      </>
-    ),
-    [],
-  );
+  const shellClassName = "mx-auto w-full max-w-[1260px] px-4 sm:px-6 lg:px-8";
 
   return (
     <div className="min-h-screen bg-white text-[#13306b]">
       <PublicSiteHeader />
 
       <main className="overflow-x-hidden bg-white">
-        <section className="overflow-visible pt-4 lg:pt-6">
+        <section className="overflow-visible pt-4 lg:pt-7">
           <div className={`${shellClassName} relative`}>
-            <div className="grid gap-6 lg:grid-cols-[0.94fr_1.06fr] lg:items-start lg:gap-8">
-              <div className="pt-2 lg:pt-3">
-                <div className="max-w-[530px]">
-                  <h1 className="hero-mock-title text-[2.9rem] font-black uppercase leading-[0.94] tracking-tight text-[#13306b] sm:text-[3.65rem] lg:text-[4.2rem] xl:text-[4.55rem]">
-                    {heroTitle}
+            <div className="mb-4 hidden justify-end lg:flex">
+              <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-[#13306b] transition-colors hover:text-[#ef2027]">
+                <Phone className="h-6 w-6" strokeWidth={2.2} />
+                <span className="text-[2.15rem] font-black tracking-tight">410-754-4343</span>
+              </a>
+            </div>
+
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)] lg:items-start lg:gap-10">
+              <div className="pt-2 lg:pt-4">
+                <div className="max-w-[550px]">
+                  <h1 className="hero-mock-title text-[3rem] font-black uppercase leading-[0.92] tracking-tight text-[#13306b] sm:text-[3.55rem] md:text-[3.85rem] lg:text-[4rem] xl:text-[4.28rem]">
+                    <span className="block">Comprehensive</span>
+                    <span className="block">Healthcare That&apos;s</span>
+                    <span className="block">
+                      <span className="text-[#ef2027]">On Time.</span> Every Time.
+                    </span>
                   </h1>
-                  <p className="mt-6 max-w-[500px] text-[1rem] leading-8 text-[#4f6796] lg:text-[1.04rem]">
+                  <p className="mt-6 max-w-[520px] text-[1rem] leading-8 text-[#4f6796] lg:text-[1.04rem]">
                     On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment
                     with compassion, convenience, and a commitment to your well-being.
                   </p>
@@ -171,7 +169,7 @@ export default function PublicLandingPage() {
                     </Button>
                   </div>
 
-                  <div className="mt-8 flex max-w-[460px] items-start gap-4 rounded-[18px] border border-[#dce6f5] bg-[#f4f8ff] p-5 shadow-[0_18px_38px_-36px_rgba(19,48,107,0.45)]">
+                  <div className="mt-8 flex max-w-[470px] items-start gap-4 rounded-[18px] border border-[#dce6f5] bg-[#f4f8ff] p-5 shadow-[0_18px_38px_-36px_rgba(19,48,107,0.45)]">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#13306b] shadow-sm">
                       <BookOpenText className="h-5 w-5" />
                     </div>
@@ -183,17 +181,19 @@ export default function PublicLandingPage() {
                 </div>
               </div>
 
-              <div className="relative z-10 flex justify-center lg:justify-end lg:-mb-14">
-                <img
-                  src={heroImage}
-                  alt="Doctor discussing care plan with a patient"
-                  className="w-full max-w-[760px] rounded-[28px] object-contain object-top shadow-[0_28px_60px_-40px_rgba(19,48,107,0.42)]"
-                  loading="eager"
-                />
+              <div className="relative z-10 flex justify-center lg:justify-end">
+                <div className="w-full max-w-[760px] overflow-hidden rounded-[28px] shadow-[0_28px_60px_-40px_rgba(19,48,107,0.42)]">
+                  <img
+                    src={heroImage}
+                    alt="Doctor discussing care plan with a patient"
+                    className="w-full object-cover object-center"
+                    loading="eager"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="relative z-20 mt-7 rounded-[22px] bg-[#13306b] px-2 py-1 text-white shadow-mock lg:-mt-3">
+            <div className="relative z-20 mt-8 rounded-[22px] bg-[#13306b] px-2 py-1 text-white shadow-mock lg:-mt-10">
               <div className="grid sm:grid-cols-2 lg:grid-cols-5">
                 {trustHighlights.map((item, index) => (
                   <div
@@ -202,7 +202,12 @@ export default function PublicLandingPage() {
                       index < trustHighlights.length - 1 ? "border-b border-white/10 lg:border-b-0 lg:border-r lg:border-white/15" : ""
                     }`}
                   >
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-white/30 bg-white/5">
+                    <div
+                      className={cn(
+                        "flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-white/30 bg-white/5",
+                        item.isAccent && "border-[#ef2027]/45 bg-[#ef2027]/12 text-[#ef2027]",
+                      )}
+                    >
                       <item.icon className="h-6 w-6" />
                     </div>
                     <p className="text-[0.95rem] font-bold leading-snug text-white">{item.title}</p>
