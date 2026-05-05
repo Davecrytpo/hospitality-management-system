@@ -20,7 +20,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import heroImage from "@/assets/home-hero-doctor-patient.jpg";
+import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
 import secondaryImage from "@/assets/services-family-banner.jpg";
 import insuranceAetna from "@/assets/insurance-aetna.svg";
 import insuranceBcbs from "@/assets/insurance-bcbs.svg";
@@ -155,7 +155,7 @@ export default function PublicCatalogPage() {
   const items = getCatalogItems(kind);
   const label = getCatalogLabel(kind);
   const item = getCatalogItem(kind, slug);
-  const shellClassName = "mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-7";
+  const shellClassName = "mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8";
 
   if (slug && !item) return <Navigate to={`/${kind}`} replace />;
 
@@ -164,10 +164,17 @@ export default function PublicCatalogPage() {
       <div className="min-h-screen bg-white text-[#13306b]">
         <PublicSiteHeader />
         <main className="overflow-x-hidden bg-white">
-          <section className="overflow-visible pt-4 lg:pt-6">
+          <section className="overflow-visible pt-4 lg:pt-7">
             <div className={`${shellClassName} relative`}>
-              <div className="grid gap-6 lg:grid-cols-[0.94fr_1.06fr] lg:items-start lg:gap-8">
-                <div className="pt-2 lg:pt-3">
+              <div className="mb-4 hidden justify-end lg:flex">
+                <a href="tel:+14107544343" className="inline-flex items-center gap-3 whitespace-nowrap text-[#13306b] transition-colors hover:text-[#ef2027]">
+                  <Phone className="h-6 w-6" strokeWidth={2.2} />
+                  <span className="text-[2.15rem] font-black tracking-tight">410-754-4343</span>
+                </a>
+              </div>
+
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-start lg:gap-8 xl:gap-10">
+                <div className="pt-2 lg:pt-4">
                   <div className="max-w-[520px]">
                     <h1 className="hero-mock-title text-[2.95rem] font-black uppercase leading-[0.94] tracking-tight text-[#13306b] sm:text-[3.75rem] lg:text-[4.55rem]">
                       Our Services
@@ -179,7 +186,7 @@ export default function PublicCatalogPage() {
                       well-being - every step of the way.
                     </p>
 
-                    <div className="mt-8 flex max-w-[460px] items-start gap-4 rounded-[18px] border border-[#dce6f5] bg-[#f4f8ff] p-5 shadow-[0_18px_38px_-36px_rgba(19,48,107,0.45)]">
+                    <div className="mt-8 flex max-w-[470px] items-start gap-4 rounded-[18px] border border-[#dce6f5] bg-[#f4f8ff] p-5 shadow-[0_18px_38px_-36px_rgba(19,48,107,0.45)]">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#13306b] shadow-sm">
                         <BookOpenText className="h-5 w-5" />
                       </div>
@@ -191,17 +198,19 @@ export default function PublicCatalogPage() {
                   </div>
                 </div>
 
-                <div className="relative z-10 flex justify-center lg:justify-end lg:-mb-14">
-                  <img
-                    src={heroImage}
-                    alt="Doctor discussing care with a patient"
-                    className="w-full max-w-[760px] rounded-[28px] object-contain object-top shadow-[0_28px_60px_-40px_rgba(19,48,107,0.42)]"
-                    loading="eager"
-                  />
+                <div className="relative z-10 flex justify-center lg:justify-end">
+                  <div className="w-full overflow-hidden rounded-[28px] shadow-[0_28px_60px_-40px_rgba(19,48,107,0.42)]">
+                    <img
+                      src={heroImage}
+                      alt="Doctor discussing care with a patient"
+                      className="w-full object-cover object-center"
+                      loading="eager"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="relative z-20 mt-7 rounded-[22px] bg-[#13306b] px-2 py-1 text-white shadow-mock lg:-mt-3">
+              <div className="relative z-20 mt-8 rounded-[22px] bg-[#13306b] px-2 py-1 text-white shadow-mock lg:-mt-10">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-5">
                   {trustHighlights.map((entry, index) => (
                     <div

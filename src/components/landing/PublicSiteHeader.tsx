@@ -20,7 +20,7 @@ export function PublicSiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [appointmentOpen, setAppointmentOpen] = useState(false);
   const location = useLocation();
-  const shellClassName = "mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8";
+  const shellClassName = "mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8";
 
   const openAppointment = () => {
     setMobileOpen(false);
@@ -40,25 +40,25 @@ export function PublicSiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[#dde5f4] bg-white shadow-[0_14px_34px_-30px_rgba(19,48,107,0.42)]">
-        <div className={`${shellClassName} flex min-h-[82px] items-center justify-between gap-4 py-2 lg:min-h-[90px]`}>
+      <header className="relative z-40 border-b border-[#dde5f4] bg-white shadow-[0_14px_34px_-30px_rgba(19,48,107,0.42)]">
+        <div className={`${shellClassName} flex min-h-[84px] items-center justify-between gap-4 py-2 lg:min-h-[92px]`}>
           <Link to="/" aria-label="On Time Medical Group home" className="inline-flex shrink-0">
             <img
               src={logo}
               alt="On Time Medical Group"
-              className="h-[60px] w-[60px] object-contain sm:h-[68px] sm:w-[68px] lg:h-[76px] lg:w-[76px]"
-              width={76}
-              height={76}
+              className="h-[62px] w-[62px] object-contain sm:h-[70px] sm:w-[70px] lg:h-[78px] lg:w-[78px]"
+              width={78}
+              height={78}
             />
           </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex xl:gap-8">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex xl:gap-9">
             {navItems.map((item) => (
               <Link
                 key={item.label}
                 to={item.href}
                 className={cn(
-                  "border-b-2 border-transparent pb-1.5 text-[0.8rem] font-black uppercase tracking-[0.04em] text-[#13306b] transition-colors hover:text-[#ef2027] whitespace-nowrap xl:text-[0.84rem]",
+                  "border-b-2 border-transparent pb-1.5 text-[0.82rem] font-black uppercase tracking-[0.04em] text-[#13306b] transition-colors hover:text-[#ef2027] whitespace-nowrap xl:text-[0.86rem]",
                   isNavItemActive(item.label, item.href) && "border-[#ef2027] text-[#ef2027]",
                 )}
                 aria-current={isNavItemActive(item.label, item.href) ? "page" : undefined}

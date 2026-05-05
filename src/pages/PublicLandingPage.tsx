@@ -116,7 +116,7 @@ const insuranceLogos = [
 
 export default function PublicLandingPage() {
   const [appointmentOpen, setAppointmentOpen] = useState(false);
-  const shellClassName = "mx-auto w-full max-w-[1260px] px-4 sm:px-6 lg:px-8";
+  const shellClassName = "mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8";
 
   return (
     <div className="min-h-screen bg-white text-[#13306b]">
@@ -126,13 +126,13 @@ export default function PublicLandingPage() {
         <section className="overflow-visible pt-4 lg:pt-7">
           <div className={`${shellClassName} relative`}>
             <div className="mb-4 hidden justify-end lg:flex">
-              <a href="tel:+14107544343" className="inline-flex items-center gap-3 text-[#13306b] transition-colors hover:text-[#ef2027]">
+              <a href="tel:+14107544343" className="inline-flex items-center gap-3 whitespace-nowrap text-[#13306b] transition-colors hover:text-[#ef2027]">
                 <Phone className="h-6 w-6" strokeWidth={2.2} />
                 <span className="text-[2.15rem] font-black tracking-tight">410-754-4343</span>
               </a>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)] lg:items-start lg:gap-10">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-start lg:gap-8 xl:gap-10">
               <div className="pt-2 lg:pt-4">
                 <div className="max-w-[550px]">
                   <h1 className="hero-mock-title text-[3rem] font-black uppercase leading-[0.92] tracking-tight text-[#13306b] sm:text-[3.55rem] md:text-[3.85rem] lg:text-[4rem] xl:text-[4.28rem]">
@@ -182,7 +182,7 @@ export default function PublicLandingPage() {
               </div>
 
               <div className="relative z-10 flex justify-center lg:justify-end">
-                <div className="w-full max-w-[760px] overflow-hidden rounded-[28px] shadow-[0_28px_60px_-40px_rgba(19,48,107,0.42)]">
+                <div className="w-full overflow-hidden rounded-[28px] shadow-[0_28px_60px_-40px_rgba(19,48,107,0.42)]">
                   <img
                     src={heroImage}
                     alt="Doctor discussing care plan with a patient"
@@ -425,13 +425,13 @@ export default function PublicLandingPage() {
         </section>
 
         <section id="contact" className={`${shellClassName} pb-10 pt-2`}>
-          <div className="grid overflow-hidden rounded-[22px] bg-[#13306b] text-white lg:grid-cols-3">
+          <div className="grid overflow-hidden rounded-[22px] bg-[#13306b] text-white lg:grid-cols-[1.12fr_1fr_0.88fr]">
             <div className="flex items-center gap-5 border-b border-white/10 px-7 py-8 lg:border-b-0 lg:border-r">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-white/20">
                 <Calendar className="h-7 w-7" />
               </div>
               <div>
-                <p className="text-[1.35rem] font-black leading-tight">Ready to Take the Next Step?</p>
+                <p className="text-[1.18rem] font-black leading-tight lg:whitespace-nowrap xl:text-[1.35rem]">Ready to Take the Next Step?</p>
                 <p className="mt-2 text-sm leading-6 text-white/75">We&apos;re here to help you live a healthier, happier life on your time.</p>
               </div>
             </div>
@@ -442,7 +442,7 @@ export default function PublicLandingPage() {
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">Call Us Today</p>
-                <a href="tel:+14107544343" className="mt-1 block text-[2rem] font-black leading-none tracking-tight">
+                <a href="tel:+14107544343" className="mt-1 block whitespace-nowrap text-[1.78rem] font-black leading-none tracking-tight xl:text-[2rem]">
                   410-754-4343
                 </a>
               </div>

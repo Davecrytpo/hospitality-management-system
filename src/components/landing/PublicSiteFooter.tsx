@@ -33,7 +33,7 @@ const footerHighlights = [
 ];
 
 export function PublicSiteFooter() {
-  const shellClassName = "mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-7";
+  const shellClassName = "mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8";
 
   return (
     <footer className="border-t border-[#dde5f4] bg-white">
@@ -59,13 +59,13 @@ export function PublicSiteFooter() {
           </div>
         </div>
 
-        <div className="mt-4 grid overflow-hidden rounded-[20px] bg-[#13306b] text-white lg:grid-cols-4">
+        <div className="mt-4 grid overflow-hidden rounded-[20px] bg-[#13306b] text-white lg:grid-cols-[1.14fr_1.02fr_0.94fr_0.9fr]">
           <div className="flex items-center gap-5 border-b border-white/10 px-7 py-8 lg:border-b-0 lg:border-r">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/25">
               <Calendar className="h-7 w-7" />
             </div>
             <div>
-              <p className="text-[1.35rem] font-black leading-tight">Ready to Take the Next Step?</p>
+              <p className="text-[1.18rem] font-black leading-tight lg:whitespace-nowrap xl:text-[1.35rem]">Ready to Take the Next Step?</p>
               <p className="mt-2 text-sm leading-6 text-white/75">We&apos;re here to help you live a healthier, happier life.</p>
             </div>
           </div>
@@ -75,8 +75,8 @@ export function PublicSiteFooter() {
               <Phone className="h-7 w-7" />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">Call Us Today</p>
-              <a href="tel:+14107544343" className="mt-1 block text-[1.95rem] font-black leading-none tracking-tight">
+              <p className="whitespace-nowrap text-xs font-bold uppercase tracking-[0.14em] text-white/55">Call Us Today</p>
+              <a href="tel:+14107544343" className="mt-1 block whitespace-nowrap text-[1.78rem] font-black leading-none tracking-tight xl:text-[1.95rem]">
                 410-754-4343
               </a>
               <p className="mt-2 text-sm leading-6 text-white/75">Our team is here to help you.</p>
