@@ -8,6 +8,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 
 // Public Pages
 import PublicLandingPage from "./pages/PublicLandingPage";
+import PublicAboutPage from "./pages/PublicAboutPage";
 import PublicCatalogPage from "./pages/PublicCatalogPage";
 import KioskCheckinPage from "./pages/KioskCheckinPage";
 import PublicVerificationPage from "./pages/PublicVerificationPage";
@@ -202,6 +203,7 @@ const App = () => (
           <Routes>
             {/* Public Pages */}
             <Route path="/" element={<PublicLandingPage />} />
+            <Route path="/about-us" element={<PublicAboutPage />} />
             <Route path="/services" element={<PublicCatalogPage />} />
             <Route path="/services/:slug" element={<PublicCatalogPage />} />
             <Route path="/specialties" element={<PublicCatalogPage />} />

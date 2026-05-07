@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
-  { label: "About Us", href: "/#about" },
+  { label: "About Us", href: "/about-us" },
   { label: "Patient Resources", href: "/#resources" },
   { label: "Insurance", href: "/#insurance" },
   { label: "Contact", href: "/#contact" },
@@ -29,6 +29,7 @@ export function PublicSiteHeader() {
 
   const isNavItemActive = (label: string, href: string) => {
     if (label === "Services") return location.pathname.startsWith("/services");
+    if (label === "About Us") return location.pathname.startsWith("/about-us");
 
     const [pathname, hash] = href.split("#");
     if (hash) {

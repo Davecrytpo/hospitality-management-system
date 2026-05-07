@@ -290,7 +290,7 @@ export default function PublicLandingPage() {
               </div>
 
               <Button variant="outline" className="mt-8 h-12 rounded-md border-2 border-[#13306b]/18 px-7 text-[13px] font-bold uppercase shadow-sm" asChild>
-                <Link to="/services">Learn More About Us</Link>
+                <Link to="/about-us">Learn More About Us</Link>
               </Button>
             </div>
           </div>
