@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 import aboutHeroImage from "@/assets/about-hero-design-cleaner.png";
-import buildingImage from "@/assets/mockup-building.jpg";
+import aboutBuildingImage from "@/assets/about-building-design.png";
 import insuranceAetna from "@/assets/insurance-aetna.svg";
 import insuranceBcbs from "@/assets/insurance-bcbs.svg";
 import insuranceCareFirst from "@/assets/insurance-carefirst.svg";
@@ -202,7 +202,7 @@ export default function PublicAboutPage() {
         <section className={`${shellClassName} py-6 lg:py-7`}>
           <div className="grid gap-5 lg:grid-cols-[0.96fr_0.88fr_0.88fr_1fr]">
             <article className="overflow-hidden rounded-[22px] border border-[#dfe7f5] bg-white shadow-[0_22px_48px_-38px_rgba(19,48,107,0.3)]">
-              <img src={buildingImage} alt="On Time Medical Group building exterior" className="h-full w-full object-cover" loading="lazy" />
+              <img src={aboutBuildingImage} alt="On Time Medical Group building exterior" className="h-full w-full object-cover" loading="lazy" />
             </article>
 
             <article className="relative overflow-hidden rounded-[22px] border border-[#dfe7f5] bg-white px-6 py-6 shadow-[0_22px_48px_-38px_rgba(19,48,107,0.3)] sm:px-7">
