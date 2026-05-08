@@ -3,19 +3,16 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BookOpenText,
-  Brain,
   Calendar,
   Check,
   ChevronRight,
   FileText,
-  Heart,
   HeartHandshake,
   HeartPulse,
   MapPin,
   Phone,
   ShieldCheck,
   Star,
-  Stethoscope,
   UserRound,
 } from "lucide-react";
 
@@ -34,6 +31,7 @@ import resourcesImage from "@/assets/mockup-resources-woman.jpg";
 import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
 import { Button } from "@/components/ui/button";
+import { homepageServiceCards } from "@/data/servicePageContent";
 import { cn } from "@/lib/utils";
 
 const trustHighlights = [
@@ -42,51 +40,6 @@ const trustHighlights = [
   { title: "All-in-One Care Mind, Body, You.", icon: UserRound },
   { title: "Convenient Locations Near You", icon: MapPin },
   { title: "Compassionate Care, Every Step of the Way", icon: HeartHandshake },
-];
-
-const serviceCards = [
-  {
-    number: "1.",
-    title: "Primary Care",
-    description: "Personalized care for your everyday health needs.",
-    icon: Stethoscope,
-    accent: "blue" as const,
-  },
-  {
-    number: "2.",
-    title: "Preventive Care",
-    description: "Stay ahead of health issues with screenings, vaccinations, and more.",
-    icon: ShieldCheck,
-    accent: "red" as const,
-  },
-  {
-    number: "3.",
-    title: "Women's Health",
-    description: "Compassionate care for every stage of a woman's life.",
-    icon: Heart,
-    accent: "red" as const,
-  },
-  {
-    number: "4.",
-    title: "Chronic Disease Management",
-    description: "Ongoing care to help you manage chronic conditions.",
-    icon: HeartPulse,
-    accent: "blue" as const,
-  },
-  {
-    number: "5.",
-    title: "Mental Health Services (OMHC)",
-    description: "Support for your mental wellness and emotional well-being.",
-    icon: Brain,
-    accent: "blue" as const,
-  },
-  {
-    number: "6.",
-    title: "Substance Use Treatment",
-    description: "Evidence-based treatment and recovery support.",
-    icon: HeartHandshake,
-    accent: "red" as const,
-  },
 ];
 
 const whyChooseUs = [
@@ -230,7 +183,7 @@ export default function PublicLandingPage() {
           </div>
 
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            {serviceCards.map((service) => (
+            {homepageServiceCards.map((service) => (
               <article
                 key={service.title}
                 className="flex min-h-[282px] flex-col rounded-[18px] border border-[#dbe4f4] bg-white px-5 py-8 text-center shadow-[0_18px_40px_-34px_rgba(19,48,107,0.28)] transition-all hover:shadow-mock"
@@ -247,7 +200,7 @@ export default function PublicLandingPage() {
                   {service.number} {service.title}
                 </h3>
                 <p className="mt-4 text-[0.86rem] leading-6 text-[#4f6796]">{service.description}</p>
-                <Link to="/services" className="mt-auto inline-flex items-center justify-center gap-2 pt-7 text-[0.8rem] font-black uppercase text-[#ef2027]">
+                <Link to={service.href} className="mt-auto inline-flex items-center justify-center gap-2 pt-7 text-[0.8rem] font-black uppercase text-[#ef2027]">
                   Learn More
                   <ArrowRight className="h-4 w-4" />
                 </Link>

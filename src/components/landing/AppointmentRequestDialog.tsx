@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { serviceDirectoryCards } from "@/data/servicePageContent";
 
 type AppointmentForm = {
   firstName: string;
@@ -24,6 +25,11 @@ type AppointmentForm = {
   notes: string;
 };
 
+const appointmentServiceOptions = serviceDirectoryCards.map((card) => ({
+  label: card.title,
+  value: card.href.replace("/services/", ""),
+}));
+
 const defaultAppointmentForm: AppointmentForm = {
   firstName: "",
   lastName: "",
@@ -31,7 +37,7 @@ const defaultAppointmentForm: AppointmentForm = {
   phone: "",
   email: "",
   patientStatus: "new-patient",
-  service: "primary-care",
+  service: appointmentServiceOptions[0]?.value ?? "primary-care",
   visitType: "in-person",
   insuranceProvider: "",
   preferredLocation: "easton",
@@ -51,7 +57,7 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
     const service = appointmentForm.service.replace(/-/g, " ");
     const visitType = appointmentForm.visitType.replace(/-/g, " ");
     const location = appointmentForm.preferredLocation.replace(/-/g, " ");
-    return `${service} • ${visitType} • ${location}`;
+    return `${service} - ${visitType} - ${location}`;
   }, [appointmentForm.preferredLocation, appointmentForm.service, appointmentForm.visitType]);
 
   const updateAppointmentField = (field: keyof AppointmentForm, value: string) => {
@@ -176,12 +182,11 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="primary-care">Primary Care</SelectItem>
-                  <SelectItem value="preventive-care">Preventive Care</SelectItem>
-                  <SelectItem value="womens-health">Women's Health</SelectItem>
-                  <SelectItem value="chronic-care">Chronic Disease Management</SelectItem>
-                  <SelectItem value="mental-health">Mental Health Services</SelectItem>
-                  <SelectItem value="substance-use">Substance Use Treatment</SelectItem>
+                  {appointmentServiceOptions.map((service) => (
+                    <SelectItem key={service.value} value={service.value}>
+                      {service.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

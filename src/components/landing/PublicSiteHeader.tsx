@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, Lock, Menu, Phone, X } from "lucide-react";
+import { Calendar, ChevronDown, Lock, Menu, Phone, X } from "lucide-react";
 
 import logo from "@/assets/logo-ontime.png";
 import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { Button } from "@/components/ui/button";
+import { serviceNavItems } from "@/data/servicePageContent";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -54,19 +55,55 @@ export function PublicSiteHeader() {
           </Link>
 
           <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex xl:gap-9">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className={cn(
-                  "border-b-2 border-transparent pb-1.5 text-[0.82rem] font-black uppercase tracking-[0.04em] text-[#13306b] transition-colors hover:text-[#ef2027] whitespace-nowrap xl:text-[0.86rem]",
-                  isNavItemActive(item.label, item.href) && "border-[#ef2027] text-[#ef2027]",
-                )}
-                aria-current={isNavItemActive(item.label, item.href) ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) =>
+              item.label === "Services" ? (
+                <div key={item.label} className="group relative">
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 border-b-2 border-transparent pb-1.5 text-[0.82rem] font-black uppercase tracking-[0.04em] text-[#13306b] transition-colors hover:text-[#ef2027] whitespace-nowrap xl:text-[0.86rem]",
+                      isNavItemActive(item.label, item.href) && "border-[#ef2027] text-[#ef2027]",
+                    )}
+                    aria-current={isNavItemActive(item.label, item.href) ? "page" : undefined}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
+                  </Link>
+
+                  <div className="pointer-events-none absolute left-1/2 top-full z-50 w-[430px] -translate-x-1/2 translate-y-2 pt-4 opacity-0 transition-all duration-150 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                    <div className="rounded-[20px] border border-[#dde5f4] bg-white p-5 shadow-[0_26px_52px_-34px_rgba(19,48,107,0.38)]">
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#4f6796]">Explore Care Services</p>
+                      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                        {serviceNavItems.map((service) => (
+                          <Link
+                            key={service.href}
+                            to={service.href}
+                            className="rounded-[14px] border border-[#e3eaf7] px-4 py-3 text-[0.8rem] font-bold text-[#13306b] transition-colors hover:border-[#ef2027]/20 hover:text-[#ef2027]"
+                          >
+                            {service.label}
+                          </Link>
+                        ))}
+                      </div>
+                      <Link to="/services" className="mt-4 inline-flex text-[0.76rem] font-black uppercase tracking-[0.08em] text-[#ef2027]">
+                        View All Services
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className={cn(
+                    "border-b-2 border-transparent pb-1.5 text-[0.82rem] font-black uppercase tracking-[0.04em] text-[#13306b] transition-colors hover:text-[#ef2027] whitespace-nowrap xl:text-[0.86rem]",
+                    isNavItemActive(item.label, item.href) && "border-[#ef2027] text-[#ef2027]",
+                  )}
+                  aria-current={isNavItemActive(item.label, item.href) ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              ),
+            )}
           </nav>
 
           <div className="hidden shrink-0 items-center gap-3 lg:flex">
@@ -114,6 +151,21 @@ export function PublicSiteHeader() {
                   {item.label}
                 </Link>
               ))}
+              <div className="rounded-[16px] border border-[#dde5f4] bg-[#f5f8ff] p-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#4f6796]">Explore Care Services</p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {serviceNavItems.map((service) => (
+                    <Link
+                      key={service.href}
+                      to={service.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-[12px] border border-[#e3eaf7] bg-white px-4 py-3 text-[0.82rem] font-bold text-[#13306b] transition-colors hover:text-[#ef2027]"
+                    >
+                      {service.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Button variant="outline" className="btn-mock-outline h-12 text-[13px] uppercase" asChild>
                   <Link to="/patient-portal/login" onClick={() => setMobileOpen(false)}>

@@ -1,23 +1,16 @@
+import { useState } from "react";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
   BookOpenText,
-  Brain,
   Calendar,
   CheckCircle2,
-  HandHeart,
-  Heart,
   HeartHandshake,
-  HeartPulse,
   MapPin,
   Phone,
-  Plus,
   ShieldCheck,
-  Stethoscope,
   UserRound,
-  Users,
-  type LucideIcon,
 } from "lucide-react";
 
 import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
@@ -28,11 +21,14 @@ import insuranceCareFirst from "@/assets/insurance-carefirst.svg";
 import insuranceCigna from "@/assets/insurance-cigna.svg";
 import insuranceMedicare from "@/assets/insurance-medicare.svg";
 import insuranceUnited from "@/assets/insurance-unitedhealthcare.svg";
+import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { PublicSiteFooter } from "@/components/landing/PublicSiteFooter";
 import { PublicSiteHeader } from "@/components/landing/PublicSiteHeader";
 import { Button } from "@/components/ui/button";
 import { getCatalogItem, getCatalogItems, getCatalogLabel, type PublicCatalogKind } from "@/data/publicSiteContent";
+import { getServicePageContent, serviceDirectoryCards, type ServiceDirectoryCard } from "@/data/servicePageContent";
 import { cn } from "@/lib/utils";
+import PublicServicePage from "./PublicServicePage";
 
 const insuranceLogos = [
   { name: "Aetna", src: insuranceAetna },
@@ -51,111 +47,18 @@ const trustHighlights = [
   { title: "Compassionate Care, Every Step of the Way", icon: HeartHandshake },
 ];
 
-type ServiceCardProps = {
-  title: string;
-  icon: LucideIcon;
-  number: string;
-  description: string;
-  accent: "blue" | "red";
-  bullets: string[];
-  badge?: string;
-  href: string;
-};
-
-const serviceList: ServiceCardProps[] = [
-  {
-    title: "Primary Care",
-    icon: Stethoscope,
-    number: "1.",
-    description: "Personalized care for your everyday health needs.",
-    accent: "blue",
-    bullets: ["Preventive Care", "Chronic Condition Management", "Physicals & Wellness Exams", "Health Screenings"],
-    href: "/services/smart-appointments",
-  },
-  {
-    title: "Preventive Care",
-    icon: ShieldCheck,
-    number: "2.",
-    description: "Stay ahead with screenings and preventive services.",
-    accent: "red",
-    bullets: ["Health Screenings", "Vaccinations", "Wellness Check-Ups", "Risk Assessments"],
-    href: "/services/smart-appointments",
-  },
-  {
-    title: "Chronic Disease Management",
-    icon: HeartPulse,
-    number: "3.",
-    description: "Ongoing care to help you manage chronic conditions.",
-    accent: "blue",
-    bullets: ["Diabetes Management", "Hypertension Management", "Asthma & COPD Care", "Heart Disease Management"],
-    href: "/services/premium-inpatient-care",
-  },
-  {
-    title: "Women's Health",
-    icon: Heart,
-    number: "4.",
-    description: "Compassionate care for every stage of life.",
-    accent: "red",
-    bullets: ["Pap Smears", "Birth Control Counseling", "Menopause Management", "Pregnancy Support"],
-    href: "/services/smart-appointments",
-  },
-  {
-    title: "Men's Health",
-    icon: UserRound,
-    number: "5.",
-    description: "Focused care for men's health and wellness.",
-    accent: "blue",
-    bullets: ["Prostate Health", "Hormone Therapy", "Erectile Dysfunction", "Wellness Exams"],
-    href: "/services/smart-appointments",
-  },
-  {
-    title: "Mental Health Services (OMHC)",
-    icon: Brain,
-    number: "6.",
-    description: "Support for your mental wellness and emotional well-being.",
-    accent: "blue",
-    bullets: ["Anxiety & Depression", "Stress Management", "Counseling & Therapy", "Medication Management"],
-    badge: "Integrated Care",
-    href: "/services/smart-appointments",
-  },
-  {
-    title: "Substance Use Treatment",
-    icon: HandHeart,
-    number: "7.",
-    description: "Evidence-based treatment and recovery support.",
-    accent: "red",
-    bullets: ["Assessment & Evaluation", "Individual Counseling", "Relapse Prevention", "Recovery Support Services"],
-    badge: "Confidential Care",
-    href: "/services/smart-appointments",
-  },
-  {
-    title: "Geriatric Care",
-    icon: Users,
-    number: "8.",
-    description: "Comprehensive care designed for healthy aging and independence.",
-    accent: "blue",
-    bullets: ["Geriatric Assessments", "Medication Management", "Fall Prevention", "Memory & Cognitive Support"],
-    href: "/services/premium-inpatient-care",
-  },
-  {
-    title: "Urgent Care",
-    icon: Plus,
-    number: "9.",
-    description: "Care for minor illnesses and injuries when you need it most.",
-    accent: "red",
-    bullets: ["Cold, Flu & Fever", "Minor Injuries", "Infections", "And More"],
-    href: "/services/express-check-in",
-  },
-];
-
 export default function PublicCatalogPage() {
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
   const { slug } = useParams();
   const location = useLocation();
   const kind: PublicCatalogKind = location.pathname.startsWith("/specialties") ? "specialties" : "services";
   const items = getCatalogItems(kind);
   const label = getCatalogLabel(kind);
   const item = getCatalogItem(kind, slug);
+  const servicePage = kind === "services" ? getServicePageContent(slug) : null;
   const shellClassName = "mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8";
+
+  if (servicePage) return <PublicServicePage service={servicePage} />;
 
   if (slug && !item) return <Navigate to={`/${kind}`} replace />;
 
@@ -244,13 +147,13 @@ export default function PublicCatalogPage() {
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-              {serviceList.slice(0, 5).map((service) => (
+              {serviceDirectoryCards.slice(0, 5).map((service) => (
                 <ServiceCard key={service.title} {...service} />
               ))}
             </div>
 
             <div className="mx-auto mt-5 grid max-w-[980px] gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {serviceList.slice(5).map((service) => (
+              {serviceDirectoryCards.slice(5).map((service) => (
                 <ServiceCard key={service.title} {...service} />
               ))}
             </div>
@@ -275,11 +178,11 @@ export default function PublicCatalogPage() {
                   today and every day.
                 </p>
                 <div className="mt-7 flex flex-col gap-4 sm:flex-row">
-                  <Button className="btn-mock-red h-12 rounded-md px-8 text-[13px] uppercase" asChild>
-                    <Link to="/services/smart-appointments" className="inline-flex items-center">
+                  <Button className="btn-mock-red h-12 rounded-md px-8 text-[13px] uppercase" type="button" onClick={() => setAppointmentOpen(true)}>
+                    <span className="inline-flex items-center">
                       Book Appointment
                       <ArrowRight className="ml-3 h-4 w-4" />
-                    </Link>
+                    </span>
                   </Button>
                   <Button
                     variant="outline"
@@ -314,6 +217,7 @@ export default function PublicCatalogPage() {
           </section>
         </main>
         <PublicSiteFooter />
+        <AppointmentRequestDialog open={appointmentOpen} onOpenChange={setAppointmentOpen} />
       </div>
     );
   }
@@ -395,7 +299,7 @@ export default function PublicCatalogPage() {
   );
 }
 
-function ServiceCard({ title, icon: Icon, number, description, accent, bullets, badge, href }: ServiceCardProps) {
+function ServiceCard({ title, icon: Icon, number, description, accent, bullets, badge, href }: ServiceDirectoryCard) {
   return (
     <article className="flex min-h-[408px] flex-col rounded-[18px] border border-[#dbe4f4] bg-white p-6 shadow-[0_18px_38px_-34px_rgba(19,48,107,0.28)] transition-all hover:shadow-mock">
       <div
