@@ -846,7 +846,7 @@ async function uploadToCloudinary(file: File) {
   return response.json();
 }
 
-function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; onSave: (asset: CmsMediaAsset) => Promise<void>; onDelete: () => Promise<void> }) {
+function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; onSave: (asset: CmsMediaAsset) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   const [uploading, setUploading] = useState(false);
   useEffect(() => setDraft(value), [value]);
@@ -913,7 +913,7 @@ function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; on
   );
 }
 
-function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnouncement; onSave: (announcement: CmsAnnouncement) => Promise<void>; onDelete: () => Promise<void> }) {
+function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnouncement; onSave: (announcement: CmsAnnouncement) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -1018,7 +1018,7 @@ function SocialEditor({ value, onChange }: { value: CmsSocialLink[]; onChange: (
   );
 }
 
-function SiteSettingsEditor({ value, onSave }: { value: CmsSiteSettings; onSave: (settings: CmsSiteSettings) => Promise<void> }) {
+function SiteSettingsEditor({ value, onSave }: { value: CmsSiteSettings; onSave: (settings: CmsSiteSettings) => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
