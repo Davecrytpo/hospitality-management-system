@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { serviceDirectoryCards } from "@/data/servicePageContent";
+import type { CmsService, CmsSiteSettings } from "@/features/cms/types";
 
 type AppointmentForm = {
   firstName: string;
@@ -25,33 +25,51 @@ type AppointmentForm = {
   notes: string;
 };
 
-const appointmentServiceOptions = serviceDirectoryCards.map((card) => ({
-  label: card.title,
-  value: card.href.replace("/services/", ""),
-}));
-
-const defaultAppointmentForm: AppointmentForm = {
+function createDefaultAppointmentForm(
+  defaultService = "primary-care",
+  defaultLocation = "main-campus",
+  defaultPatientStatus = "new-patient",
+  defaultVisitType = "in-person",
+): AppointmentForm {
+  return {
   firstName: "",
   lastName: "",
   dateOfBirth: "",
   phone: "",
   email: "",
-  patientStatus: "new-patient",
-  service: appointmentServiceOptions[0]?.value ?? "primary-care",
-  visitType: "in-person",
+  patientStatus: defaultPatientStatus,
+  service: defaultService,
+  visitType: defaultVisitType,
   insuranceProvider: "",
-  preferredLocation: "easton",
+  preferredLocation: defaultLocation,
   preferredDate: "",
   notes: "",
-};
+  };
+}
 
 type AppointmentRequestDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  services: CmsService[];
+  settings: CmsSiteSettings;
 };
 
-export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequestDialogProps) {
-  const [appointmentForm, setAppointmentForm] = useState<AppointmentForm>(defaultAppointmentForm);
+export function AppointmentRequestDialog({ open, onOpenChange, services, settings }: AppointmentRequestDialogProps) {
+  const appointmentServiceOptions = services.map((service) => ({
+    label: service.title,
+    value: service.slug,
+  }));
+  const locationOptions = settings.appointmentSettings.locations.map((location) => ({
+    label: location,
+    value: location.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+  }));
+  const defaultForm = createDefaultAppointmentForm(
+    appointmentServiceOptions[0]?.value ?? "primary-care",
+    locationOptions[0]?.value ?? "main-campus",
+    settings.appointmentSettings.patientStatuses[0]?.toLowerCase().replace(/[^a-z0-9]+/g, "-") ?? "new-patient",
+    settings.appointmentSettings.visitTypes[0]?.toLowerCase().replace(/[^a-z0-9]+/g, "-") ?? "in-person",
+  );
+  const [appointmentForm, setAppointmentForm] = useState<AppointmentForm>(defaultForm);
 
   const appointmentSummary = useMemo(() => {
     const service = appointmentForm.service.replace(/-/g, " ");
@@ -68,7 +86,7 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
     event.preventDefault();
     toast.success("Appointment request received. Our care team will contact you shortly.");
     onOpenChange(false);
-    setAppointmentForm(defaultAppointmentForm);
+    setAppointmentForm(defaultForm);
   };
 
   return (
@@ -161,14 +179,16 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
             </div>
             <div className="space-y-2">
               <Label>Patient Status</Label>
-              <Select value={appointmentForm.patientStatus} onValueChange={(value) => updateAppointmentField("patientStatus", value)}>
+                <Select value={appointmentForm.patientStatus} onValueChange={(value) => updateAppointmentField("patientStatus", value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new-patient">New Patient</SelectItem>
-                  <SelectItem value="existing-patient">Existing Patient</SelectItem>
-                  <SelectItem value="referral">Referral / Specialist Visit</SelectItem>
+                  {settings.appointmentSettings.patientStatuses.map((status) => (
+                    <SelectItem key={status} value={status.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>
+                      {status}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -192,14 +212,16 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
             </div>
             <div className="space-y-2">
               <Label>Visit Preference</Label>
-              <Select value={appointmentForm.visitType} onValueChange={(value) => updateAppointmentField("visitType", value)}>
+                <Select value={appointmentForm.visitType} onValueChange={(value) => updateAppointmentField("visitType", value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="in-person">In Person</SelectItem>
-                  <SelectItem value="telehealth">Telehealth</SelectItem>
-                  <SelectItem value="first-available">First Available</SelectItem>
+                  {settings.appointmentSettings.visitTypes.map((visitType) => (
+                    <SelectItem key={visitType} value={visitType.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>
+                      {visitType}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -217,15 +239,16 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
             </div>
             <div className="space-y-2">
               <Label>Preferred Location</Label>
-              <Select value={appointmentForm.preferredLocation} onValueChange={(value) => updateAppointmentField("preferredLocation", value)}>
+                <Select value={appointmentForm.preferredLocation} onValueChange={(value) => updateAppointmentField("preferredLocation", value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="easton">Easton Office</SelectItem>
-                  <SelectItem value="cambridge">Cambridge Office</SelectItem>
-                  <SelectItem value="salisbury">Salisbury Office</SelectItem>
-                  <SelectItem value="first-available">First Available Location</SelectItem>
+                  {locationOptions.map((location) => (
+                    <SelectItem key={location.value} value={location.value}>
+                      {location.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -256,12 +279,12 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
           <div className="rounded-md bg-otmg-soft px-4 py-3 text-sm font-bold text-otmg-navy">Request summary: {appointmentSummary}</div>
 
           <div className="rounded-md border border-[#f3d7d8] bg-[#fff8f8] px-4 py-3 text-sm leading-6 text-[#7c2d30]">
-            For emergencies, chest pain, trouble breathing, or severe symptoms, call 911 or go to the nearest emergency room.
+            {settings.appointmentSettings.warningText}
           </div>
 
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
             <p className="text-sm font-medium leading-6 text-otmg-blue-soft">
-              For routine scheduling help, call 410-754-4343 and our front desk will assist you.
+              For routine scheduling help, call {settings.contact.phone} and our front desk will assist you.
             </p>
             <Button className="btn-mock-red h-12 px-7 text-[13px] uppercase" type="submit">
               <Calendar className="mr-2 h-4 w-4" />
@@ -269,9 +292,9 @@ export function AppointmentRequestDialog({ open, onOpenChange }: AppointmentRequ
             </Button>
           </div>
 
-          <a href="tel:+14107544343" className="inline-flex items-center gap-2 text-sm font-extrabold text-brand-red">
+          <a href={`tel:+1${settings.contact.phone.replace(/\D/g, "")}`} className="inline-flex items-center gap-2 text-sm font-extrabold text-brand-red">
             <Phone className="h-4 w-4" />
-            Prefer to call? 410-754-4343
+            Prefer to call? {settings.contact.phone}
           </a>
         </form>
       </DialogContent>

@@ -10,6 +10,12 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import PublicLandingPage from "./pages/PublicLandingPage";
 import PublicAboutPage from "./pages/PublicAboutPage";
 import PublicCatalogPage from "./pages/PublicCatalogPage";
+import PublicServicePage from "./pages/PublicServicePage";
+import PublicContactPage from "./pages/PublicContactPage";
+import PublicFaqPage from "./pages/PublicFaqPage";
+import PublicBlogPage from "./pages/PublicBlogPage";
+import PublicBlogPostPage from "./pages/PublicBlogPostPage";
+import PublicPolicyPage from "./pages/PublicPolicyPage";
 import KioskCheckinPage from "./pages/KioskCheckinPage";
 import PublicVerificationPage from "./pages/PublicVerificationPage";
 import NotFound from "./pages/NotFound";
@@ -140,6 +146,8 @@ import SettingsPage from "./pages/settings/SettingsPage";
 import SupportPage from "./pages/support/SupportPage";
 import StaffManagementPage from "./pages/staff/StaffManagementPage";
 import InternalNoticeBoard from "./pages/staff/InternalNoticeBoard";
+import CmsManagementPage from "./pages/cms/CmsManagementPage";
+import PublicCmsDynamicPage from "./pages/cms/PublicCmsDynamicPage";
 
 // Patient Portal
 import PatientRegisterPage from "./pages/patient-portal/PatientRegisterPage";
@@ -193,6 +201,10 @@ const PatientRoute = ({ children }: { children: React.ReactNode }) => (
   <AuthGuard requiredRole="patient">{children}</AuthGuard>
 );
 
+const CmsRoute = ({ children }: { children: React.ReactNode }) => (
+  <AuthGuard requiredRole={["admin", "content_manager"]}>{children}</AuthGuard>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="hospital-theme" attribute="class" enableSystem>
@@ -205,9 +217,15 @@ const App = () => (
             <Route path="/" element={<PublicLandingPage />} />
             <Route path="/about-us" element={<PublicAboutPage />} />
             <Route path="/services" element={<PublicCatalogPage />} />
-            <Route path="/services/:slug" element={<PublicCatalogPage />} />
-            <Route path="/specialties" element={<PublicCatalogPage />} />
-            <Route path="/specialties/:slug" element={<PublicCatalogPage />} />
+            <Route path="/services/:slug" element={<PublicServicePage />} />
+            <Route path="/specialties" element={<Navigate to="/services" replace />} />
+            <Route path="/specialties/:slug" element={<Navigate to="/services" replace />} />
+            <Route path="/contact" element={<PublicContactPage />} />
+            <Route path="/faq" element={<PublicFaqPage />} />
+            <Route path="/blog" element={<PublicBlogPage />} />
+            <Route path="/blog/:slug" element={<PublicBlogPostPage />} />
+            <Route path="/policies/:slug" element={<PublicPolicyPage />} />
+            <Route path="/:slug" element={<PublicCmsDynamicPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/patient-register" element={<PatientRegisterPage />} />
             <Route path="/kiosk" element={<KioskCheckinPage />} />
@@ -337,6 +355,7 @@ const App = () => (
             <Route path="/settings" element={<StaffRoute><SettingsPage /></StaffRoute>} />
             <Route path="/support" element={<StaffRoute><SupportPage /></StaffRoute>} />
             <Route path="/notice-board" element={<StaffRoute><InternalNoticeBoard /></StaffRoute>} />
+            <Route path="/cms" element={<CmsRoute><CmsManagementPage /></CmsRoute>} />
 
             {/* Patient Portal (protected) */}
             <Route path="/patient-portal" element={<PatientRoute><PatientDashboard /></PatientRoute>} />

@@ -105,12 +105,16 @@ const navigation: NavItem[] = [
   {
     title: "Notice Board", icon: Megaphone, href: "/notice-board",
     roles: ["admin", "doctor", "nurse", "pharmacist", "lab_tech", "finance", "receptionist"]
-  }
+  },
+  {
+    title: "Website CMS", icon: LayoutDashboard, href: "/cms",
+    roles: ["admin", "content_manager"]
+  },
 ];
 
 const bottomNavigation: NavItem[] = [
-  { title: "Settings", icon: Settings, href: "/settings" },
-  { title: "Help & Support", icon: HelpCircle, href: "/support" },
+  { title: "Settings", icon: Settings, href: "/settings", roles: ["admin"] },
+  { title: "Help & Support", icon: HelpCircle, href: "/support", roles: ["admin"] },
 ];
 
 export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
@@ -257,7 +261,12 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
         {/* Bottom nav */}
         <div className="border-t border-sidebar-border p-3">
           <ul className="space-y-0.5">
-            {bottomNavigation.map((item) => (
+            {bottomNavigation.filter(item => {
+              if (!item.roles) return true;
+              if (!userRole) return false;
+              if (userRole === 'admin') return true;
+              return item.roles.includes(userRole);
+            }).map((item) => (
               <li key={item.title}>
                 <Link
                   to={item.href!}

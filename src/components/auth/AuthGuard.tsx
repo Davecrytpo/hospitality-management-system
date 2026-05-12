@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
-export type UserRole = "admin" | "doctor" | "nurse" | "pharmacist" | "lab_tech" | "finance" | "receptionist" | "patient";
+export type UserRole = "admin" | "content_manager" | "doctor" | "nurse" | "pharmacist" | "lab_tech" | "finance" | "receptionist" | "patient";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -48,6 +48,8 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
               // Redirect to their respective dashboard if they don't have access to this specific page
               if (profile.role === "patient") {
                 navigate("/patient-portal", { replace: true });
+              } else if (profile.role === "content_manager") {
+                navigate("/cms", { replace: true });
               } else {
                 navigate("/dashboard", { replace: true });
               }
