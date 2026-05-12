@@ -730,7 +730,7 @@ function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument;
   );
 }
 
-function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (faq: CmsFaq) => Promise<void>; onDelete: () => Promise<void> }) {
+function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (faq: CmsFaq) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -759,7 +759,7 @@ function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (fa
   );
 }
 
-function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimonial; onSave: (testimonial: CmsTestimonial) => Promise<void>; onDelete: () => Promise<void> }) {
+function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimonial; onSave: (testimonial: CmsTestimonial) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -790,7 +790,7 @@ function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimon
   );
 }
 
-function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onSave: (member: CmsTeamMember) => Promise<void>; onDelete: () => Promise<void> }) {
+function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onSave: (member: CmsTeamMember) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
