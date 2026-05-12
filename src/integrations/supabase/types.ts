@@ -195,6 +195,303 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_announcements: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_blog_posts: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          published_at: string | null
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_faqs: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          page_slug: string | null
+          service_slug: string | null
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_slug?: string | null
+          service_slug?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_slug?: string | null
+          service_slug?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_legal_documents: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_media_assets: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_pages: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          page_type: string
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_type?: string
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_type?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_services: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_site_settings: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_team_members: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          service_slug: string | null
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          service_slug?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          service_slug?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_testimonials: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          page_slug: string | null
+          service_slug: string | null
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_slug?: string | null
+          service_slug?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_slug?: string | null
+          service_slug?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       consultation_notes: {
         Row: {
           appointment_id: string | null
@@ -1471,6 +1768,7 @@ export type Database = {
       get_my_patient_id: { Args: never; Returns: string }
       get_my_profile_id: { Args: never; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      is_content_manager: { Args: never; Returns: boolean }
       is_doctor: { Args: never; Returns: boolean }
       is_finance: { Args: never; Returns: boolean }
       is_lab_tech: { Args: never; Returns: boolean }
@@ -1489,6 +1787,7 @@ export type Database = {
         | "lab_tech"
         | "finance"
         | "receptionist"
+        | "content_manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1625,6 +1924,7 @@ export const Constants = {
         "lab_tech",
         "finance",
         "receptionist",
+        "content_manager",
       ],
     },
   },
