@@ -1,14 +1,18 @@
 import { useParams } from "react-router-dom";
 import { CmsDocumentRenderer } from "@/components/cms/CmsSectionRenderer";
 import { CmsPublicLayout } from "@/components/cms/CmsPublicLayout";
+import { cmsDefaults } from "@/features/cms/defaults";
 import { useCmsBlogPost, useCmsSiteSettings } from "@/features/cms/hooks";
+import { postLooksLikePlaceholder } from "@/features/cms/publicContent";
 import { useCmsSeo } from "@/features/cms/seo";
 import NotFound from "../NotFound";
 
 export default function PublicCmsBlogPostPage() {
   const { slug = "" } = useParams();
-  const { data: post, isLoading } = useCmsBlogPost(slug);
+  const { data: rawPost, isLoading } = useCmsBlogPost(slug);
   const { data: settings } = useCmsSiteSettings();
+  const fallbackPost = cmsDefaults.posts.find((entry) => entry.slug === slug) ?? null;
+  const post = rawPost && !postLooksLikePlaceholder(rawPost) ? rawPost : fallbackPost;
 
   useCmsSeo(post?.seo, settings);
 

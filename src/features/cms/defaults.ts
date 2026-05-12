@@ -6,6 +6,7 @@ import buildingImage from "@/assets/mockup-building.jpg";
 import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
 import logoImage from "@/assets/logo-ontime.png";
 import resourceImage from "@/assets/mockup-resources-woman.jpg";
+import secondaryImage from "@/assets/services-family-banner.jpg";
 import serviceChronicHero from "@/assets/service-page-chronic-hero.png";
 import serviceGeriatricHero from "@/assets/service-page-geriatric-hero.png";
 import serviceMentalHero from "@/assets/service-page-mental-hero.png";
@@ -259,24 +260,24 @@ function buildService(
         ],
       }),
       featureGridSection("What this service covers", config.features, {
-        subtitle: "Each detail page is fully database-driven, so the care team can expand, reorder, or revise these offerings from the CMS.",
+        subtitle: "Care details, treatment options, and next steps for this service.",
       }),
       statsSection("Care delivery highlights", config.statItems),
       featureGridSection("Why patients choose this service", config.benefits, {
-        subtitle: "Benefits, supporting copy, and the visual presentation are all controlled through the admin dashboard.",
+        subtitle: "Reasons patients choose this service for timely, coordinated care.",
       }),
-      teamSection("Meet the clinicians behind this service", "Assign specific physicians, nurses, or counselors to this service from the CMS.", {
+      teamSection("Meet the clinicians behind this service", "Meet members of the care team who support this service.", {
         dataSource: "team",
       }),
       testimonialSection("Patient feedback", "Display service-specific testimonials without hardcoding them into the page.", {
         dataSource: "testimonials",
       }),
-      faqSection("Frequently asked questions", "Answers can be updated live from the dashboard and tied to this individual service.", {
+      faqSection("Frequently asked questions", "Common questions about this service and what patients can expect.", {
         dataSource: "faqs",
       }),
       ctaSection(
         "Need help deciding what to book?",
-        "Your team can change this CTA, its buttons, and its supporting copy directly from the CMS.",
+        "Contact the care team if you need help choosing the right service or next step.",
         globalServiceSectionButtons,
       ),
     ],
@@ -287,7 +288,7 @@ const settings: CmsSiteSettings = {
   id: "default",
   brand: {
     siteName: "On Time Medical Group",
-    tagline: "Client-managed healthcare website with dynamic content, services, media, and SEO.",
+    tagline: "Compassionate care. Clear access. Reliable follow-through.",
     logo: image(logoImage, "On Time Medical Group logo"),
   },
   contact: {
@@ -312,12 +313,13 @@ const settings: CmsSiteSettings = {
     ],
   },
   footer: {
-    summary: "Compassionate care, structured digital experiences, and a public website that your client can manage without touching code.",
+    summary: "We're here to help you live a healthier, happier life.",
     highlightItems: [
-      item("All homepage sections are editable", "Hero banners, featured services, counters, FAQs, CTAs, and footer content all come from the CMS.", { icon: "sparkles" }),
-      item("Service pages scale cleanly", "Create new services, update page layouts, and manage service-specific FAQs or testimonials from the dashboard.", { icon: "stethoscope" }),
-      item("SEO stays in the admin workflow", "Meta titles, descriptions, slugs, canonical URLs, and OG images live with the content records.", { icon: "target" }),
-      item("Media is centralized", "Upload Cloudinary assets into a shared media library and reuse them across pages and services.", { icon: "camera" }),
+      item("Same-Day Appointments Available", "Get the care you need, when you need it.", { icon: "calendar" }),
+      item("Most Insurance Plans Accepted", "We accept most major insurance plans.", { icon: "shield" }),
+      item("All-in-One Care", "Primary care, mental health, and substance use treatment under one roof.", { icon: "user-round" }),
+      item("Convenient Locations", "Accessible care close to home.", { icon: "map-pin" }),
+      item("Compassionate Team", "A dedicated team here to support you.", { icon: "hand-heart" }),
     ],
     legalLinks: [
       { id: createCmsId("legal-link"), label: "Privacy Policy", href: "/policies/privacy-policy", type: "page" },
@@ -340,9 +342,9 @@ const settings: CmsSiteSettings = {
   },
   announcementBar: {
     isVisible: true,
-    text: "This website is now fully CMS-driven. Marketing, operations, and leadership can update frontend content from the dashboard.",
+    text: "Now accepting new patients for primary care, preventive care, and behavioral health services.",
     href: "/contact",
-    buttonLabel: "Talk to us",
+    buttonLabel: "Contact Us",
   },
   appointmentSettings: {
     patientStatuses: ["New patient", "Existing patient", "Referral"],
@@ -360,7 +362,7 @@ const settings: CmsSiteSettings = {
   },
   defaultSeo: seo(
     "On Time Medical Group",
-    "A fully CMS-managed healthcare website with dynamic services, content sections, media, and SEO controlled from the admin dashboard.",
+    "Compassionate primary care, mental health, urgent care, and wellness services for individuals and families.",
     "home",
     image(heroImage, "Doctor discussing care with a patient"),
   ),
@@ -376,64 +378,90 @@ const pages: CmsPage[] = [
     status: "published",
     sortOrder: 1,
     showInNavigation: true,
-    excerpt: "The public homepage with editable hero, service previews, stats, testimonials, FAQs, and CTA sections.",
+    excerpt: "The public homepage featuring services, patient resources, testimonials, and contact information.",
     seo: seo(
       "Comprehensive Healthcare That's On Time",
-      "Manage hero messaging, service previews, testimonials, statistics, FAQs, footer, and branding from the admin dashboard.",
+      "Compassionate primary care, mental health, urgent care, and wellness services for individuals and families.",
       "home",
       image(heroImage, "Doctor discussing care with a patient"),
     ),
     sections: [
       heroSection(
-        "Comprehensive healthcare that's on time. Every time.",
-        "No homepage text or imagery is hardcoded anymore. Every visible section on this page is driven from CMS records.",
+        "Comprehensive Healthcare That's On Time. Every Time.",
+        "Compassionate care for the whole family.",
         image(heroImage, "Doctor discussing care with a patient"),
         {
-          eyebrow: "Homepage",
           body:
-            "Your client can now update homepage messaging, swap background imagery, control buttons, and change highlighted proof points without a developer touching source code.",
-          buttons: [button("Explore Services", "/services"), button("Book Appointment", "/contact", "outline")],
+            "On Time Medical Group provides comprehensive primary care, mental health, and substance use treatment with compassion, convenience, and a commitment to your well-being.",
+          buttons: [button("Book Appointment", "/contact"), button("Call 410-754-4343", "tel:+14107544343", "outline")],
           items: [
-            item("Same-day appointment pathways", "", { icon: "calendar" }),
-            item("Most insurance plans accepted", "", { icon: "shield" }),
-            item("Integrated care across teams", "", { icon: "users" }),
-            item("Locations with virtual follow-up", "", { icon: "map-pin" }),
+            item("Same-Day Appointments Available", "", { icon: "calendar" }),
+            item("Most Insurance Plans Accepted", "", { icon: "shield", badge: "red" }),
+            item("All-in-One Care Mind, Body, You.", "", { icon: "user-round" }),
+            item("Convenient Locations Near You", "", { icon: "map-pin" }),
+            item("Compassionate Care, Every Step of the Way", "", { icon: "hand-heart" }),
           ],
         },
       ),
       featureGridSection(
-        "Why patients choose this network",
+        "Telehealth callout",
         [
-          item("Patient-centered access", "Dynamic booking, contact, and patient-resource sections guide visitors clearly into the next step.", { icon: "book-open" }),
-          item("Reusable service architecture", "Homepage service previews now pull from service records rather than duplicated page-specific markup.", { icon: "stethoscope" }),
-          item("Content operations from the dashboard", "Marketing teams can add, hide, duplicate, or reorder sections on the public site.", { icon: "sparkles" }),
-          item("Scalable governance", "Testimonials, FAQs, team members, blog posts, and policies are managed as structured collections.", { icon: "target" }),
+          item("Telehealth available for eligible services.", "Connect with your care team from the comfort of your home.", { icon: "book-open" }),
         ],
         {
-          subtitle: "These cards are rendered from structured block data and can be expanded or reordered from the content studio.",
+          columns: 1,
         },
       ),
-      statsSection("Operational proof points", [
-        item("Patients served annually", "", { value: "50K+", icon: "users" }),
-        item("Care coordination access", "", { value: "24/7", icon: "activity" }),
-        item("Specialists across the network", "", { value: "200+", icon: "stethoscope" }),
-        item("Locations and partner clinics", "", { value: "12", icon: "building" }),
-      ]),
-      serviceListSection("Featured services", "The cards below are driven from the services collection and can be expanded without frontend code edits."),
+      serviceListSection("Our Services", "Comprehensive care for you and your family - at every stage of life.", {
+        buttons: [button("View All Services", "/services")],
+      }),
       richTextSection(
-        "Patient resources and self-service tools",
-        "This section can be converted into links, resource cards, or a richer editorial block at any time from the admin dashboard. Use it for forms, portal links, insurance notes, telehealth readiness, or wellness campaigns.",
+        "Why Choose Us?",
+        "We're more than a healthcare provider - we're your partner in health. Our patient-centered approach ensures you get the right care, at the right time, every time.",
         {
-          buttons: [button("Patient Portal", "/patient-portal/login"), button("Contact the clinic", "/contact", "secondary")],
-          image: image(resourceImage, "Patient looking at a phone"),
+          eyebrow: "About On Time Medical Group",
+          buttons: [button("Learn More About Us", "/about-us", "outline")],
+          image: image(buildingImage, "On Time Medical Group building exterior"),
+          items: [
+            item("Experienced providers you can trust"),
+            item("Integrated services for whole-person wellness"),
+            item("Telehealth options for your convenience"),
+            item("Commitment to our community"),
+          ],
         },
       ),
-      testimonialSection("What patients are saying", "Testimonials now live in their own collection and can be shown site-wide or targeted to a specific page."),
-      faqSection("Frequently asked questions", "Answers on the homepage now pull from the shared FAQ collection and can be updated instantly from the dashboard."),
+      statsSection("Care Highlights", [
+        item("Patients Served", "", { value: "10,000+", icon: "user-round" }),
+        item("Appointments", "", { value: "Same-Day", icon: "calendar" }),
+        item("Insurance Accepted", "", { value: "Most Major", icon: "shield" }),
+        item("Care", "", { value: "Patient Focused", icon: "heart" }),
+      ]),
+      richTextSection(
+        "Patient Resources",
+        "Everything you need to manage your care, all in one place.",
+        {
+          image: image(resourceImage, "Patient using a phone"),
+          buttons: [button("Explore Resources", "/patient-register")],
+          items: [
+            item("New Patient Forms", "", { href: "/patient-register" }),
+            item("Patient Portal", "", { href: "/patient-portal/login" }),
+            item("FAQs", "", { href: "/faq" }),
+            item("Health Tips", "", { href: "/blog" }),
+          ],
+        },
+      ),
+      blogFeedSection("Latest From Our Blog", "Helpful guidance and health tips from our team."),
+      testimonialSection("What Our Patients Say", "Hear from patients who trust our team with their care."),
+      gallerySection("We Accept Most Major Insurance Plans", [], {
+        body: "...and many more.",
+      }),
       ctaSection(
-        "Ready to take the next step?",
-        "The CTA title, body, buttons, and styling are fully editable from the content workspace.",
+        "Ready to Take the Next Step?",
+        "We're here to help you live a healthier, happier life on your time.",
         [button("Book Appointment", "/contact"), button("Call 410-754-4343", "tel:+14107544343", "outline")],
+        {
+          subtitle: "Appointments available in-office or via telehealth.",
+        },
       ),
     ],
   },
@@ -446,58 +474,49 @@ const pages: CmsPage[] = [
     status: "published",
     sortOrder: 2,
     showInNavigation: true,
-    excerpt: "Mission, vision, team, timeline, certifications, and about-page CTAs managed from the CMS.",
-    seo: seo("About On Time Medical Group", "Update about-page copy, leadership content, timelines, statistics, and supporting imagery from the admin dashboard.", "about-us", image(aboutHeroImage, "Doctor speaking with a patient")),
+    excerpt: "Learn more about On Time Medical Group, our mission, and our commitment to patient-centered care.",
+    seo: seo("About On Time Medical Group", "Learn more about our mission, our story, and the care values that guide our team.", "about-us", image(aboutHeroImage, "Doctor speaking with a patient")),
     sections: [
       heroSection(
-        "About On Time Medical Group",
-        "Mission, vision, timeline, team profiles, certificates, and CTA modules now live in a flexible page-builder structure.",
+        "About Us",
+        "",
         image(aboutHeroImage, "Doctor speaking with a patient"),
         {
           body:
-            "The goal of this page is no longer to freeze copy into JSX. The client can manage narrative copy, trust points, and supporting blocks directly from the dashboard.",
-          buttons: [button("Meet the team", "/about-us"), button("Contact us", "/contact", "outline")],
+            "At On Time Medical Group, we provide high-quality, compassionate healthcare that's on time, every time. We're here to support you and your family on your health journey - today and for years to come.",
           items: [
-            item("Patient-centered care", "", { icon: "heart" }),
-            item("Integrated medical network", "", { icon: "building" }),
-            item("Reliable access and follow-through", "", { icon: "check-circle" }),
+            item("Patient Centered", "", { icon: "user-round" }),
+            item("Quality Care", "", { icon: "shield", badge: "red" }),
+            item("Integrated Care", "", { icon: "hand-heart" }),
+            item("Stronger Together", "", { icon: "heart", badge: "red" }),
           ],
-        },
-      ),
-      richTextSection(
-        "Mission, vision, and story",
-        "Mission: Deliver timely, accessible, and coordinated healthcare for families and communities.\n\nVision: Build a healthcare experience where operational clarity and compassionate care work together.\n\nStory: On Time Medical Group was founded to remove friction from everyday healthcare access and make service delivery feel reliable, connected, and human.",
-        {
-          image: image(aboutBuildingImage, "Medical building exterior"),
         },
       ),
       featureGridSection(
         "What defines the organization",
         [
-          item("Clinical quality", "Measure and communicate quality standards clearly across the site and within service pages.", { icon: "shield" }),
-          item("Connected service lines", "Primary care, mental health, urgent care, chronic care, and specialty access all share one content structure.", { icon: "activity" }),
-          item("Editable proof and credentials", "Certificates, awards, community affiliations, and partnerships are maintained from the admin dashboard.", { icon: "star" }),
+          item("Experienced Providers", "Our team brings years of experience and a passion for patient care.", { icon: "calendar" }),
+          item("Convenient Locations", "Multiple locations to serve you and your family better.", { icon: "map-pin" }),
+          item("On-Time, Every Time", "We respect your time with efficient scheduling and timely appointments.", { icon: "clock" }),
+          item("Comprehensive Healthcare", "We provide complete, coordinated care for your whole health and well-being.", { icon: "hand-heart" }),
         ],
       ),
-      timelineSection("Organization timeline", [
-        item("2016", "On Time Medical Group launches with a commitment to accessible care.", { value: "2016", icon: "target" }),
-        item("2019", "Expanded into integrated behavioral health and chronic-care coordination.", { value: "2019", icon: "brain" }),
-        item("2022", "Rolled out patient-facing digital workflows and telehealth pathways.", { value: "2022", icon: "message-square" }),
-        item("2026", "Shifted the entire public website to a structured CMS architecture.", { value: "2026", icon: "sparkles" }),
-      ]),
-      statsSection("About-page statistics", [
-        item("Years serving the region", "", { value: "10+", icon: "building" }),
-        item("Clinical programs", "", { value: "9", icon: "stethoscope" }),
-        item("Partnered care teams", "", { value: "40+", icon: "users" }),
-        item("Patient resources online", "", { value: "100%", icon: "globe" }),
-      ]),
-      teamSection("Leadership and clinical team", "Team members are editable records with bios, photos, specialties, and service assignments."),
-      gallerySection("Certificates and campus highlights", [
-        item("Main campus", "Use gallery cards for facilities, accreditations, or campaign visuals.", { image: image(buildingImage, "Main campus exterior"), icon: "building" }),
-        item("Patient-first consultation spaces", "Swap or reorder visuals without redeploying the frontend.", { image: image(heroImage, "Consultation room"), icon: "camera" }),
-        item("Community-ready care model", "Represent partnerships, events, or proof points with image-backed cards.", { image: image(resourceImage, "Patient resource photography"), icon: "users" }),
-      ]),
-      ctaSection("Talk to the team behind the care model", "This CTA can be changed from the dashboard and reused across pages or campaigns.", [button("Contact Us", "/contact"), button("Explore Services", "/services", "outline")]),
+      richTextSection("Our Mission", "To deliver timely, accessible, and comprehensive healthcare that empowers individuals and families to live healthier, fuller lives.", {
+        image: image(aboutBuildingImage, "On Time Medical Group building exterior"),
+      }),
+      richTextSection("Our Story", "On Time Medical Group was founded with a simple belief: everyone deserves quality care - on time, every time. We bring together experienced providers and a wide range of services under one roof to meet your needs at every stage of life."),
+      richTextSection("We Care For Our Community", "Proudly serving our neighbors and strengthening the communities we call home.", {
+        items: [
+          item("Culturally sensitive care"),
+          item("Affordable & accessible services"),
+          item("Accept most major insurance plans"),
+          item("Telehealth available for eligible services"),
+        ],
+      }),
+      gallerySection("We Accept Most Major Insurance Plans", [], {
+        body: "...and many more.",
+      }),
+      ctaSection("Ready to Take the Next Step?", "We're here to help you live a healthier, happier life.", [button("Book Appointment Now", "/contact"), button("Patient Portal Login", "/patient-portal/login", "outline")]),
     ],
   },
   {
@@ -509,30 +528,39 @@ const pages: CmsPage[] = [
     status: "published",
     sortOrder: 3,
     showInNavigation: true,
-    excerpt: "The service directory itself is dynamic and renders service cards from the CMS collection.",
-    seo: seo("Our Services", "Add, edit, delete, or reorder services and publish service detail pages without code changes.", "services", image(servicePrimaryHero, "Primary care illustration")),
+    excerpt: "Explore the services available at On Time Medical Group, from primary care to urgent care and behavioral health.",
+    seo: seo("Our Services", "Explore the healthcare services available at On Time Medical Group for individuals and families.", "services", image(heroImage, "Doctor discussing care with a patient")),
     sections: [
       heroSection(
-        "Our services",
-        "The entire services hub is now driven from database records, including service cards, images, slugs, and detail-page layouts.",
-        image(servicePrimaryHero, "Service directory hero"),
+        "Our Services",
+        "Comprehensive care for you and your family.",
+        image(heroImage, "Doctor discussing care with a patient"),
         {
           body:
-            "Clients can create a new service record, assign a slug, write the page copy, upload imagery, configure SEO, and publish the page directly from the admin dashboard.",
+            "At On Time Medical Group, we offer a wide range of services designed to support your physical and mental well-being - every step of the way.",
           buttons: [button("Contact Care Team", "/contact"), button("View Blog", "/blog", "outline")],
           items: [
-            item("Create new service pages", "", { icon: "sparkles" }),
-            item("Upload service imagery", "", { icon: "camera" }),
-            item("Control SEO and slugs", "", { icon: "target" }),
+            item("Telehealth available for eligible services.", "Connect with your care team from the comfort of your home.", { icon: "book-open" }),
           ],
         },
       ),
-      richTextSection(
-        "A structured service architecture",
-        "Instead of storing service content in route-specific TypeScript files, each service now exists as structured content with hero data, reusable sections, FAQs, testimonials, assigned clinicians, and CTA blocks.",
-      ),
-      serviceListSection("Service directory", "Cards below are pulled from the CMS services collection."),
-      ctaSection("Need a custom service campaign page?", "Use the same block system to launch seasonal programs, screenings, or service-specific landing pages.", [button("Book Consultation", "/contact"), button("Call the Front Desk", "tel:+14107544343", "outline")]),
+      featureGridSection("Care Highlights", [
+        item("Same-Day Appointments Available", "", { icon: "calendar" }),
+        item("Most Insurance Plans Accepted", "", { icon: "shield", badge: "red" }),
+        item("All-in-One Care Mind, Body, You.", "", { icon: "user-round" }),
+        item("Convenient Locations Near You", "", { icon: "map-pin" }),
+        item("Compassionate Care, Every Step of the Way", "", { icon: "hand-heart" }),
+      ], {
+        columns: 5,
+      }),
+      serviceListSection("Our Services Include", ""),
+      richTextSection("We're Here For You", "Whether it's a routine check-up, mental health support, or urgent care, our team is here to help you feel your best - today and every day.", {
+        image: image(secondaryImage, "Family sitting together on a couch"),
+        buttons: [button("Book Appointment", "/contact"), button("Call 410-754-4343", "tel:+14107544343", "outline")],
+      }),
+      gallerySection("We Accept Most Major Insurance Plans", [], {
+        body: "...and many more.",
+      }),
     ],
   },
   {
@@ -544,12 +572,12 @@ const pages: CmsPage[] = [
     status: "published",
     sortOrder: 4,
     showInNavigation: true,
-    excerpt: "Contact information, support hours, CTAs, and helpful next steps managed from the CMS.",
-    seo: seo("Contact Us", "Update contact details, opening hours, CTA content, and patient-support guidance from the admin dashboard.", "contact", image(buildingImage, "Medical building exterior")),
+    excerpt: "Get in touch with the On Time Medical Group team for appointments, questions, and patient support.",
+    seo: seo("Contact Us", "Contact On Time Medical Group for appointments, patient support, and general questions.", "contact", image(buildingImage, "Medical building exterior")),
     sections: [
       heroSection(
         "Contact the care team",
-        "Phone numbers, email addresses, addresses, social links, support hours, and CTA content can now be updated from the dashboard.",
+        "We're here to help you schedule care, ask questions, and find the right next step.",
         image(buildingImage, "Medical building exterior"),
         {
           body: "Use this page for intake help, service inquiries, care coordination requests, insurance questions, or general patient support.",
@@ -563,10 +591,10 @@ const pages: CmsPage[] = [
       ]),
       richTextSection(
         "Support hours and next steps",
-        "Use this area to communicate operating hours, emergency guidance, referral instructions, or campaign-specific contact details. Because it is block-driven, the content team can rework this section for seasonal campaigns without developer intervention.",
+        "Reach out during regular business hours for scheduling support, insurance questions, referrals, and general patient assistance. For urgent or life-threatening emergencies, call 911 or go to the nearest emergency room.",
       ),
-      faqSection("Contact and scheduling FAQs", "Use shared FAQs here or assign contact-specific FAQs from the admin dashboard."),
-      ctaSection("Want a callback instead?", "Your team can swap this CTA at any time for a callback request, WhatsApp flow, or appointment form.", [button("Request Appointment", "/services"), button("Open Patient Portal", "/patient-portal/login", "outline")]),
+      faqSection("Contact and scheduling FAQs", "Answers to common questions about appointments, support, and patient communication."),
+      ctaSection("Need help getting started?", "Choose the option that works best for you and our team will help with the rest.", [button("Request Appointment", "/services"), button("Open Patient Portal", "/patient-portal/login", "outline")]),
     ],
   },
   {
@@ -578,19 +606,19 @@ const pages: CmsPage[] = [
     status: "published",
     sortOrder: 5,
     showInNavigation: true,
-    excerpt: "Frequently asked questions page built from the FAQ collection instead of embedded JSX arrays.",
-    seo: seo("Frequently Asked Questions", "Manage website FAQs, answers, categories, and service-specific FAQ collections from the admin dashboard.", "faq", image(resourceImage, "Patient resource photography")),
+    excerpt: "Answers to common questions about services, appointments, insurance, and patient support.",
+    seo: seo("Frequently Asked Questions", "Find answers to common questions about appointments, services, insurance, and patient support.", "faq", image(resourceImage, "Patient resource photography")),
     sections: [
       heroSection(
         "Frequently asked questions",
-        "Global FAQs, service-specific FAQs, and contact guidance now live in one editable collection.",
+        "Find quick answers about appointments, services, insurance, and patient support.",
         image(resourceImage, "Patient resources"),
         {
-          body: "Add a new answer once, then target it to the homepage, services, contact page, or a specific service detail page.",
+          body: "If you still need help after reading through these answers, our team is available by phone, email, or through the patient portal.",
         },
       ),
-      faqSection("General FAQ collection", "This page automatically renders published FAQ entries assigned to the site-wide experience."),
-      ctaSection("Still need help?", "Move visitors directly to the right next step with editable CTA buttons.", [button("Contact Us", "/contact"), button("Browse Services", "/services", "outline")]),
+      faqSection("General FAQ collection", "Common questions from patients and families."),
+      ctaSection("Still need help?", "Our team can help you find the right service, schedule a visit, or answer your questions.", [button("Contact Us", "/contact"), button("Browse Services", "/services", "outline")]),
     ],
   },
   {
@@ -602,12 +630,12 @@ const pages: CmsPage[] = [
     status: "published",
     sortOrder: 6,
     showInNavigation: true,
-    excerpt: "Blog landing page fed from the CMS blog post collection.",
-    seo: seo("Health Blog", "Publish blog posts, update featured imagery, manage SEO, and control the blog landing page from the admin dashboard.", "blog", image(blogWellnessImage, "Health blog photography")),
+    excerpt: "Patient education, wellness guidance, and healthcare updates from the On Time Medical Group team.",
+    seo: seo("Health Blog", "Patient education, wellness guidance, and healthcare updates from On Time Medical Group.", "blog", image(blogWellnessImage, "Health blog photography")),
     sections: [
       heroSection(
         "Insights, updates, and patient education",
-        "The blog index and each individual post are now CMS records with editable layouts and SEO fields.",
+        "Helpful articles designed to support your health, answer questions, and guide everyday care decisions.",
         image(blogWellnessImage, "Health blog photography"),
         {
           body: "Use the blog collection for patient education, community updates, campaign content, or service-related trust building.",
@@ -615,11 +643,11 @@ const pages: CmsPage[] = [
         },
       ),
       richTextSection(
-        "A real content workflow for marketing teams",
-        "Blog cards, cover images, authors, categories, post bodies, and metadata are no longer tied to code changes. Publish educational content and keep the site fresh from the dashboard.",
+        "Health information you can use",
+        "From preventive care reminders to urgent-care guidance, our blog helps patients and families stay informed and prepared.",
       ),
-      blogFeedSection("Latest articles", "This section pulls from published blog records."),
-      ctaSection("Need a campaign page or editorial landing page?", "Use the same block builder to support events, programs, or awareness campaigns.", [button("Talk to Marketing Support", "/contact"), button("View Services", "/services", "outline")]),
+      blogFeedSection("Latest articles", "Recent articles from our care and patient education teams."),
+      ctaSection("Looking for care now?", "Explore our services or contact the team if you need help finding the right next step.", [button("Contact Us", "/contact"), button("View Services", "/services", "outline")]),
     ],
   },
 ];
@@ -630,7 +658,7 @@ const services: CmsService[] = [
     title: "Primary Care",
     shortTitle: "Primary Care",
     excerpt: "Personalized everyday care for preventive health, routine concerns, and long-term care coordination.",
-    summary: "A flexible service detail page where clinicians or marketing staff can manage hero copy, care highlights, FAQs, testimonials, and calls to action from the admin dashboard.",
+    summary: "Personalized care for routine visits, preventive screenings, and long-term health support.",
     icon: "stethoscope",
     previewImage: image(servicePrimaryHero, "Primary care illustration"),
     heroCopy: "Primary care becomes the operational anchor for long-term relationships, preventive planning, medication review, and coordinated referrals.",
@@ -650,41 +678,41 @@ const services: CmsService[] = [
       item("Appointment access", "", { value: "Same week", icon: "calendar" }),
       item("Follow-up model", "", { value: "Coordinated", icon: "users" }),
     ],
-    seoDescription: "Edit the entire primary-care detail page from the admin dashboard, including hero copy, benefits, FAQs, testimonials, assigned clinicians, and SEO.",
+    seoDescription: "Primary care services for routine visits, preventive screenings, medication management, and long-term health support.",
   }),
   buildService({
     slug: "preventive-care",
     title: "Preventive Care",
     shortTitle: "Preventive Care",
     excerpt: "Screenings, wellness planning, vaccinations, and early-detection support tailored to life stage and risk profile.",
-    summary: "This service page is structured for preventive programs, seasonal campaigns, and risk-based care messaging that teams can update independently.",
+    summary: "Preventive care focused on screenings, wellness visits, vaccinations, and early detection.",
     icon: "shield",
     previewImage: image(servicePreventiveHero, "Preventive care illustration"),
     heroCopy: "Preventive care content can now flex with seasonality, campaign focus, and patient education priorities without restructuring code.",
     features: [
       item("Annual wellness visits", "Shape the experience around early detection, personalized screening plans, and recurring follow-up.", { icon: "calendar" }),
       item("Cancer screenings", "Promote age-appropriate screening pathways and the supporting care journey.", { icon: "shield" }),
-      item("Vaccinations", "Support vaccine campaigns, reminders, and educational copy from the CMS.", { icon: "activity" }),
+      item("Vaccinations", "Stay current on recommended vaccines and seasonal protection.", { icon: "activity" }),
       item("Lab-led prevention", "Connect cholesterol, blood-pressure, diabetes, and related testing into a cohesive program message.", { icon: "microscope" }),
     ],
     benefits: [
       item("Earlier intervention", "Updated preventive messaging helps patients understand why screening matters before symptoms appear.", { icon: "target" }),
       item("Lower downstream risk", "Prevention-focused care reduces avoidable complications and missed care gaps.", { icon: "heart" }),
-      item("Better campaign flexibility", "Swap visuals, copy, and CTAs for wellness months or screening pushes from the dashboard.", { icon: "sparkles" }),
+      item("Personalized wellness planning", "Tailor screening and prevention plans around age, history, and health goals.", { icon: "sparkles" }),
     ],
     statItems: [
       item("Preventive pathways", "", { value: "Multi-stage", icon: "activity" }),
       item("Visit planning", "", { value: "Personalized", icon: "target" }),
       item("Coverage readiness", "", { value: "Insurance-aware", icon: "shield" }),
     ],
-    seoDescription: "Manage preventive care hero content, wellness programs, FAQs, and seasonal campaign messaging from the admin dashboard.",
+    seoDescription: "Preventive care services including annual wellness visits, screenings, vaccinations, and proactive health planning.",
   }),
   buildService({
     slug: "chronic-disease-management",
     title: "Chronic Disease Management",
     shortTitle: "Chronic Care",
     excerpt: "Structured support for diabetes, hypertension, thyroid conditions, weight management, and longer-term treatment planning.",
-    summary: "The chronic-care page is designed for longitudinal programs, recurring touchpoints, and evolving care-plan messaging controlled in the CMS.",
+    summary: "Ongoing support for chronic conditions including diabetes, hypertension, thyroid concerns, and weight management.",
     icon: "activity",
     previewImage: image(serviceChronicHero, "Chronic disease management illustration"),
     heroCopy: "This page can evolve alongside care models, payer expectations, and digital follow-up programs without route-level rewrites.",
@@ -697,7 +725,7 @@ const services: CmsService[] = [
     benefits: [
       item("Improved continuity", "Patients understand the full long-term care journey instead of isolated appointments.", { icon: "users" }),
       item("Stronger education", "Use the page to reinforce monitoring, self-management, and lifestyle support content.", { icon: "book-open" }),
-      item("Flexible program messaging", "Adjust campaigns, coaching offers, or care bundles from the dashboard.", { icon: "sparkles" }),
+      item("Goal-focused care planning", "Support follow-up goals, coaching, and lifestyle changes over time.", { icon: "sparkles" }),
     ],
     statItems: [
       item("Care model", "", { value: "Longitudinal", icon: "users" }),
@@ -711,10 +739,10 @@ const services: CmsService[] = [
     title: "Women's Health",
     shortTitle: "Women's Health",
     excerpt: "Comprehensive women's health support spanning preventive care, hormonal care, reproductive planning, and wellness.",
-    summary: "Use structured CMS content to keep women's-health messaging current across life stages, campaigns, and patient education priorities.",
+    summary: "Comprehensive women's health support across preventive care, reproductive wellness, hormonal care, and healthy aging.",
     icon: "heart",
     previewImage: image(serviceWomensHero, "Women's health illustration"),
-    heroCopy: "This service page supports rich lifecycle messaging, evolving programs, and page-level SEO without hardcoded content dependencies.",
+    heroCopy: "Women's health care should feel compassionate, clear, and supportive through every stage of life.",
     features: [
       item("Well-woman exams", "Promote preventive visits and recurring wellness pathways from one editable page.", { icon: "calendar" }),
       item("Hormonal care", "Manage copy for cycle health, menopause support, and symptom-led follow-up programs.", { icon: "heart" }),
@@ -723,7 +751,7 @@ const services: CmsService[] = [
     ],
     benefits: [
       item("Life-stage flexibility", "Organize messaging around adolescence, reproductive years, and menopause without redesigning the page.", { icon: "sparkles" }),
-      item("Confident education", "Use the CMS to publish clearer guidance and FAQs that answer real patient concerns.", { icon: "book-open" }),
+      item("Clear preventive guidance", "Get practical information about screenings, wellness visits, and next steps.", { icon: "book-open" }),
       item("Integrated care access", "Connect primary care, preventive care, diagnostics, and counseling through one digital journey.", { icon: "activity" }),
     ],
     statItems: [
@@ -731,7 +759,7 @@ const services: CmsService[] = [
       item("Visit options", "", { value: "Virtual + in-person", icon: "globe" }),
       item("Program flexibility", "", { value: "High", icon: "sparkles" }),
     ],
-    seoDescription: "Women’s health content, lifecycle copy, FAQs, testimonials, SEO, and CTAs are all editable from the admin dashboard.",
+    seoDescription: "Women's health services including well-woman exams, family planning, hormonal care, and preventive screenings.",
   }),
   buildService({
     slug: "mens-health",
@@ -751,14 +779,14 @@ const services: CmsService[] = [
     benefits: [
       item("Better engagement", "Reduce friction for topics patients often delay or avoid discussing.", { icon: "message-square" }),
       item("Clear treatment pathways", "Use structured sections to explain options, timing, and likely next steps.", { icon: "check-circle" }),
-      item("Flexible campaign support", "Run awareness content or men's-health promotions from the dashboard.", { icon: "sparkles" }),
+      item("Focused preventive support", "Encourage earlier conversations around screening, labs, and wellness planning.", { icon: "sparkles" }),
     ],
     statItems: [
       item("Support areas", "", { value: "Preventive + diagnostic", icon: "shield" }),
       item("Access model", "", { value: "Fast consult pathways", icon: "clock" }),
       item("Education readiness", "", { value: "Editable", icon: "book-open" }),
     ],
-    seoDescription: "Manage men’s-health service content, images, assigned clinicians, FAQs, testimonials, and SEO settings from the dashboard.",
+    seoDescription: "Men's health services including physicals, lab evaluation, screenings, and lifestyle-focused care.",
   }),
   buildService({
     slug: "mental-health-services",
@@ -768,16 +796,16 @@ const services: CmsService[] = [
     summary: "This service page supports program updates, therapist assignments, and education content without rebuilding the frontend.",
     icon: "brain",
     previewImage: image(serviceMentalHero, "Mental health illustration"),
-    heroCopy: "Behavioral-health content needs flexibility. This page now supports service updates, clinician assignments, and FAQ changes from the CMS.",
+    heroCopy: "Behavioral health care should feel accessible, compassionate, and connected to your overall wellness.",
     features: [
       item("Therapy pathways", "Describe counseling options, intake expectations, and follow-up structure in editable blocks.", { icon: "message-square" }),
       item("Psychiatric evaluation", "Clarify assessment steps, medication support, and coordination with other care teams.", { icon: "brain" }),
-      item("Stress and resilience care", "Run seasonal or campaign-based mental-wellness content without code changes.", { icon: "heart" }),
+      item("Stress and resilience care", "Support for stress, anxiety, emotional wellness, and everyday coping.", { icon: "heart" }),
       item("Integrated care coordination", "Connect mental-health services to primary care and chronic-care pathways.", { icon: "users" }),
     ],
     benefits: [
       item("Better accessibility", "Editable content helps reduce stigma and clarify what getting help looks like.", { icon: "heart" }),
-      item("More adaptive programming", "Support group updates, telehealth emphasis, or care-model changes from the CMS.", { icon: "sparkles" }),
+      item("Flexible care options", "Support in-person visits, virtual care, and coordinated follow-up.", { icon: "sparkles" }),
       item("Connected patient journey", "Keep referrals, medication follow-up, and education aligned across teams.", { icon: "activity" }),
     ],
     statItems: [
@@ -785,7 +813,7 @@ const services: CmsService[] = [
       item("Care model", "", { value: "Integrated", icon: "users" }),
       item("Publishing flexibility", "", { value: "High", icon: "sparkles" }),
     ],
-    seoDescription: "Mental-health pages, therapist sections, FAQs, testimonials, telehealth messaging, and SEO are all manageable from the admin dashboard.",
+    seoDescription: "Mental health services including therapy, psychiatric evaluation, stress support, and integrated behavioral health care.",
   }),
   buildService({
     slug: "substance-use-treatment",
@@ -795,12 +823,12 @@ const services: CmsService[] = [
     summary: "The recovery-support page is built for evolving programs, clinician assignments, community resources, and compassionate editorial control.",
     icon: "hand-heart",
     previewImage: image(serviceSubstanceHero, "Substance use treatment illustration"),
-    heroCopy: "Recovery programs often change over time. This service page now adapts to those changes without a developer editing code.",
+    heroCopy: "Recovery support should be compassionate, clear, and focused on each patient's path forward.",
     features: [
       item("Assessment and intake", "Describe confidential entry points and first-step expectations clearly.", { icon: "message-square" }),
-      item("Medication-assisted treatment", "Manage treatment-program detail and education content from the CMS.", { icon: "pill" }),
+      item("Medication-assisted treatment", "Evidence-based medication support as part of a broader recovery plan.", { icon: "pill" }),
       item("Counseling and support", "Highlight therapy, family support, and peer recovery pathways.", { icon: "users" }),
-      item("Aftercare planning", "Publish ongoing support models and resource links directly from the dashboard.", { icon: "globe" }),
+      item("Aftercare planning", "Ongoing support, community resources, and follow-up planning for continued recovery.", { icon: "globe" }),
     ],
     benefits: [
       item("Confidential, patient-first messaging", "Give staff control over tone and clarity as programs evolve.", { icon: "shield" }),
@@ -810,19 +838,19 @@ const services: CmsService[] = [
     statItems: [
       item("Care model", "", { value: "Evidence-based", icon: "shield" }),
       item("Support depth", "", { value: "Assessment to aftercare", icon: "users" }),
-      item("Message control", "", { value: "CMS-managed", icon: "sparkles" }),
+      item("Care approach", "", { value: "Coordinated", icon: "sparkles" }),
     ],
-    seoDescription: "Substance-use treatment pages, recovery program details, FAQs, clinician sections, testimonials, and SEO live in the CMS.",
+    seoDescription: "Substance use treatment services including assessment, counseling, medication-assisted treatment, and recovery support.",
   }),
   buildService({
     slug: "geriatric-care",
     title: "Geriatric Care",
     shortTitle: "Geriatric Care",
     excerpt: "Comprehensive support for aging adults, caregivers, memory concerns, chronic conditions, and independence planning.",
-    summary: "This service page is optimized for caregiver-facing education, aging-well programs, and coordinated clinical storytelling from the CMS.",
+    summary: "Comprehensive care for aging adults, caregivers, memory concerns, chronic conditions, and healthy aging.",
     icon: "users",
     previewImage: image(serviceGeriatricHero, "Geriatric care illustration"),
-    heroCopy: "The CMS allows care teams to tailor language for patients, caregivers, and community partners without engineering involvement.",
+    heroCopy: "Geriatric care should support both patients and caregivers with practical guidance, planning, and long-term coordination.",
     features: [
       item("Comprehensive assessments", "Explain functional, cognitive, and preventive reviews in a clearer way.", { icon: "stethoscope" }),
       item("Caregiver coordination", "Add service-specific resources, caregiver tips, or support pathways as needed.", { icon: "users" }),
@@ -831,27 +859,27 @@ const services: CmsService[] = [
     ],
     benefits: [
       item("Patient and caregiver clarity", "Keep page copy understandable for families coordinating longer-term care.", { icon: "message-square" }),
-      item("Program-specific education", "Launch or revise aging-well initiatives directly from the dashboard.", { icon: "book-open" }),
+      item("Program-specific education", "Helpful information for healthy aging, safety, memory support, and caregiver coordination.", { icon: "book-open" }),
       item("Flexible support content", "Support home-based, virtual, or in-office care models without route rewrites.", { icon: "sparkles" }),
     ],
     statItems: [
       item("Care audience", "", { value: "Patients + caregivers", icon: "users" }),
       item("Support model", "", { value: "Long-term", icon: "activity" }),
-      item("Program agility", "", { value: "CMS-first", icon: "sparkles" }),
+      item("Care focus", "", { value: "Aging well", icon: "sparkles" }),
     ],
-    seoDescription: "Geriatric-care content, caregiver resources, clinician sections, FAQs, and SEO are editable from the admin dashboard.",
+    seoDescription: "Geriatric care services supporting aging adults, caregivers, memory concerns, and long-term wellness.",
   }),
   buildService({
     slug: "urgent-care",
     title: "Urgent Care",
     shortTitle: "Urgent Care",
     excerpt: "Fast, non-emergency care for minor illnesses and injuries, with telehealth and in-person pathways.",
-    summary: "This urgent-care page supports changing access messaging, seasonal campaigns, and service-specific operational updates without code changes.",
+    summary: "Fast, non-emergency care for minor illnesses and injuries with in-person and virtual support.",
     icon: "clock",
     previewImage: image(serviceUrgentHero, "Urgent care illustration"),
-    heroCopy: "Urgent-care demand changes fast. The CMS allows operations or marketing teams to update messaging, wait-time notes, and next-step guidance quickly.",
+    heroCopy: "When you need prompt care for a non-emergency illness or injury, our urgent care team is here to help.",
     features: [
-      item("Cold and flu care", "Publish seasonal guidance and acute-symptom intake expectations from the dashboard.", { icon: "activity" }),
+      item("Cold and flu care", "Prompt evaluation and treatment for common illnesses and seasonal symptoms.", { icon: "activity" }),
       item("Minor injuries", "Keep treatment and triage explanations current as workflows change.", { icon: "shield" }),
       item("Rapid testing", "Promote available tests, timelines, and telehealth follow-up processes.", { icon: "microscope" }),
       item("Telehealth screening", "Let the team pivot messaging between virtual and in-person capacity as needed.", { icon: "globe" }),
@@ -864,9 +892,9 @@ const services: CmsService[] = [
     statItems: [
       item("Care type", "", { value: "Non-emergency", icon: "shield" }),
       item("Access options", "", { value: "Virtual + walk-in", icon: "globe" }),
-      item("Update speed", "", { value: "Live from CMS", icon: "sparkles" }),
+      item("Access support", "", { value: "Same-day guidance", icon: "sparkles" }),
     ],
-    seoDescription: "Urgent-care access messaging, hero banners, FAQs, service highlights, and SEO are editable from the CMS dashboard.",
+    seoDescription: "Urgent care services for minor illnesses, injuries, rapid testing, and same-day guidance.",
   }),
 ];
 
@@ -887,12 +915,12 @@ const posts: CmsBlogPost[] = [
     excerpt: "Help patients make faster, clearer decisions about non-emergency symptoms and care access.",
     coverImage: image(blogUrgentImage, "Urgent care article image"),
     publishedAt: "2026-05-12",
-    seo: seo("When to Choose Urgent Care", "A CMS-managed patient education article about choosing urgent care for non-emergency situations.", "blog/when-to-choose-urgent-care", image(blogUrgentImage, "Urgent care article image")),
+    seo: seo("When to Choose Urgent Care", "Patient guidance on when urgent care is the right choice for non-emergency symptoms and minor injuries.", "blog/when-to-choose-urgent-care", image(blogUrgentImage, "Urgent care article image")),
     sections: [
-      heroSection("When to choose urgent care", "This post layout, content, imagery, and SEO are editable from the blog collection.", image(blogUrgentImage, "Urgent care article image")),
+      heroSection("When to choose urgent care", "Learn when urgent care is the right next step for fast, non-emergency treatment.", image(blogUrgentImage, "Urgent care article image")),
       richTextSection(
         "Fast guidance for non-emergency symptoms",
-        "Use urgent care for symptoms or injuries that need prompt attention but are not severe enough for the emergency room. The advantage of a CMS-driven blog is that your team can keep this guidance current with service availability, seasonal advice, or updated patient routing rules.",
+        "Use urgent care for symptoms or injuries that need prompt attention but are not severe enough for the emergency room. Common reasons include cold and flu symptoms, minor cuts, sprains, rashes, and uncomplicated infections.",
       ),
       featureGridSection("Common examples", [
         item("Cold and flu symptoms", "Use blog cards to reinforce which symptoms are appropriate for urgent care.", { icon: "activity" }),
@@ -912,12 +940,12 @@ const posts: CmsBlogPost[] = [
     excerpt: "A practical guide to screenings, annual visits, and long-term wellness planning that the content team can keep fresh.",
     coverImage: image(blogWellnessImage, "Preventive care wellness article"),
     publishedAt: "2026-05-08",
-    seo: seo("Build a Better Preventive Care Routine", "Dynamic preventive-care blog content managed from the admin dashboard.", "blog/building-a-better-preventive-care-routine", image(blogWellnessImage, "Preventive care wellness article")),
+    seo: seo("Build a Better Preventive Care Routine", "Practical guidance for wellness visits, screenings, vaccines, and long-term preventive care planning.", "blog/building-a-better-preventive-care-routine", image(blogWellnessImage, "Preventive care wellness article")),
     sections: [
-      heroSection("Build a better preventive care routine", "The blog system supports cover images, categories, SEO, and modular post bodies.", image(blogWellnessImage, "Preventive care wellness article")),
+      heroSection("Build a better preventive care routine", "Simple habits and regular screenings can make a meaningful difference over time.", image(blogWellnessImage, "Preventive care wellness article")),
       richTextSection(
-        "Why prevention needs a clearer digital experience",
-        "Patients are more likely to act when information is clear, relevant, and easy to trust. The CMS lets your team update copy, FAQs, and supporting CTAs as preventive programs evolve.",
+        "Why prevention matters",
+        "Patients are more likely to stay healthy when preventive care is part of a regular routine. Wellness visits, recommended screenings, vaccines, and follow-up on results all play a role in protecting long-term health.",
       ),
       featureGridSection("Simple habits that matter", [
         item("Schedule wellness visits", "Promote annual planning and consistent touchpoints.", { icon: "calendar" }),
@@ -928,63 +956,63 @@ const posts: CmsBlogPost[] = [
   },
   {
     id: createCmsId("post"),
-    slug: "how-cms-driven-service-pages-improve-patient-trust",
-    title: "How CMS-Driven Service Pages Improve Patient Trust",
-    category: "Digital Experience",
-    authorName: "Website Strategy Team",
+    slug: "how-to-prepare-for-your-first-visit",
+    title: "How to Prepare for Your First Visit",
+    category: "Patient Resources",
+    authorName: "Care Navigation Team",
     status: "published",
     sortOrder: 3,
-    excerpt: "A content-operations perspective on why structured service pages outperform hardcoded one-off layouts.",
+    excerpt: "A simple checklist to help new patients feel prepared before their first appointment.",
     coverImage: image(buildingImage, "Healthcare website strategy article"),
     publishedAt: "2026-05-04",
-    seo: seo("How CMS-Driven Service Pages Improve Patient Trust", "A blog post about structured healthcare content architecture and patient trust.", "blog/how-cms-driven-service-pages-improve-patient-trust", image(buildingImage, "Healthcare website strategy article")),
+    seo: seo("How to Prepare for Your First Visit", "A simple first-visit checklist for new patients at On Time Medical Group.", "blog/how-to-prepare-for-your-first-visit", image(buildingImage, "Healthcare website strategy article")),
     sections: [
-      heroSection("How CMS-driven service pages improve patient trust", "Explain your content operations strategy directly on the site and keep it current from the dashboard.", image(buildingImage, "Healthcare website strategy article")),
+      heroSection("How to prepare for your first visit", "A little preparation can make your first appointment smoother and less stressful.", image(buildingImage, "Healthcare website strategy article")),
       richTextSection(
-        "Structured content creates better patient experiences",
-        "When services use the same flexible architecture, the website becomes easier to maintain and easier for patients to trust. Consistent structure supports better SEO, clearer next steps, and fewer outdated content fragments.",
+        "What to bring and what to expect",
+        "Bring a photo ID, insurance card, medication list, and any relevant medical records or referral notes. Arrive a few minutes early if you need to complete forms, and write down any symptoms, questions, or concerns you want to discuss with your care team.",
       ),
-      featureGridSection("What improves", [
-        item("Consistency", "Every service page can include hero, features, FAQs, clinicians, testimonials, and CTAs.", { icon: "check-circle" }),
-        item("Speed of updates", "Teams publish changes without waiting for a developer deployment.", { icon: "sparkles" }),
-        item("Scalability", "New services or campaigns use the same reusable section system.", { icon: "building" }),
+      featureGridSection("Helpful reminders", [
+        item("Bring your essentials", "Have your ID, insurance details, and medication list ready.", { icon: "check-circle" }),
+        item("Write down questions", "A short list helps you cover everything that matters during the visit.", { icon: "book-open" }),
+        item("Know your next steps", "Ask about follow-up, prescriptions, labs, or referrals before you leave.", { icon: "building" }),
       ]),
     ],
   },
 ];
 
 const faqs: CmsFaq[] = [
-  { id: createCmsId("faq"), question: "Can the client update the homepage without a developer?", answer: "Yes. Hero content, service previews, statistics, testimonials, FAQs, CTAs, footer content, and contact details are editable from the admin dashboard.", category: "General", status: "published", sortOrder: 1, pageSlug: "home" },
-  { id: createCmsId("faq"), question: "Can I add a brand-new service page from admin?", answer: "Yes. Create a new service record, assign the slug, upload imagery, configure SEO, and publish the page without editing code.", category: "Services", status: "published", sortOrder: 2, pageSlug: "services" },
-  { id: createCmsId("faq"), question: "Where do I manage meta titles and descriptions?", answer: "Every page, service, blog post, and policy record includes editable SEO fields in the admin workspace.", category: "SEO", status: "published", sortOrder: 3, pageSlug: "faq" },
-  { id: createCmsId("faq"), question: "Can the website team reorder sections on a page?", answer: "Yes. The section editor allows pages and service layouts to be reordered, duplicated, hidden, or removed from the dashboard.", category: "General", status: "published", sortOrder: 4, pageSlug: "home" },
+  { id: createCmsId("faq"), question: "Do you accept new patients?", answer: "Yes. We welcome new patients for a range of primary care, preventive care, and behavioral health services.", category: "General", status: "published", sortOrder: 1, pageSlug: "home" },
+  { id: createCmsId("faq"), question: "What services do you offer?", answer: "Our team provides primary care, preventive care, chronic disease management, women's health, men's health, mental health services, substance use treatment, geriatric care, and urgent care.", category: "Services", status: "published", sortOrder: 2, pageSlug: "services" },
+  { id: createCmsId("faq"), question: "How can I contact the clinic?", answer: "You can call, email, or use the patient portal to reach our team for appointments, questions, and follow-up support.", category: "Support", status: "published", sortOrder: 3, pageSlug: "faq" },
+  { id: createCmsId("faq"), question: "Do you offer telehealth visits?", answer: "Yes. Telehealth is available for eligible services and follow-up care when appropriate.", category: "General", status: "published", sortOrder: 4, pageSlug: "home" },
   { id: createCmsId("faq"), question: "What should I expect during a primary care visit?", answer: "Your care team can use this answer to explain consultation flow, follow-up, lab coordination, or annual wellness expectations.", category: "Service FAQ", status: "published", sortOrder: 5, serviceSlug: "primary-care" },
-  { id: createCmsId("faq"), question: "Do you offer same-day appointments for primary care?", answer: "Yes. The service page can be updated to reflect same-day, next-day, or scheduled-only availability directly from the CMS.", category: "Service FAQ", status: "published", sortOrder: 6, serviceSlug: "primary-care" },
-  { id: createCmsId("faq"), question: "How often should I schedule preventive screenings?", answer: "That depends on age, risk factors, and health history. Use the CMS to tailor screening guidance as programs change.", category: "Service FAQ", status: "published", sortOrder: 7, serviceSlug: "preventive-care" },
-  { id: createCmsId("faq"), question: "Are preventive visits covered by insurance?", answer: "Coverage varies by plan, but the admin team can keep this answer aligned to the clinic's current guidance.", category: "Service FAQ", status: "published", sortOrder: 8, serviceSlug: "preventive-care" },
+  { id: createCmsId("faq"), question: "Do you offer same-day appointments for primary care?", answer: "Yes. Same-day appointments may be available depending on scheduling and the type of concern.", category: "Service FAQ", status: "published", sortOrder: 6, serviceSlug: "primary-care" },
+  { id: createCmsId("faq"), question: "How often should I schedule preventive screenings?", answer: "That depends on your age, medical history, family history, and risk factors. Your provider can recommend the right schedule for you.", category: "Service FAQ", status: "published", sortOrder: 7, serviceSlug: "preventive-care" },
+  { id: createCmsId("faq"), question: "Are preventive visits covered by insurance?", answer: "Coverage varies by plan, but many preventive services are covered. Our team can help you understand what to expect.", category: "Service FAQ", status: "published", sortOrder: 8, serviceSlug: "preventive-care" },
   { id: createCmsId("faq"), question: "How is chronic care follow-up organized?", answer: "Use this answer to explain check-ins, monitoring cadence, medication review, and care-coordination touchpoints.", category: "Service FAQ", status: "published", sortOrder: 9, serviceSlug: "chronic-disease-management" },
   { id: createCmsId("faq"), question: "Can chronic care content be personalized by program?", answer: "Yes. Sections can be adjusted for diabetes, hypertension, thyroid care, or broader care-management campaigns.", category: "Service FAQ", status: "published", sortOrder: 10, serviceSlug: "chronic-disease-management" },
   { id: createCmsId("faq"), question: "Do you support patients across different life stages?", answer: "Yes. Women's-health content can be organized around prevention, reproductive planning, menopause support, or broader wellness needs.", category: "Service FAQ", status: "published", sortOrder: 11, serviceSlug: "womens-health" },
-  { id: createCmsId("faq"), question: "Can this page promote campaign-specific women's health programs?", answer: "Yes. Hero content, section order, CTAs, and supporting copy are all editable from the dashboard.", category: "Service FAQ", status: "published", sortOrder: 12, serviceSlug: "womens-health" },
+  { id: createCmsId("faq"), question: "What women's health services do you provide?", answer: "We support preventive visits, reproductive wellness, hormonal care, and healthy aging with compassionate, whole-person care.", category: "Service FAQ", status: "published", sortOrder: 12, serviceSlug: "womens-health" },
   { id: createCmsId("faq"), question: "Can men's-health services cover preventive and lifestyle concerns?", answer: "Yes. The service page can explain screening, labs, cardiovascular health, and quality-of-life concerns together.", category: "Service FAQ", status: "published", sortOrder: 13, serviceSlug: "mens-health" },
-  { id: createCmsId("faq"), question: "Can you run awareness campaigns through this page?", answer: "Yes. Use the CMS to change visuals, CTAs, or educational blocks for men's-health awareness initiatives.", category: "Service FAQ", status: "published", sortOrder: 14, serviceSlug: "mens-health" },
+  { id: createCmsId("faq"), question: "What concerns can men's health visits address?", answer: "Men's health visits can include preventive screening, lab review, lifestyle support, cardiovascular risk, and quality-of-life concerns.", category: "Service FAQ", status: "published", sortOrder: 14, serviceSlug: "mens-health" },
   { id: createCmsId("faq"), question: "Are virtual mental-health visits supported?", answer: "Yes. Mental-health service pages can present virtual and in-person care pathways side by side.", category: "Service FAQ", status: "published", sortOrder: 15, serviceSlug: "mental-health-services" },
-  { id: createCmsId("faq"), question: "Can therapist or provider sections be updated from admin?", answer: "Yes. Clinician assignments are stored as CMS records rather than hardcoded into the page.", category: "Service FAQ", status: "published", sortOrder: 16, serviceSlug: "mental-health-services" },
-  { id: createCmsId("faq"), question: "Is substance-use treatment information handled sensitively?", answer: "Yes. The CMS allows tone, language, and program details to be updated carefully as services evolve.", category: "Service FAQ", status: "published", sortOrder: 17, serviceSlug: "substance-use-treatment" },
-  { id: createCmsId("faq"), question: "Can community resources be added to recovery pages?", answer: "Yes. Teams can add new sections, support resources, or CTAs without developer assistance.", category: "Service FAQ", status: "published", sortOrder: 18, serviceSlug: "substance-use-treatment" },
-  { id: createCmsId("faq"), question: "Can caregivers use the geriatric-care page for guidance?", answer: "Yes. The CMS makes it easy to maintain caregiver-facing content, support steps, and next actions.", category: "Service FAQ", status: "published", sortOrder: 19, serviceSlug: "geriatric-care" },
+  { id: createCmsId("faq"), question: "What can I expect from a first mental-health visit?", answer: "Your first visit may include a conversation about symptoms, history, goals, and the care options that fit your needs.", category: "Service FAQ", status: "published", sortOrder: 16, serviceSlug: "mental-health-services" },
+  { id: createCmsId("faq"), question: "Is substance-use treatment information handled sensitively?", answer: "Yes. We approach recovery support with compassion, privacy, and respect for each patient's situation.", category: "Service FAQ", status: "published", sortOrder: 17, serviceSlug: "substance-use-treatment" },
+  { id: createCmsId("faq"), question: "Can community resources be added to recovery pages?", answer: "Yes. Recovery support can include counseling, aftercare planning, and helpful community-based resources.", category: "Service FAQ", status: "published", sortOrder: 18, serviceSlug: "substance-use-treatment" },
+  { id: createCmsId("faq"), question: "Can caregivers use the geriatric-care page for guidance?", answer: "Yes. Geriatric care often includes caregiver support, care coordination, and practical next-step guidance.", category: "Service FAQ", status: "published", sortOrder: 19, serviceSlug: "geriatric-care" },
   { id: createCmsId("faq"), question: "Can this page highlight memory or mobility support?", answer: "Yes. The block system is flexible enough to emphasize specific programs or concerns.", category: "Service FAQ", status: "published", sortOrder: 20, serviceSlug: "geriatric-care" },
   { id: createCmsId("faq"), question: "What conditions fit urgent care best?", answer: "Urgent-care content can clarify common non-emergency conditions and route patients to the right next step.", category: "Service FAQ", status: "published", sortOrder: 21, serviceSlug: "urgent-care" },
-  { id: createCmsId("faq"), question: "Can urgent-care messaging change during high-volume periods?", answer: "Yes. Because the content is CMS-driven, the page can adapt quickly to volume, seasons, or campaign needs.", category: "Service FAQ", status: "published", sortOrder: 22, serviceSlug: "urgent-care" },
+  { id: createCmsId("faq"), question: "Can urgent-care messaging change during high-volume periods?", answer: "Yes. Wait times, availability, and patient guidance may change based on volume, season, and clinic operations.", category: "Service FAQ", status: "published", sortOrder: 22, serviceSlug: "urgent-care" },
 ];
 
 const testimonials: CmsTestimonial[] = [
-  { id: createCmsId("testimonial"), quote: "The new site finally feels organized. We can update homepage campaigns and service details ourselves without waiting on code changes.", name: "Marketing Director", role: "Healthcare network leadership", rating: 5, status: "published", sortOrder: 1, pageSlug: "home" },
+  { id: createCmsId("testimonial"), quote: "The staff is so kind and professional. I always feel heard and cared for.", name: "Jessica M.", role: "Patient", rating: 5, status: "published", sortOrder: 1, pageSlug: "home" },
   { id: createCmsId("testimonial"), quote: "The primary-care page explains the care journey clearly and makes follow-up expectations easier to understand.", name: "Nia R.", role: "Primary care patient", rating: 5, status: "published", sortOrder: 2, serviceSlug: "primary-care" },
-  { id: createCmsId("testimonial"), quote: "Our wellness campaign team can launch updated preventive-care messaging in hours instead of waiting for a developer sprint.", name: "Operations Lead", role: "Preventive program team", rating: 5, status: "published", sortOrder: 3, serviceSlug: "preventive-care" },
+  { id: createCmsId("testimonial"), quote: "My preventive visit was thorough, encouraging, and easy to schedule. I left with a clear plan for follow-up.", name: "Carla S.", role: "Preventive care patient", rating: 5, status: "published", sortOrder: 3, serviceSlug: "preventive-care" },
   { id: createCmsId("testimonial"), quote: "The mental-health page feels more compassionate and practical now, and the FAQs answer what I needed before booking.", name: "Amina K.", role: "Behavioral health patient", rating: 5, status: "published", sortOrder: 4, serviceSlug: "mental-health-services" },
-  { id: createCmsId("testimonial"), quote: "We can manage service imagery, team sections, and SEO in one place, which is exactly what our content workflow needed.", name: "Digital Strategy Manager", role: "Admin dashboard user", rating: 5, status: "published", sortOrder: 5, pageSlug: "services" },
-  { id: createCmsId("testimonial"), quote: "The urgent-care page now answers the right questions quickly and routes patients more clearly into the right next step.", name: "Reception Supervisor", role: "Front-office operations", rating: 5, status: "published", sortOrder: 6, serviceSlug: "urgent-care" },
+  { id: createCmsId("testimonial"), quote: "The services page made it easy to understand what care was available for my family and what to do next.", name: "Marcus T.", role: "Patient", rating: 5, status: "published", sortOrder: 5, pageSlug: "services" },
+  { id: createCmsId("testimonial"), quote: "Urgent care was quick, professional, and reassuring when I needed help right away.", name: "Danielle R.", role: "Urgent care patient", rating: 5, status: "published", sortOrder: 6, serviceSlug: "urgent-care" },
 ];
 
 const teamMembers: CmsTeamMember[] = [
@@ -1001,15 +1029,15 @@ const legalDocuments: CmsLegalDocument[] = [
     id: createCmsId("legal"),
     slug: "privacy-policy",
     title: "Privacy Policy",
-    summary: "Editable privacy-policy content managed from the legal-documents collection.",
+    summary: "Information about how patient and visitor information is collected, used, and protected.",
     status: "published",
     sortOrder: 1,
-    seo: seo("Privacy Policy", "Manage privacy policy content and SEO from the admin dashboard.", "policies/privacy-policy"),
+    seo: seo("Privacy Policy", "Learn how On Time Medical Group collects, uses, and protects patient and visitor information.", "policies/privacy-policy"),
     sections: [
-      heroSection("Privacy Policy", "Policies are now managed as content records instead of hardcoded legal pages.", image(buildingImage, "Privacy policy header image")),
+      heroSection("Privacy Policy", "Learn how patient and visitor information is collected, used, and protected.", image(buildingImage, "Privacy policy header image")),
       richTextSection(
         "How information is handled",
-        "This page should outline what data is collected, how it is used, where it is stored, and how patients can contact the organization about privacy concerns. Because the page is CMS-managed, legal or operations teams can keep it current without editing code.",
+        "This policy explains what information may be collected through the website, how it is used to support care and communication, how it is protected, and how patients can contact the organization with privacy questions.",
       ),
     ],
   },
@@ -1017,15 +1045,15 @@ const legalDocuments: CmsLegalDocument[] = [
     id: createCmsId("legal"),
     slug: "terms-of-service",
     title: "Terms of Service",
-    summary: "Editable terms page managed from the legal-documents collection.",
+    summary: "Terms that govern the use of this website and related patient communication tools.",
     status: "published",
     sortOrder: 2,
-    seo: seo("Terms of Service", "Manage terms-of-service content and SEO from the admin dashboard.", "policies/terms-of-service"),
+    seo: seo("Terms of Service", "Read the terms that govern use of the On Time Medical Group website and related services.", "policies/terms-of-service"),
     sections: [
-      heroSection("Terms of Service", "Your legal content is now part of the same structured CMS workflow as the rest of the website.", image(buildingImage, "Terms of service header image")),
+      heroSection("Terms of Service", "Terms that govern the use of this website and related patient communication tools.", image(buildingImage, "Terms of service header image")),
       richTextSection(
         "Use, access, and site terms",
-        "Use this page for website usage terms, disclaimers, service access conditions, booking terms, and other legal content that should remain under administrative control.",
+        "This page can outline website usage terms, disclaimers, booking conditions, acceptable use policies, and any other legal terms that apply to patients and visitors using the site.",
       ),
     ],
   },
@@ -1043,12 +1071,12 @@ const mediaAssets: CmsMediaAsset[] = [
 const announcements: CmsAnnouncement[] = [
   {
     id: createCmsId("announcement"),
-    title: "CMS Launch",
-    body: "The public website now runs on a structured CMS model with editable pages, services, media, blog, FAQs, policies, and SEO.",
+    title: "New Patient Appointments",
+    body: "Appointments are available for primary care, preventive care, and select behavioral health services.",
     status: "published",
     sortOrder: 1,
-    href: "/services",
-    buttonLabel: "Explore the site",
+    href: "/contact",
+    buttonLabel: "Contact Us",
   },
 ];
 

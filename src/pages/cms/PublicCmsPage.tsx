@@ -1,6 +1,8 @@
 import { CmsDocumentRenderer } from "@/components/cms/CmsSectionRenderer";
 import { CmsPublicLayout } from "@/components/cms/CmsPublicLayout";
+import { cmsDefaults } from "@/features/cms/defaults";
 import { useCmsBlogPosts, useCmsFaqs, useCmsPage, useCmsServices, useCmsSiteSettings, useCmsTeamMembers, useCmsTestimonials } from "@/features/cms/hooks";
+import { pageLooksLikePlaceholder } from "@/features/cms/publicContent";
 import { useCmsSeo } from "@/features/cms/seo";
 import NotFound from "../NotFound";
 
@@ -17,13 +19,15 @@ function LoadingState() {
 }
 
 export default function PublicCmsPage({ slug }: { slug: string }) {
-  const { data: page, isLoading } = useCmsPage(slug);
+  const { data: rawPage, isLoading } = useCmsPage(slug);
   const { data: settings } = useCmsSiteSettings();
   const { data: services = [] } = useCmsServices();
   const { data: posts = [] } = useCmsBlogPosts();
   const { data: teamMembers = [] } = useCmsTeamMembers();
   const { data: faqs = [] } = useCmsFaqs(slug === "faq" || slug === "contact" ? undefined : { pageSlug: slug });
   const { data: testimonials = [] } = useCmsTestimonials({ pageSlug: slug });
+  const fallbackPage = cmsDefaults.pages.find((entry) => entry.slug === slug) ?? null;
+  const page = rawPage && !pageLooksLikePlaceholder(rawPage) ? rawPage : fallbackPage;
 
   useCmsSeo(page?.seo, settings);
 

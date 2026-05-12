@@ -1,14 +1,18 @@
 import { useParams } from "react-router-dom";
 import { CmsDocumentRenderer } from "@/components/cms/CmsSectionRenderer";
 import { CmsPublicLayout } from "@/components/cms/CmsPublicLayout";
+import { cmsDefaults } from "@/features/cms/defaults";
 import { useCmsLegalDocument, useCmsSiteSettings } from "@/features/cms/hooks";
+import { legalDocumentLooksLikePlaceholder } from "@/features/cms/publicContent";
 import { useCmsSeo } from "@/features/cms/seo";
 import NotFound from "../NotFound";
 
 export default function PublicCmsLegalPage() {
   const { slug = "" } = useParams();
-  const { data: document, isLoading } = useCmsLegalDocument(slug);
+  const { data: rawDocument, isLoading } = useCmsLegalDocument(slug);
   const { data: settings } = useCmsSiteSettings();
+  const fallbackDocument = cmsDefaults.legalDocuments.find((entry) => entry.slug === slug) ?? null;
+  const document = rawDocument && !legalDocumentLooksLikePlaceholder(rawDocument) ? rawDocument : fallbackDocument;
 
   useCmsSeo(document?.seo, settings);
 

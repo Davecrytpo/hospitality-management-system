@@ -3,8 +3,10 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Calendar, ChevronDown, Lock, Menu, Phone, X } from "lucide-react";
 import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { Button } from "@/components/ui/button";
+import { cmsDefaults } from "@/features/cms/defaults";
 import { getCmsIcon } from "@/features/cms/icons";
 import { useCmsAnnouncements, useCmsPages, useCmsRealtime, useCmsServices, useCmsSiteSettings } from "@/features/cms/hooks";
+import { looksLikeCmsPlaceholder, pageLooksLikePlaceholder, settingsTextLooksLikePlaceholder } from "@/features/cms/publicContent";
 import type { CmsNavigationItem, CmsPage, CmsService, CmsSiteSettings } from "@/features/cms/types";
 import { cn } from "@/lib/utils";
 
@@ -325,12 +327,17 @@ export function CmsPublicLayout({ children }: { children: React.ReactNode }) {
   useCmsRealtime();
 
   const [appointmentOpen, setAppointmentOpen] = useState(false);
-  const { data: settings } = useCmsSiteSettings();
-  const { data: pages = [] } = useCmsPages();
+  const { data: rawSettings } = useCmsSiteSettings();
+  const { data: rawPages = [] } = useCmsPages();
   const { data: services = [] } = useCmsServices();
   const { data: announcements = [] } = useCmsAnnouncements();
+  const settings = rawSettings && !settingsTextLooksLikePlaceholder(rawSettings) ? rawSettings : cmsDefaults.settings;
+  const pages = rawPages.map((page) => {
+    const fallbackPage = cmsDefaults.pages.find((entry) => entry.slug === page.slug);
+    return pageLooksLikePlaceholder(page) && fallbackPage ? fallbackPage : page;
+  });
   const banner =
-    settings?.announcementBar.isVisible && settings.announcementBar.text
+    settings.announcementBar.isVisible && settings.announcementBar.text && !looksLikeCmsPlaceholder(settings.announcementBar.text)
       ? {
           text: settings.announcementBar.text,
           href: settings.announcementBar.href,
@@ -358,8 +365,6 @@ export function CmsPublicLayout({ children }: { children: React.ReactNode }) {
         : undefined,
     [settings],
   );
-
-  if (!settings) return null;
 
   return (
     <div style={themeStyle} className="min-h-screen bg-[var(--cms-background)] text-[var(--cms-text)]">
