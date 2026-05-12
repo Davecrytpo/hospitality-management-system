@@ -503,8 +503,8 @@ function DocumentCard({
   title: string;
   children: React.ReactNode;
   badge?: string;
-  onSave: () => Promise<void>;
-  onDelete?: () => Promise<void>;
+  onSave: () => Promise<unknown>;
+  onDelete?: () => Promise<unknown>;
 }) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -565,7 +565,7 @@ function DocumentCard({
   );
 }
 
-function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (page: CmsPage) => Promise<void>; onDelete: () => Promise<void> }) {
+function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (page: CmsPage) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -614,7 +614,7 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
   );
 }
 
-function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<void>; onDelete: () => Promise<void> }) {
+function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -670,7 +670,7 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
   );
 }
 
-function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSave: (post: CmsBlogPost) => Promise<void>; onDelete: () => Promise<void> }) {
+function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSave: (post: CmsBlogPost) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -703,7 +703,7 @@ function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSav
   );
 }
 
-function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument; onSave: (document: CmsLegalDocument) => Promise<void>; onDelete: () => Promise<void> }) {
+function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument; onSave: (document: CmsLegalDocument) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -730,7 +730,7 @@ function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument;
   );
 }
 
-function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (faq: CmsFaq) => Promise<void>; onDelete: () => Promise<void> }) {
+function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (faq: CmsFaq) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -759,7 +759,7 @@ function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (fa
   );
 }
 
-function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimonial; onSave: (testimonial: CmsTestimonial) => Promise<void>; onDelete: () => Promise<void> }) {
+function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimonial; onSave: (testimonial: CmsTestimonial) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -790,7 +790,7 @@ function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimon
   );
 }
 
-function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onSave: (member: CmsTeamMember) => Promise<void>; onDelete: () => Promise<void> }) {
+function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onSave: (member: CmsTeamMember) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -846,7 +846,7 @@ async function uploadToCloudinary(file: File) {
   return response.json();
 }
 
-function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; onSave: (asset: CmsMediaAsset) => Promise<void>; onDelete: () => Promise<void> }) {
+function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; onSave: (asset: CmsMediaAsset) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   const [uploading, setUploading] = useState(false);
   useEffect(() => setDraft(value), [value]);
@@ -913,7 +913,7 @@ function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; on
   );
 }
 
-function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnouncement; onSave: (announcement: CmsAnnouncement) => Promise<void>; onDelete: () => Promise<void> }) {
+function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnouncement; onSave: (announcement: CmsAnnouncement) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -1018,7 +1018,7 @@ function SocialEditor({ value, onChange }: { value: CmsSocialLink[]; onChange: (
   );
 }
 
-function SiteSettingsEditor({ value, onSave }: { value: CmsSiteSettings; onSave: (settings: CmsSiteSettings) => Promise<void> }) {
+function SiteSettingsEditor({ value, onSave }: { value: CmsSiteSettings; onSave: (settings: CmsSiteSettings) => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 

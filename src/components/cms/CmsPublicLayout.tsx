@@ -21,7 +21,7 @@ function isExternalNavigationItem(item: Pick<CmsNavigationItem, "type" | "href">
 }
 
 function buildNavigationItems(settings: CmsSiteSettings, pages: CmsPage[]) {
-  const publishedPages = pages
+  const publishedPages: CmsNavigationItem[] = pages
     .filter((page) => page.status === "published" && page.showInNavigation)
     .sort((left, right) => left.sortOrder - right.sortOrder)
     .map((page) => ({

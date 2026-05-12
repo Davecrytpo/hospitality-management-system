@@ -6,6 +6,7 @@ import { getCmsIcon } from "@/features/cms/icons";
 import type {
   CmsBlogPost,
   CmsFaq,
+  CmsItem,
   CmsPage,
   CmsSection,
   CmsService,
@@ -14,6 +15,8 @@ import type {
   CmsTestimonial,
 } from "@/features/cms/types";
 import { cn } from "@/lib/utils";
+
+type ResolvedCmsItem = CmsItem;
 
 interface CmsSectionRendererProps {
   section: CmsSection;
@@ -80,7 +83,7 @@ function resolveItems({
     case "services": {
       const visibleServices = page?.slug === "home" || page?.pageType === "home" ? services.filter((service) => service.featuredOnHome) : services;
 
-      return visibleServices.map((service) => ({
+      return visibleServices.map((service): ResolvedCmsItem => ({
         id: service.id,
         title: service.title,
         subtitle: service.categoryLabel,
@@ -91,13 +94,13 @@ function resolveItems({
       }));
     }
     case "faqs":
-      return faqs.map((faq) => ({
+      return faqs.map((faq): ResolvedCmsItem => ({
         id: faq.id,
         title: faq.question,
         description: faq.answer,
       }));
     case "testimonials":
-      return testimonials.map((testimonial) => ({
+      return testimonials.map((testimonial): ResolvedCmsItem => ({
         id: testimonial.id,
         title: testimonial.name,
         subtitle: testimonial.role,
@@ -106,7 +109,7 @@ function resolveItems({
         value: `${testimonial.rating}/5`,
       }));
     case "team":
-      return teamMembers.map((member) => ({
+      return teamMembers.map((member): ResolvedCmsItem => ({
         id: member.id,
         title: member.name,
         subtitle: member.role,
@@ -115,7 +118,7 @@ function resolveItems({
         metadata: [member.specialty ?? "", member.email ?? "", member.phone ?? ""].filter(Boolean),
       }));
     case "blog-posts":
-      return posts.map((post) => ({
+      return posts.map((post): ResolvedCmsItem => ({
         id: post.id,
         title: post.title,
         subtitle: `${post.category} - ${post.authorName}`,
