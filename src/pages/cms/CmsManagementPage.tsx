@@ -503,8 +503,8 @@ function DocumentCard({
   title: string;
   children: React.ReactNode;
   badge?: string;
-  onSave: () => Promise<void>;
-  onDelete?: () => Promise<void>;
+  onSave: () => Promise<unknown>;
+  onDelete?: () => Promise<unknown>;
 }) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -565,7 +565,7 @@ function DocumentCard({
   );
 }
 
-function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (page: CmsPage) => Promise<void>; onDelete: () => Promise<void> }) {
+function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (page: CmsPage) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
