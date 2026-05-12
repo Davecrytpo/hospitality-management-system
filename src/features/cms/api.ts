@@ -75,7 +75,7 @@ async function fetchSingleton<T>(table: CmsTableName, id: string, fallback: T): 
     if (isRecoverableCmsError(error)) return cloneCmsValue(fallback);
     throw error;
   }
-  return data?.content ? cloneCmsValue(data.content as T) : cloneCmsValue(fallback);
+  return data?.content && Object.keys(data.content as Record<string, unknown>).length > 0 ? cloneCmsValue(data.content as T) : cloneCmsValue(fallback);
 }
 
 async function fetchCollection<T extends { status?: string; sortOrder?: number }>(
@@ -114,7 +114,16 @@ async function fetchCollection<T extends { status?: string; sortOrder?: number }
     throw error;
   }
 
-  const content = (data ?? []).map((row: CmsDocumentRow<T>) => row.content);
+  if (!data || data.length === 0) {
+    let results = cloneCmsValue(fallback);
+    if (!options?.includeDrafts) results = publishedOnly(results);
+    if (options?.filter?.page_slug) results = results.filter((item: any) => item.pageSlug === options.filter?.page_slug);
+    if (options?.filter?.service_slug) results = results.filter((item: any) => item.serviceSlug === options.filter?.service_slug);
+    if (options?.singleSlug) results = results.filter((item: any) => item.slug === options.singleSlug);
+    return sortByOrder(results);
+  }
+
+  const content = data.map((row: CmsDocumentRow<T>) => row.content);
   return sortByOrder(content);
 }
 
