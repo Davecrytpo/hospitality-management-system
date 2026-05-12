@@ -65,11 +65,11 @@ function sortByOrder<T extends { sortOrder?: number }>(items: T[]) {
   return [...items].sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0));
 }
 
-function collectionFallback<K extends keyof CmsSeedBundle>(key: K) {
+function collectionFallback<K extends keyof CmsSeedBundle>(key: K): CmsSeedBundle[K] {
   return cloneCmsValue(cmsDefaults[key]);
 }
 
-async function fetchSingleton<T>(table: CmsTableName, id: string, fallback: T) {
+async function fetchSingleton<T>(table: CmsTableName, id: string, fallback: T): Promise<T> {
   const { data, error } = await cmsTable<T>(table).select("content").eq("id", id).maybeSingle();
   if (error) {
     if (isRecoverableCmsError(error)) return cloneCmsValue(fallback);
@@ -82,7 +82,7 @@ async function fetchCollection<T extends { status?: string; sortOrder?: number }
   table: CmsTableName,
   fallback: T[],
   options?: { filter?: Record<string, string | undefined>; includeDrafts?: boolean; singleSlug?: string },
-) {
+): Promise<T[]> {
   let query = cmsTable<CmsDocumentRow<T>>(table).select("content").order("sort_order", { ascending: true });
 
   if (options?.singleSlug) {
@@ -131,33 +131,33 @@ function collectionRow<T extends { id: string; status?: string; sortOrder?: numb
   };
 }
 
-export async function fetchCmsSiteSettings() {
+export async function fetchCmsSiteSettings(): Promise<CmsSiteSettings> {
   return fetchSingleton<CmsSiteSettings>("cms_site_settings", "default", cmsDefaults.settings);
 }
 
-export async function fetchCmsPages(includeDrafts = false) {
+export async function fetchCmsPages(includeDrafts = false): Promise<CmsPage[]> {
   return fetchCollection<CmsPage>("cms_pages", collectionFallback("pages"), { includeDrafts });
 }
 
-export async function fetchCmsPageBySlug(slug: string) {
+export async function fetchCmsPageBySlug(slug: string): Promise<CmsPage | null> {
   const pages = await fetchCollection<CmsPage>("cms_pages", collectionFallback("pages"), { singleSlug: slug });
   return pages[0] ?? null;
 }
 
-export async function fetchCmsServices(includeDrafts = false) {
+export async function fetchCmsServices(includeDrafts = false): Promise<CmsService[]> {
   return fetchCollection<CmsService>("cms_services", collectionFallback("services"), { includeDrafts });
 }
 
-export async function fetchCmsServiceBySlug(slug: string) {
+export async function fetchCmsServiceBySlug(slug: string): Promise<CmsService | null> {
   const services = await fetchCollection<CmsService>("cms_services", collectionFallback("services"), { singleSlug: slug });
   return services[0] ?? null;
 }
 
-export async function fetchCmsBlogPosts(includeDrafts = false) {
+export async function fetchCmsBlogPosts(includeDrafts = false): Promise<CmsBlogPost[]> {
   return fetchCollection<CmsBlogPost>("cms_blog_posts", collectionFallback("posts"), { includeDrafts });
 }
 
-export async function fetchCmsBlogPostBySlug(slug: string) {
+export async function fetchCmsBlogPostBySlug(slug: string): Promise<CmsBlogPost | null> {
   const posts = await fetchCollection<CmsBlogPost>("cms_blog_posts", collectionFallback("posts"), { singleSlug: slug });
   return posts[0] ?? null;
 }
