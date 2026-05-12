@@ -6,6 +6,7 @@ import logo from "@/assets/logo-ontime.png";
 import { AppointmentRequestDialog } from "@/components/landing/AppointmentRequestDialog";
 import { Button } from "@/components/ui/button";
 import { serviceNavItems } from "@/data/servicePageContent";
+import { cmsDefaults } from "@/features/cms/defaults";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -180,7 +181,7 @@ export function PublicSiteHeader() {
           </div>
         )}
       </header>
-      <AppointmentRequestDialog open={appointmentOpen} onOpenChange={setAppointmentOpen} />
+      <AppointmentRequestDialog open={appointmentOpen} onOpenChange={setAppointmentOpen} services={cmsDefaults.services} settings={cmsDefaults.settings} />
     </>
   );
 }
