@@ -614,7 +614,7 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
   );
 }
 
-function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<void>; onDelete: () => Promise<void> }) {
+function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -670,7 +670,7 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
   );
 }
 
-function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSave: (post: CmsBlogPost) => Promise<void>; onDelete: () => Promise<void> }) {
+function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSave: (post: CmsBlogPost) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -703,7 +703,7 @@ function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSav
   );
 }
 
-function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument; onSave: (document: CmsLegalDocument) => Promise<void>; onDelete: () => Promise<void> }) {
+function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument; onSave: (document: CmsLegalDocument) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
