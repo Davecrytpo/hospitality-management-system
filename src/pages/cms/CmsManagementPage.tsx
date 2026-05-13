@@ -1166,6 +1166,7 @@ export default function CmsManagementPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Website CMS</h1>
             <p className="text-muted-foreground">Manage pages, services, FAQs, testimonials, blog posts, legal pages, media, navigation, branding, and SEO.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Set an item to <span className="font-semibold text-foreground">published</span> and click <span className="font-semibold text-foreground">Save</span> to make it live. Draft items stay hidden from the public website.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button

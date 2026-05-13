@@ -17,6 +17,21 @@ export function cloneCmsValue<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
 
+export function normalizeCmsSlug(value: string) {
+  return value
+    .trim()
+    .replace(/^\/+|\/+$/g, "")
+    .split("/")
+    .map((segment) =>
+      segment
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, ""),
+    )
+    .filter(Boolean)
+    .join("/");
+}
+
 export function createEmptyImage(): CmsImage {
   return { url: "", alt: "" };
 }

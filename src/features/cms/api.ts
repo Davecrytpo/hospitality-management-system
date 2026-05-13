@@ -23,7 +23,7 @@ import type {
   CmsTeamMember,
   CmsTestimonial,
 } from "./types";
-import { cloneCmsValue } from "./utils";
+import { cloneCmsValue, normalizeCmsSlug } from "./utils";
 
 type CmsTableName =
   | "cms_site_settings"
@@ -188,6 +188,10 @@ function collectionRow<T extends { id: string; status?: string; sortOrder?: numb
   };
 }
 
+function resolveDocumentSlug(rawSlug: string | undefined, fallbackTitle: string, fallbackId: string) {
+  return normalizeCmsSlug(rawSlug ?? "") || normalizeCmsSlug(fallbackTitle) || fallbackId;
+}
+
 export async function fetchCmsSiteSettings(): Promise<CmsSiteSettings> {
   return fetchSingleton<CmsSiteSettings>("cms_site_settings", "default", cmsDefaults.settings, normalizeCmsSiteSettings);
 }
@@ -277,41 +281,65 @@ export async function saveCmsSiteSettings(content: CmsSiteSettings) {
 }
 
 export async function saveCmsPage(page: CmsPage) {
-  const normalizedPage = normalizeCmsPage(page);
+  const normalizedSlug = resolveDocumentSlug(page.slug, page.title, page.id);
+  const normalizedPage = normalizeCmsPage({
+    ...page,
+    slug: normalizedSlug,
+    seo: {
+      ...page.seo,
+      slug: normalizedSlug,
+    },
+  });
   const { error } = await cmsTable("cms_pages").upsert(
     {
       ...collectionRow(normalizedPage, { slug: normalizedPage.slug, page_type: normalizedPage.pageType }),
       slug: normalizedPage.slug,
       page_type: normalizedPage.pageType,
     },
-    { onConflict: "slug" },
+    { onConflict: "id" },
   );
   if (error) throw error;
   return normalizedPage;
 }
 
 export async function saveCmsService(service: CmsService) {
-  const normalizedService = normalizeCmsService(service);
+  const normalizedSlug = resolveDocumentSlug(service.slug, service.title, service.id);
+  const normalizedService = normalizeCmsService({
+    ...service,
+    slug: normalizedSlug,
+    seo: {
+      ...service.seo,
+      slug: normalizedSlug,
+    },
+  });
   const { error } = await cmsTable("cms_services").upsert(
     {
       ...collectionRow(normalizedService, { slug: normalizedService.slug }),
       slug: normalizedService.slug,
     },
-    { onConflict: "slug" },
+    { onConflict: "id" },
   );
   if (error) throw error;
   return normalizedService;
 }
 
 export async function saveCmsBlogPost(post: CmsBlogPost) {
-  const normalizedPost = normalizeCmsBlogPost(post);
+  const normalizedSlug = resolveDocumentSlug(post.slug, post.title, post.id);
+  const normalizedPost = normalizeCmsBlogPost({
+    ...post,
+    slug: normalizedSlug,
+    seo: {
+      ...post.seo,
+      slug: normalizedSlug,
+    },
+  });
   const { error } = await cmsTable("cms_blog_posts").upsert(
     {
       ...collectionRow(normalizedPost, { slug: normalizedPost.slug, published_at: normalizedPost.publishedAt }),
       slug: normalizedPost.slug,
       published_at: normalizedPost.publishedAt,
     },
-    { onConflict: "slug" },
+    { onConflict: "id" },
   );
   if (error) throw error;
   return normalizedPost;
@@ -358,13 +386,21 @@ export async function saveCmsTeamMember(member: CmsTeamMember) {
 }
 
 export async function saveCmsLegalDocument(document: CmsLegalDocument) {
-  const normalizedDocument = normalizeCmsLegalDocument(document);
+  const normalizedSlug = resolveDocumentSlug(document.slug, document.title, document.id);
+  const normalizedDocument = normalizeCmsLegalDocument({
+    ...document,
+    slug: normalizedSlug,
+    seo: {
+      ...document.seo,
+      slug: normalizedSlug,
+    },
+  });
   const { error } = await cmsTable("cms_legal_documents").upsert(
     {
       ...collectionRow(normalizedDocument, { slug: normalizedDocument.slug }),
       slug: normalizedDocument.slug,
     },
-    { onConflict: "slug" },
+    { onConflict: "id" },
   );
   if (error) throw error;
   return normalizedDocument;
