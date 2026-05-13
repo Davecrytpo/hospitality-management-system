@@ -39,9 +39,10 @@ export function createEmptyImage(): CmsImage {
 export function createEmptyButton(): CmsButton {
   return {
     id: createCmsId("button"),
-    label: "Learn More",
-    href: "/",
+    label: "",
+    href: "",
     variant: "primary",
+    newTab: false,
   };
 }
 

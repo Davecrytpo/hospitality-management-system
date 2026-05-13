@@ -266,6 +266,68 @@ interface CmsMediaLibraryContextValue {
 
 const CmsMediaLibraryContext = createContext<CmsMediaLibraryContextValue | null>(null);
 
+interface CmsPresetOption {
+  label: string;
+  value: string;
+}
+
+interface CmsEditorAssistContextValue {
+  linkOptions: CmsPresetOption[];
+  buttonLabelOptions: CmsPresetOption[];
+  navigationLabelOptions: CmsPresetOption[];
+  socialLabelOptions: CmsPresetOption[];
+}
+
+const CmsEditorAssistContext = createContext<CmsEditorAssistContextValue | null>(null);
+
+const presetSelectSentinels = {
+  empty: "__empty__",
+  custom: "__custom__",
+} as const;
+
+const buttonLabelPresetOptions: CmsPresetOption[] = [
+  { label: "Book Appointment", value: "Book Appointment" },
+  { label: "Schedule Visit", value: "Schedule Visit" },
+  { label: "Contact Us", value: "Contact Us" },
+  { label: "Learn More", value: "Learn More" },
+  { label: "Explore Services", value: "Explore Services" },
+  { label: "Read More", value: "Read More" },
+  { label: "View Details", value: "View Details" },
+  { label: "Get Started", value: "Get Started" },
+  { label: "Call Now", value: "Call Now" },
+];
+
+const navigationLabelPresetOptions: CmsPresetOption[] = [
+  { label: "Home", value: "Home" },
+  { label: "About Us", value: "About Us" },
+  { label: "Services", value: "Services" },
+  { label: "Contact", value: "Contact" },
+  { label: "FAQs", value: "FAQs" },
+  { label: "Blog", value: "Blog" },
+  { label: "Patient Portal", value: "Patient Portal" },
+  { label: "Book Appointment", value: "Book Appointment" },
+];
+
+const socialLabelPresetOptions: CmsPresetOption[] = [
+  { label: "Facebook", value: "Facebook" },
+  { label: "Instagram", value: "Instagram" },
+  { label: "LinkedIn", value: "LinkedIn" },
+  { label: "X / Twitter", value: "X / Twitter" },
+  { label: "YouTube", value: "YouTube" },
+  { label: "TikTok", value: "TikTok" },
+];
+
+const defaultLinkPresetOptions: CmsPresetOption[] = [
+  { label: "Homepage (/)", value: "/" },
+  { label: "About Us (/about-us)", value: "/about-us" },
+  { label: "Services (/services)", value: "/services" },
+  { label: "Contact (/contact)", value: "/contact" },
+  { label: "FAQs (/faq)", value: "/faq" },
+  { label: "Blog (/blog)", value: "/blog" },
+  { label: "Patient Portal (/patient-portal/login)", value: "/patient-portal/login" },
+  { label: "Admin Login (/auth)", value: "/auth" },
+];
+
 const corePageSlugs = ["home", "about-us", "services", "contact", "faq", "blog"];
 const collectionOrder: CmsCollectionKey[] = ["overview", "settings", "pages", "services", "blog", "faqs", "testimonials", "team", "legal", "media", "announcements"];
 const scopeOptions: Array<{ key: CmsScopeKey; label: string }> = [
@@ -387,6 +449,96 @@ function matchesScope(status: CmsStatus, scope: CmsScopeKey) {
   return status === "draft";
 }
 
+function getPagePublicHref(slug: string) {
+  return slug === "home" ? "/" : `/${slug}`;
+}
+
+function getPolicyPublicHref(slug: string) {
+  return `/policies/${slug}`;
+}
+
+function formatSlugLabel(slug: string) {
+  const normalized = slug === "home" ? "home" : slug.replace(/^\/+|\/+$/g, "");
+  return normalized
+    .split("/")
+    .filter(Boolean)
+    .map((segment) =>
+      segment
+        .split("-")
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" "),
+    )
+    .join(" / ");
+}
+
+function dedupePresetOptions(options: CmsPresetOption[]) {
+  const seen = new Set<string>();
+  return options.filter((option) => {
+    if (seen.has(option.value)) return false;
+    seen.add(option.value);
+    return true;
+  });
+}
+
+function buildCmsLinkOptions({
+  pages,
+  services,
+  legalDocuments,
+  settings,
+}: {
+  pages: CmsPage[];
+  services: CmsService[];
+  legalDocuments: CmsLegalDocument[];
+  settings?: CmsSiteSettings;
+}) {
+  const dynamicOptions: CmsPresetOption[] = [
+    ...defaultLinkPresetOptions,
+    ...pages
+      .filter((page) => page.status === "published")
+      .sort((left, right) => left.sortOrder - right.sortOrder)
+      .map((page) => {
+        const href = getPagePublicHref(page.slug);
+        return {
+          label: `Page: ${page.navigationLabel || page.title || formatSlugLabel(page.slug)} (${href})`,
+          value: href,
+        };
+      }),
+    ...services
+      .filter((service) => service.status === "published")
+      .sort((left, right) => left.sortOrder - right.sortOrder)
+      .map((service) => ({
+        label: `Service: ${service.title} (/services/${service.slug})`,
+        value: `/services/${service.slug}`,
+      })),
+    ...legalDocuments
+      .filter((document) => document.status === "published")
+      .sort((left, right) => left.sortOrder - right.sortOrder)
+      .map((document) => ({
+        label: `Policy: ${document.title} (${getPolicyPublicHref(document.slug)})`,
+        value: getPolicyPublicHref(document.slug),
+      })),
+  ];
+
+  const phone = settings?.contact.phone;
+  if (phone) {
+    dynamicOptions.push({
+      label: `Call Clinic (tel:${phone})`,
+      value: `tel:${phone}`,
+    });
+  }
+
+  const email = settings?.contact.email;
+  if (email) {
+    dynamicOptions.push({
+      label: `Email Clinic (mailto:${email})`,
+      value: `mailto:${email}`,
+    });
+  }
+
+  return dedupePresetOptions(dynamicOptions);
+}
+
 function getStatusLabel(status: CmsStatus) {
   switch (status) {
     case "published":
@@ -402,8 +554,64 @@ function useCmsMediaLibrary() {
   return useContext(CmsMediaLibraryContext);
 }
 
+function useCmsEditorAssist() {
+  return (
+    useContext(CmsEditorAssistContext) ?? {
+      linkOptions: defaultLinkPresetOptions,
+      buttonLabelOptions: buttonLabelPresetOptions,
+      navigationLabelOptions: navigationLabelPresetOptions,
+      socialLabelOptions: socialLabelPresetOptions,
+    }
+  );
+}
+
+function getPresetSelectValue(value: string | undefined, options: CmsPresetOption[]) {
+  if (!value) return presetSelectSentinels.empty;
+  return options.some((option) => option.value === value) ? value : presetSelectSentinels.custom;
+}
+
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{children}</Label>;
+}
+
+function PresetSelect({
+  label,
+  value,
+  options,
+  placeholder,
+  onValueChange,
+}: {
+  label: string;
+  value: string | undefined;
+  options: CmsPresetOption[];
+  placeholder: string;
+  onValueChange: (next: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <FieldLabel>{label}</FieldLabel>
+      <Select
+        value={getPresetSelectValue(value, options)}
+        onValueChange={(next) => {
+          if (next === presetSelectSentinels.custom) return;
+          onValueChange(next === presetSelectSentinels.empty ? "" : next);
+        }}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={presetSelectSentinels.empty}>No preset selected</SelectItem>
+          <SelectItem value={presetSelectSentinels.custom}>Keep manual value</SelectItem>
+          {options.map((option) => (
+            <SelectItem key={`${label}-${option.value}`} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 }
 
 function StatusSelectItems() {
@@ -584,14 +792,16 @@ function ImageFields({ label, value, onChange }: { label: string; value?: CmsIma
 }
 
 function ButtonsEditor({ value, onChange }: { value: CmsButton[]; onChange: (next: CmsButton[]) => void }) {
+  const { buttonLabelOptions, linkOptions } = useCmsEditorAssist();
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <FieldLabel>Buttons</FieldLabel>
-          <p className="text-sm text-muted-foreground">Add call-to-action buttons for this section. You can set label, link style, and whether the link opens in a new tab.</p>
+          <p className="text-sm text-muted-foreground">Add call-to-action buttons for this section. Use quick presets for common labels and links, then fine-tune anything manually below.</p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptyButton()])}>
+        <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => onChange([...value, createEmptyButton()])}>
           <Plus className="mr-2 h-4 w-4" />
           Add Button
         </Button>
@@ -616,22 +826,46 @@ function ButtonsEditor({ value, onChange }: { value: CmsButton[]; onChange: (nex
                 </Button>
               </div>
             </div>
-            <div className="grid gap-3 lg:grid-cols-2">
-              <Input value={entry.label} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, label: event.target.value } : button)))} placeholder="Button label" />
-              <Input value={entry.href} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, href: event.target.value } : button)))} placeholder="/contact, tel:+123..., or https://..." />
+            <div className="grid gap-4 xl:grid-cols-2">
+              <PresetSelect
+                label="Quick label"
+                value={entry.label}
+                options={buttonLabelOptions}
+                placeholder="Choose a common button label"
+                onValueChange={(next) => onChange(value.map((button) => (button.id === entry.id ? { ...button, label: next } : button)))}
+              />
+              <div className="space-y-2">
+                <FieldLabel>Button Label</FieldLabel>
+                <Input value={entry.label} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, label: event.target.value } : button)))} placeholder="Example: Book Appointment" />
+              </div>
+              <PresetSelect
+                label="Quick link"
+                value={entry.href}
+                options={linkOptions}
+                placeholder="Choose a website page, service, or contact action"
+                onValueChange={(next) => onChange(value.map((button) => (button.id === entry.id ? { ...button, href: next } : button)))}
+              />
+              <div className="space-y-2">
+                <FieldLabel>Button Link</FieldLabel>
+                <Input value={entry.href} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, href: event.target.value } : button)))} placeholder="/contact, tel:+123..., or https://..." />
+                <p className="text-xs text-muted-foreground">You can paste a custom website link, a phone link like tel:+234..., or an external link.</p>
+              </div>
             </div>
             <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
-              <Select value={entry.variant} onValueChange={(variant) => onChange(value.map((button) => (button.id === entry.id ? { ...button, variant: variant as CmsButton["variant"] } : button)))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="primary">Primary</SelectItem>
-                  <SelectItem value="secondary">Secondary</SelectItem>
-                  <SelectItem value="outline">Outline</SelectItem>
-                  <SelectItem value="ghost">Ghost</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <FieldLabel>Button Style</FieldLabel>
+                <Select value={entry.variant} onValueChange={(variant) => onChange(value.map((button) => (button.id === entry.id ? { ...button, variant: variant as CmsButton["variant"] } : button)))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="primary">Primary</SelectItem>
+                    <SelectItem value="secondary">Secondary</SelectItem>
+                    <SelectItem value="outline">Outline</SelectItem>
+                    <SelectItem value="ghost">Ghost</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex items-center justify-between rounded-lg border px-3 py-2">
                 <div>
                   <p className="text-sm font-medium text-foreground">Open in new tab</p>
@@ -1386,15 +1620,42 @@ function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; on
 
 function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnouncement; onSave: (announcement: CmsAnnouncement) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
+  const { buttonLabelOptions, linkOptions } = useCmsEditorAssist();
   useEffect(() => setDraft(value), [value]);
 
   return (
     <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
-      <div className="grid gap-3 lg:grid-cols-4">
-        <Input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} placeholder="Title" />
-        <Input value={draft.href ?? ""} onChange={(event) => setDraft({ ...draft, href: event.target.value })} placeholder="Link" />
-        <Input value={draft.buttonLabel ?? ""} onChange={(event) => setDraft({ ...draft, buttonLabel: event.target.value })} placeholder="Button label" />
-        <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="space-y-2">
+          <FieldLabel>Title</FieldLabel>
+          <Input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} placeholder="Announcement title" />
+        </div>
+        <div className="space-y-2">
+          <FieldLabel>Sort Order</FieldLabel>
+          <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
+        </div>
+        <PresetSelect
+          label="Quick button label"
+          value={draft.buttonLabel ?? ""}
+          options={buttonLabelOptions}
+          placeholder="Choose a common action label"
+          onValueChange={(next) => setDraft({ ...draft, buttonLabel: next })}
+        />
+        <div className="space-y-2">
+          <FieldLabel>Button Label</FieldLabel>
+          <Input value={draft.buttonLabel ?? ""} onChange={(event) => setDraft({ ...draft, buttonLabel: event.target.value })} placeholder="Example: Read More" />
+        </div>
+        <PresetSelect
+          label="Quick link"
+          value={draft.href ?? ""}
+          options={linkOptions}
+          placeholder="Choose a website page or contact action"
+          onValueChange={(next) => setDraft({ ...draft, href: next })}
+        />
+        <div className="space-y-2">
+          <FieldLabel>Announcement Link</FieldLabel>
+          <Input value={draft.href ?? ""} onChange={(event) => setDraft({ ...draft, href: event.target.value })} placeholder="/contact or https://..." />
+        </div>
       </div>
       <Select value={draft.status} onValueChange={(status) => setDraft({ ...draft, status: status as CmsAnnouncement["status"] })}>
         <SelectTrigger>
@@ -1410,41 +1671,80 @@ function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnounc
 }
 
 function NavigationEditor({ value, onChange }: { value: CmsNavigationItem[]; onChange: (next: CmsNavigationItem[]) => void }) {
+  const { navigationLabelOptions, linkOptions } = useCmsEditorAssist();
+
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <FieldLabel>Navigation Items</FieldLabel>
-        <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, { id: createCmsId("nav"), label: "New Nav Item", href: "/", type: "page" }])}>
+        <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => onChange([...value, { id: createCmsId("nav"), label: "", href: "", type: "page" }])}>
           <Plus className="mr-2 h-4 w-4" />
           Add Item
         </Button>
       </div>
       <div className="space-y-3">
         {value.map((entry, index) => (
-          <div key={entry.id} className="grid gap-3 rounded-lg border p-3 lg:grid-cols-[1fr_1fr_180px_auto]">
-            <Input value={entry.label} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, label: event.target.value } : itemValue)))} placeholder="Label" />
-            <Input value={entry.href} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, href: event.target.value } : itemValue)))} placeholder="Href" />
-            <Select value={entry.type} onValueChange={(type) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, type: type as CmsNavigationItem["type"] } : itemValue)))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="page">page</SelectItem>
-                <SelectItem value="external">external</SelectItem>
-                <SelectItem value="anchor">anchor</SelectItem>
-                <SelectItem value="services-menu">services-menu</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
-                <ArrowUp className="h-4 w-4" />
-              </Button>
-              <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
-                <ArrowDown className="h-4 w-4" />
-              </Button>
-              <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((itemValue) => itemValue.id !== entry.id))}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
+          <div key={entry.id} className="space-y-4 rounded-xl border bg-card/50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Badge variant="secondary">Item {index + 1}</Badge>
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((itemValue) => itemValue.id !== entry.id))}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-4 xl:grid-cols-2">
+              <PresetSelect
+                label="Quick label"
+                value={entry.label}
+                options={navigationLabelOptions}
+                placeholder="Choose a common navigation label"
+                onValueChange={(next) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, label: next } : itemValue)))}
+              />
+              <div className="space-y-2">
+                <FieldLabel>Navigation Label</FieldLabel>
+                <Input value={entry.label} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, label: event.target.value } : itemValue)))} placeholder="Example: About Us" />
+              </div>
+              <PresetSelect
+                label="Quick link"
+                value={entry.href}
+                options={linkOptions}
+                placeholder="Choose a page, service, or contact action"
+                onValueChange={(next) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, href: next } : itemValue)))}
+              />
+              <div className="space-y-2">
+                <FieldLabel>Navigation Link</FieldLabel>
+                <Input
+                  value={entry.href}
+                  onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, href: event.target.value } : itemValue)))}
+                  placeholder={entry.type === "anchor" ? "#section-id" : entry.type === "external" ? "https://example.com" : entry.type === "services-menu" ? "Optional for services menu" : "/contact"}
+                />
+              </div>
+            </div>
+            <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
+              <div className="space-y-2">
+                <FieldLabel>Item Type</FieldLabel>
+                <Select value={entry.type} onValueChange={(type) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, type: type as CmsNavigationItem["type"] } : itemValue)))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="page">page</SelectItem>
+                    <SelectItem value="external">external</SelectItem>
+                    <SelectItem value="anchor">anchor</SelectItem>
+                    <SelectItem value="services-menu">services-menu</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="rounded-lg border px-3 py-2 text-xs text-muted-foreground">
+                Use <span className="font-medium text-foreground">page</span> for normal internal links, <span className="font-medium text-foreground">external</span> for outside websites, <span className="font-medium text-foreground">anchor</span> for in-page jumps like <span className="font-medium text-foreground">#faq</span>, and <span className="font-medium text-foreground">services-menu</span> for the services dropdown trigger.
+              </div>
             </div>
           </div>
         ))}
@@ -1454,34 +1754,57 @@ function NavigationEditor({ value, onChange }: { value: CmsNavigationItem[]; onC
 }
 
 function SocialEditor({ value, onChange }: { value: CmsSocialLink[]; onChange: (next: CmsSocialLink[]) => void }) {
+  const { socialLabelOptions } = useCmsEditorAssist();
+
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <FieldLabel>Social Links</FieldLabel>
-        <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, { id: createCmsId("social"), label: "New Social Link", href: "", icon: "globe" }])}>
+        <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => onChange([...value, { id: createCmsId("social"), label: "", href: "", icon: "globe" }])}>
           <Plus className="mr-2 h-4 w-4" />
           Add Link
         </Button>
       </div>
-      {value.map((entry) => (
-        <div key={entry.id} className="grid gap-3 rounded-lg border p-3 lg:grid-cols-[1fr_1fr_180px_auto]">
-          <Input value={entry.label} onChange={(event) => onChange(value.map((link) => (link.id === entry.id ? { ...link, label: event.target.value } : link)))} placeholder="Label" />
-          <Input value={entry.href} onChange={(event) => onChange(value.map((link) => (link.id === entry.id ? { ...link, href: event.target.value } : link)))} placeholder="https://..." />
-          <Select value={entry.icon} onValueChange={(icon) => onChange(value.map((link) => (link.id === entry.id ? { ...link, icon: icon as CmsSocialLink["icon"] } : link)))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {cmsIconOptions.map((icon) => (
-                <SelectItem key={icon} value={icon}>
-                  {icon}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((link) => link.id !== entry.id))}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
+      {value.map((entry, index) => (
+        <div key={entry.id} className="space-y-4 rounded-xl border bg-card/50 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <Badge variant="secondary">Social Link {index + 1}</Badge>
+            <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((link) => link.id !== entry.id))}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="grid gap-4 xl:grid-cols-2">
+            <PresetSelect
+              label="Quick label"
+              value={entry.label}
+              options={socialLabelOptions}
+              placeholder="Choose a social platform"
+              onValueChange={(next) => onChange(value.map((link) => (link.id === entry.id ? { ...link, label: next } : link)))}
+            />
+            <div className="space-y-2">
+              <FieldLabel>Social Label</FieldLabel>
+              <Input value={entry.label} onChange={(event) => onChange(value.map((link) => (link.id === entry.id ? { ...link, label: event.target.value } : link)))} placeholder="Example: Instagram" />
+            </div>
+            <div className="space-y-2">
+              <FieldLabel>Social URL</FieldLabel>
+              <Input value={entry.href} onChange={(event) => onChange(value.map((link) => (link.id === entry.id ? { ...link, href: event.target.value } : link)))} placeholder="https://instagram.com/your-page" />
+            </div>
+            <div className="space-y-2">
+              <FieldLabel>Icon</FieldLabel>
+              <Select value={entry.icon} onValueChange={(icon) => onChange(value.map((link) => (link.id === entry.id ? { ...link, icon: icon as CmsSocialLink["icon"] } : link)))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {cmsIconOptions.map((icon) => (
+                    <SelectItem key={icon} value={icon}>
+                      {icon}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       ))}
     </div>
@@ -1500,6 +1823,7 @@ function SiteSettingsEditor({
   onOpenPanel: (panel: CmsSettingsPanelKey) => void;
 }) {
   const [draft, setDraft] = useState(value);
+  const { buttonLabelOptions, linkOptions } = useCmsEditorAssist();
   useEffect(() => setDraft(value), [value]);
 
   return (
@@ -1604,30 +1928,66 @@ function SiteSettingsEditor({
                 <FieldLabel>Announcement Bar</FieldLabel>
                 <Switch checked={draft.announcementBar.isVisible} onCheckedChange={(checked) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, isVisible: checked } })} />
               </div>
-              <div className="mt-3 grid gap-3 lg:grid-cols-3">
-                <Input value={draft.announcementBar.text} onChange={(event) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, text: event.target.value } })} placeholder="Announcement text" />
-                <Input value={draft.announcementBar.href ?? ""} onChange={(event) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, href: event.target.value } })} placeholder="Announcement link" />
-                <Input value={draft.announcementBar.buttonLabel ?? ""} onChange={(event) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, buttonLabel: event.target.value } })} placeholder="Announcement button label" />
+              <div className="mt-3 grid gap-4 xl:grid-cols-2">
+                <div className="space-y-2 xl:col-span-2">
+                  <FieldLabel>Announcement Text</FieldLabel>
+                  <Input value={draft.announcementBar.text} onChange={(event) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, text: event.target.value } })} placeholder="Announcement text" />
+                </div>
+                <PresetSelect
+                  label="Quick link"
+                  value={draft.announcementBar.href ?? ""}
+                  options={linkOptions}
+                  placeholder="Choose a page, service, or contact action"
+                  onValueChange={(next) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, href: next } })}
+                />
+                <div className="space-y-2">
+                  <FieldLabel>Announcement Link</FieldLabel>
+                  <Input value={draft.announcementBar.href ?? ""} onChange={(event) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, href: event.target.value } })} placeholder="/contact or https://..." />
+                </div>
+                <PresetSelect
+                  label="Quick button label"
+                  value={draft.announcementBar.buttonLabel ?? ""}
+                  options={buttonLabelOptions}
+                  placeholder="Choose a common action label"
+                  onValueChange={(next) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, buttonLabel: next } })}
+                />
+                <div className="space-y-2">
+                  <FieldLabel>Button Label</FieldLabel>
+                  <Input value={draft.announcementBar.buttonLabel ?? ""} onChange={(event) => setDraft({ ...draft, announcementBar: { ...draft.announcementBar, buttonLabel: event.target.value } })} placeholder="Announcement button label" />
+                </div>
               </div>
             </div>
           </WorkspacePanel>
         </TabsContent>
 
         <TabsContent value="appointments" className="space-y-5">
-          <WorkspacePanel title="Appointment Settings" description="Manage the appointment warning text and the available patient workflow options.">
-            <Textarea value={draft.appointmentSettings.warningText} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, warningText: event.target.value } })} rows={3} placeholder="Appointment warning text" />
+          <WorkspacePanel title="Appointment Settings" description="Manage the patient workflow options and the message shown before patients submit an appointment request.">
+            <div className="space-y-2">
+              <FieldLabel>Warning Text</FieldLabel>
+              <Textarea value={draft.appointmentSettings.warningText} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, warningText: event.target.value } })} rows={3} placeholder="Appointment warning text" />
+            </div>
             <div className="grid gap-3 lg:grid-cols-3">
-              <Textarea value={draft.appointmentSettings.patientStatuses.join("\n")} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, patientStatuses: event.target.value.split("\n").map((line) => line.trim()).filter(Boolean) } })} rows={3} placeholder="Patient statuses" />
-              <Textarea value={draft.appointmentSettings.visitTypes.join("\n")} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, visitTypes: event.target.value.split("\n").map((line) => line.trim()).filter(Boolean) } })} rows={3} placeholder="Visit types" />
-              <Textarea value={draft.appointmentSettings.locations.join("\n")} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, locations: event.target.value.split("\n").map((line) => line.trim()).filter(Boolean) } })} rows={3} placeholder="Locations" />
+              <div className="space-y-2">
+                <FieldLabel>Patient Statuses</FieldLabel>
+                <Textarea value={draft.appointmentSettings.patientStatuses.join("\n")} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, patientStatuses: event.target.value.split("\n").map((line) => line.trim()).filter(Boolean) } })} rows={4} placeholder="One status per line" />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Visit Types</FieldLabel>
+                <Textarea value={draft.appointmentSettings.visitTypes.join("\n")} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, visitTypes: event.target.value.split("\n").map((line) => line.trim()).filter(Boolean) } })} rows={4} placeholder="One visit type per line" />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Locations</FieldLabel>
+                <Textarea value={draft.appointmentSettings.locations.join("\n")} onChange={(event) => setDraft({ ...draft, appointmentSettings: { ...draft.appointmentSettings, locations: event.target.value.split("\n").map((line) => line.trim()).filter(Boolean) } })} rows={4} placeholder="One location per line" />
+              </div>
             </div>
           </WorkspacePanel>
         </TabsContent>
 
         <TabsContent value="seo" className="space-y-5">
-          <WorkspacePanel title="Default SEO Settings" description="Manage the fallback metadata used when pages do not override their own SEO settings.">
-            <SeoEditor value={draft.defaultSeo} onChange={(next) => setDraft({ ...draft, defaultSeo: next })} />
-          </WorkspacePanel>
+          <SeoEditor
+            value={draft.defaultSeo}
+            onChange={(next) => setDraft({ ...draft, defaultSeo: next })}
+          />
         </TabsContent>
       </Tabs>
     </DocumentCard>
@@ -2462,6 +2822,15 @@ export default function CmsManagementPage() {
     ],
     [announcements, faqs, legalDocuments, mediaAssets, pages, posts, services, teamMembers, testimonials],
   );
+  const editorAssistValue = useMemo<CmsEditorAssistContextValue>(
+    () => ({
+      linkOptions: buildCmsLinkOptions({ pages, services, legalDocuments, settings }),
+      buttonLabelOptions: buttonLabelPresetOptions,
+      navigationLabelOptions: navigationLabelPresetOptions,
+      socialLabelOptions: socialLabelPresetOptions,
+    }),
+    [legalDocuments, pages, services, settings],
+  );
 
   const canSeedDefaults = contentHealth.every((entry) => entry.total === 0);
 
@@ -2786,38 +3155,40 @@ export default function CmsManagementPage() {
   }
 
   return (
-    <CmsMediaLibraryContext.Provider value={{ mediaAssets }}>
-      <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Content Management</h1>
-              <p className="text-muted-foreground">Manage website pages, service dashboards, branding, media, SEO, and website settings from dedicated enterprise workspaces.</p>
-            </div>
-            {canSeedDefaults && (
-              <div className="flex flex-wrap gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={async () => {
-                  try {
-                    await seedDefaults.mutateAsync(undefined as never);
-                    toast.success("CMS defaults seeded");
-                  } catch (error) {
-                    toast.error(error instanceof Error ? error.message : "Seed failed");
-                  }
-                }}
-              >
-                <RefreshCcw className="mr-2 h-4 w-4" />
-                Seed Website Content
-              </Button>
+    <CmsEditorAssistContext.Provider value={editorAssistValue}>
+      <CmsMediaLibraryContext.Provider value={{ mediaAssets }}>
+        <DashboardLayout>
+          <div className="space-y-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">Content Management</h1>
+                <p className="text-muted-foreground">Manage website pages, service dashboards, branding, media, SEO, and website settings from dedicated enterprise workspaces.</p>
               </div>
-            )}
-          </div>
+              {canSeedDefaults && (
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        await seedDefaults.mutateAsync(undefined as never);
+                        toast.success("CMS defaults seeded");
+                      } catch (error) {
+                        toast.error(error instanceof Error ? error.message : "Seed failed");
+                      }
+                    }}
+                  >
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    Seed Website Content
+                  </Button>
+                </div>
+              )}
+            </div>
 
-          <div className="space-y-6">{workspace}</div>
-        </div>
-      </DashboardLayout>
-    </CmsMediaLibraryContext.Provider>
+            <div className="space-y-6">{workspace}</div>
+          </div>
+        </DashboardLayout>
+      </CmsMediaLibraryContext.Provider>
+    </CmsEditorAssistContext.Provider>
   );
 }
