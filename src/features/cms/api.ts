@@ -103,7 +103,7 @@ function isRecoverableCmsError(error: unknown) {
 }
 
 function publishedOnly<T extends { status?: string }>(items: T[]) {
-  return items.filter((item) => item.status !== "draft");
+  return items.filter((item) => item.status === "published");
 }
 
 function sortByOrder<T extends { sortOrder?: number }>(items: T[]) {

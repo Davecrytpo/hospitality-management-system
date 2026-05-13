@@ -357,8 +357,7 @@ const App = () => (
             <Route path="/settings" element={<StaffRoute><SettingsPage /></StaffRoute>} />
             <Route path="/support" element={<StaffRoute><SupportPage /></StaffRoute>} />
             <Route path="/notice-board" element={<StaffRoute><InternalNoticeBoard /></StaffRoute>} />
-            <Route path="/cms" element={<CmsRoute><CmsManagementPage /></CmsRoute>} />
-            <Route path="/cms/:tab" element={<CmsRoute><CmsManagementPage /></CmsRoute>} />
+            <Route path="/cms/*" element={<CmsRoute><CmsManagementPage /></CmsRoute>} />
 
             {/* Patient Portal (protected) */}
             <Route path="/patient-portal" element={<PatientRoute><PatientDashboard /></PatientRoute>} />

@@ -1,4 +1,4 @@
-export type CmsStatus = "draft" | "published";
+export type CmsStatus = "draft" | "published" | "deleted";
 
 export type CmsSectionType =
   | "hero"

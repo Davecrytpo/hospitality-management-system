@@ -1,28 +1,43 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowDown,
   ArrowUp,
+  CheckCircle2,
+  ChevronRight,
   Copy,
+  Eye,
+  ExternalLink,
+  FileText,
   ImagePlus,
+  LayoutDashboard,
   Loader2,
+  Megaphone,
+  Newspaper,
   Plus,
   RefreshCcw,
   Save,
+  Settings2,
+  Shield,
+  Stethoscope,
   Trash2,
+  Undo2,
+  Users,
+  type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { cmsDefaults } from "@/features/cms/defaults";
 import { cmsIconOptions } from "@/features/cms/icons";
 import {
   useCmsAnnouncements,
@@ -62,22 +77,18 @@ import type {
   CmsPage,
   CmsSection,
   CmsService,
+  CmsStatus,
   CmsSiteSettings,
   CmsSocialLink,
   CmsTeamMember,
   CmsTestimonial,
 } from "@/features/cms/types";
 import { cloneCmsValue, createCmsId, createEmptyButton, createEmptyImage, createEmptyItem, createEmptySection } from "@/features/cms/utils";
+import { cn } from "@/lib/utils";
 
 const sectionTypes: CmsSection["type"][] = ["hero", "richText", "featureGrid", "stats", "serviceList", "testimonialList", "faqList", "cta", "teamGrid", "gallery", "timeline", "blogFeed", "contactCards"];
 const sectionThemes: CmsSection["theme"][] = ["light", "muted", "primary", "accent"];
 const dataSources: CmsSection["dataSource"][] = ["manual", "services", "testimonials", "faqs", "team", "blog-posts"];
-const cmsTabValues = ["settings", "pages", "services", "blog", "faqs", "testimonials", "team", "legal", "media", "announcements"] as const;
-type CmsTabValue = (typeof cmsTabValues)[number];
-
-function isCmsTabValue(value: string | null | undefined): value is CmsTabValue {
-  return value ? cmsTabValues.includes(value as CmsTabValue) : false;
-}
 
 function moveItem<T>(items: T[], index: number, direction: -1 | 1) {
   const nextIndex = index + direction;
@@ -221,20 +232,302 @@ function createBlankAnnouncement(): CmsAnnouncement {
   };
 }
 
+type CmsCollectionKey =
+  | "overview"
+  | "settings"
+  | "pages"
+  | "services"
+  | "blog"
+  | "faqs"
+  | "testimonials"
+  | "team"
+  | "legal"
+  | "media"
+  | "announcements";
+
+type CmsScopeKey = "live" | "drafts" | "deleted" | "all";
+
+interface CmsWorkspaceRecord<T extends { id: string; status: CmsStatus }> {
+  key: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  status: CmsStatus;
+  item: T;
+  chips?: string[];
+}
+
+interface CmsMediaLibraryContextValue {
+  mediaAssets: CmsMediaAsset[];
+}
+
+const CmsMediaLibraryContext = createContext<CmsMediaLibraryContextValue | null>(null);
+
+const corePageSlugs = ["home", "about-us", "services", "contact", "faq", "blog"];
+const collectionOrder: CmsCollectionKey[] = ["overview", "settings", "pages", "services", "blog", "faqs", "testimonials", "team", "legal", "media", "announcements"];
+const scopeOptions: Array<{ key: CmsScopeKey; label: string }> = [
+  { key: "live", label: "Live" },
+  { key: "drafts", label: "Drafts" },
+  { key: "deleted", label: "Deleted" },
+  { key: "all", label: "All" },
+];
+const collectionMeta: Record<Exclude<CmsCollectionKey, "overview">, { label: string; singularLabel: string; description: string; icon: LucideIcon; defaultScope?: CmsScopeKey }> = {
+  settings: {
+    label: "Settings",
+    singularLabel: "Setting",
+    description: "Branding, contact details, navigation, footer, SEO defaults, and booking labels.",
+    icon: Settings2,
+  },
+  pages: {
+    label: "Pages",
+    singularLabel: "Page",
+    description: "Homepage, About, Services page, Contact, FAQ, Blog landing, and standard pages.",
+    icon: FileText,
+    defaultScope: "live",
+  },
+  services: {
+    label: "Services",
+    singularLabel: "Service",
+    description: "Service directory cards and service detail pages.",
+    icon: Stethoscope,
+    defaultScope: "live",
+  },
+  blog: {
+    label: "Blog",
+    singularLabel: "Blog post",
+    description: "Blog landing content and individual blog posts.",
+    icon: Newspaper,
+    defaultScope: "live",
+  },
+  faqs: {
+    label: "FAQs",
+    singularLabel: "FAQ",
+    description: "Global FAQs and service-specific FAQ entries.",
+    icon: CheckCircle2,
+    defaultScope: "live",
+  },
+  testimonials: {
+    label: "Testimonials",
+    singularLabel: "Testimonial",
+    description: "Homepage, services, and page-specific testimonials.",
+    icon: ExternalLink,
+    defaultScope: "live",
+  },
+  team: {
+    label: "Team",
+    singularLabel: "Team member",
+    description: "Doctors, clinicians, and service team members.",
+    icon: Users,
+    defaultScope: "live",
+  },
+  legal: {
+    label: "Policies",
+    singularLabel: "Policy",
+    description: "Privacy policy, terms, and other legal content.",
+    icon: Shield,
+    defaultScope: "live",
+  },
+  media: {
+    label: "Media",
+    singularLabel: "Media asset",
+    description: "Media library for images, videos, and downloadable files.",
+    icon: ImagePlus,
+    defaultScope: "live",
+  },
+  announcements: {
+    label: "Announcements",
+    singularLabel: "Announcement",
+    description: "Announcement bar notices and public alerts.",
+    icon: Megaphone,
+    defaultScope: "live",
+  },
+};
+
+function isCmsCollectionKey(value: string | null | undefined): value is CmsCollectionKey {
+  return Boolean(value) && collectionOrder.includes(value as CmsCollectionKey);
+}
+
+function isCmsScopeKey(value: string | null | undefined): value is CmsScopeKey {
+  return value === "live" || value === "drafts" || value === "deleted" || value === "all";
+}
+
+function getScopeFromStatus(status: CmsStatus): CmsScopeKey {
+  switch (status) {
+    case "published":
+      return "live";
+    case "deleted":
+      return "deleted";
+    default:
+      return "drafts";
+  }
+}
+
+function matchesScope(status: CmsStatus, scope: CmsScopeKey) {
+  if (scope === "all") return true;
+  if (scope === "live") return status === "published";
+  if (scope === "deleted") return status === "deleted";
+  return status === "draft";
+}
+
+function getStatusLabel(status: CmsStatus) {
+  switch (status) {
+    case "published":
+      return "Live";
+    case "deleted":
+      return "Deleted";
+    default:
+      return "Draft";
+  }
+}
+
+function useCmsMediaLibrary() {
+  return useContext(CmsMediaLibraryContext);
+}
+
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{children}</Label>;
 }
 
+function StatusSelectItems() {
+  return (
+    <>
+      <SelectItem value="draft">Draft</SelectItem>
+      <SelectItem value="published">Live</SelectItem>
+      <SelectItem value="deleted">Deleted</SelectItem>
+    </>
+  );
+}
+
+function StatusBadge({ status }: { status: CmsStatus }) {
+  return (
+    <Badge
+      className={cn(
+        "border text-[11px] font-semibold uppercase tracking-[0.12em]",
+        status === "published" && "border-emerald-200 bg-emerald-50 text-emerald-700",
+        status === "draft" && "border-amber-200 bg-amber-50 text-amber-700",
+        status === "deleted" && "border-rose-200 bg-rose-50 text-rose-700",
+      )}
+    >
+      {getStatusLabel(status)}
+    </Badge>
+  );
+}
+
 function ImageFields({ label, value, onChange }: { label: string; value?: CmsImage; onChange: (next: CmsImage) => void }) {
   const current = value ?? createEmptyImage();
+  const mediaLibrary = useCmsMediaLibrary();
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const imageAssets = useMemo(
+    () =>
+      (mediaLibrary?.mediaAssets ?? [])
+        .filter((asset) => asset.type === "image" && asset.status !== "deleted")
+        .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0)),
+    [mediaLibrary?.mediaAssets],
+  );
 
   return (
     <div className="space-y-3">
       <FieldLabel>{label}</FieldLabel>
       <div className="grid gap-3 md:grid-cols-[1fr_220px]">
-        <Input value={current.url} onChange={(event) => onChange({ ...current, url: event.target.value })} placeholder="https://..." />
+        <Input value={current.url} onChange={(event) => onChange({ ...current, url: event.target.value })} placeholder="/cms-assets/... or https://..." />
         <Input value={current.alt} onChange={(event) => onChange({ ...current, alt: event.target.value })} placeholder="Alt text" />
       </div>
+      <div className="flex flex-wrap items-center gap-3">
+        {imageAssets.length > 0 && (
+          <Button type="button" variant="outline" size="sm" onClick={() => setLibraryOpen(true)}>
+            <Eye className="mr-2 h-4 w-4" />
+            Choose From Media Library
+          </Button>
+        )}
+        <Label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium">
+          <ImagePlus className="h-4 w-4" />
+          Upload Image
+          <input
+            type="file"
+            className="hidden"
+            accept="image/*"
+            onChange={async (event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+
+              try {
+                setUploading(true);
+                const uploaded = await uploadToCloudinary(file);
+                const fallbackAlt = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+                onChange({
+                  ...current,
+                  url: uploaded.secure_url,
+                  alt: current.alt || fallbackAlt,
+                  publicId: uploaded.public_id,
+                  width: uploaded.width,
+                  height: uploaded.height,
+                });
+                toast.success("Image uploaded");
+              } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Upload failed");
+              } finally {
+                setUploading(false);
+                event.target.value = "";
+              }
+            }}
+          />
+        </Label>
+        <span className="text-xs text-muted-foreground">
+          No need to paste a link. Upload here or choose an existing asset from the media library.
+        </span>
+      </div>
+      {uploading && <p className="text-sm text-muted-foreground">Uploading image...</p>}
+      {current.url && (
+        <div className="overflow-hidden rounded-xl border border-border bg-muted/20">
+          <img src={current.url} alt={current.alt || label} className="max-h-60 w-full object-contain" />
+        </div>
+      )}
+      <Dialog open={libraryOpen} onOpenChange={setLibraryOpen}>
+        <DialogContent className="sm:max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>Select an image</DialogTitle>
+            <DialogDescription>Choose an existing image from the CMS media library.</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[70vh] pr-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {imageAssets.map((asset) => (
+                <button
+                  key={asset.id}
+                  type="button"
+                  className="overflow-hidden rounded-xl border border-border bg-background text-left transition-colors hover:border-primary/40"
+                  onClick={() => {
+                    onChange({
+                      ...current,
+                      url: asset.url,
+                      alt: current.alt || asset.alt || asset.name,
+                      width: asset.width,
+                      height: asset.height,
+                    });
+                    setLibraryOpen(false);
+                  }}
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-muted/30">
+                    <img src={asset.url} alt={asset.alt || asset.name} className="h-full w-full object-cover" />
+                  </div>
+                  <div className="space-y-1 p-4">
+                    <p className="font-semibold text-foreground">{asset.name}</p>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{asset.alt || "No alt text yet"}</p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <StatusBadge status={asset.status} />
+                      {asset.tags.slice(0, 2).map((tag) => (
+                        <Badge key={tag} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -572,7 +865,7 @@ function DocumentCard({
   );
 }
 
-function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (page: CmsPage) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (page: CmsPage) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -604,8 +897,7 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">draft</SelectItem>
-            <SelectItem value="published">published</SelectItem>
+            <StatusSelectItems />
           </SelectContent>
         </Select>
         <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
@@ -621,7 +913,7 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
   );
 }
 
-function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -639,8 +931,7 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">draft</SelectItem>
-            <SelectItem value="published">published</SelectItem>
+            <StatusSelectItems />
           </SelectContent>
         </Select>
         <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
@@ -677,7 +968,7 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
   );
 }
 
-function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSave: (post: CmsBlogPost) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSave: (post: CmsBlogPost) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -695,8 +986,7 @@ function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSav
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">draft</SelectItem>
-            <SelectItem value="published">published</SelectItem>
+            <StatusSelectItems />
           </SelectContent>
         </Select>
         <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
@@ -710,7 +1000,7 @@ function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSav
   );
 }
 
-function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument; onSave: (document: CmsLegalDocument) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument; onSave: (document: CmsLegalDocument) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -724,8 +1014,7 @@ function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument;
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">draft</SelectItem>
-            <SelectItem value="published">published</SelectItem>
+            <StatusSelectItems />
           </SelectContent>
         </Select>
         <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
@@ -737,7 +1026,7 @@ function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument;
   );
 }
 
-function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (faq: CmsFaq) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (faq: CmsFaq) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -755,8 +1044,7 @@ function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (fa
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">draft</SelectItem>
-            <SelectItem value="published">published</SelectItem>
+            <StatusSelectItems />
           </SelectContent>
         </Select>
         <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
@@ -766,7 +1054,7 @@ function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (fa
   );
 }
 
-function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimonial; onSave: (testimonial: CmsTestimonial) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimonial; onSave: (testimonial: CmsTestimonial) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -784,8 +1072,7 @@ function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimon
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">draft</SelectItem>
-            <SelectItem value="published">published</SelectItem>
+            <StatusSelectItems />
           </SelectContent>
         </Select>
         <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
@@ -797,7 +1084,7 @@ function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimon
   );
 }
 
-function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onSave: (member: CmsTeamMember) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onSave: (member: CmsTeamMember) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -817,8 +1104,7 @@ function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onS
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">draft</SelectItem>
-            <SelectItem value="published">published</SelectItem>
+            <StatusSelectItems />
           </SelectContent>
         </Select>
         <Input type="number" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) || 0 })} placeholder="Sort order" />
@@ -853,7 +1139,7 @@ async function uploadToCloudinary(file: File) {
   return response.json();
 }
 
-function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; onSave: (asset: CmsMediaAsset) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; onSave: (asset: CmsMediaAsset) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   const [uploading, setUploading] = useState(false);
   useEffect(() => setDraft(value), [value]);
@@ -920,7 +1206,7 @@ function MediaEditorCard({ value, onSave, onDelete }: { value: CmsMediaAsset; on
   );
 }
 
-function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnouncement; onSave: (announcement: CmsAnnouncement) => Promise<unknown>; onDelete: () => Promise<unknown> }) {
+function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnouncement; onSave: (announcement: CmsAnnouncement) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 
@@ -937,8 +1223,7 @@ function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnounc
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="draft">draft</SelectItem>
-          <SelectItem value="published">published</SelectItem>
+          <StatusSelectItems />
         </SelectContent>
       </Select>
       <Textarea value={draft.body} onChange={(event) => setDraft({ ...draft, body: event.target.value })} placeholder="Announcement text" rows={4} />
@@ -1106,10 +1391,585 @@ function SiteSettingsEditor({ value, onSave }: { value: CmsSiteSettings; onSave:
   );
 }
 
+function buildCmsHref(collection: CmsCollectionKey, scope?: CmsScopeKey, key?: string) {
+  if (collection === "overview") return "/cms";
+  if (collection === "settings") return "/cms/settings";
+
+  const segments = ["/cms", collection];
+  if (scope) segments.push(scope);
+  if (key) segments.push(encodeURIComponent(key));
+  return segments.join("/");
+}
+
+function CmsEmptyState({
+  title,
+  body,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  body: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <Card className="border-dashed">
+      <CardContent className="flex min-h-[260px] flex-col items-center justify-center gap-4 p-8 text-center">
+        <div className="rounded-full bg-primary/8 p-3 text-primary">
+          <LayoutDashboard className="h-6 w-6" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-foreground">{title}</h3>
+          <p className="mx-auto max-w-xl text-sm leading-6 text-muted-foreground">{body}</p>
+        </div>
+        {actionLabel && onAction && (
+          <Button type="button" onClick={onAction}>
+            <Plus className="mr-2 h-4 w-4" />
+            {actionLabel}
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CmsOverviewDashboard({
+  counts,
+  pages,
+  draftServices,
+  onOpenCollection,
+  onOpenPage,
+}: {
+  counts: Array<{ key: Exclude<CmsCollectionKey, "overview">; total: number; live: number; drafts: number; deleted: number }>;
+  pages: CmsPage[];
+  draftServices: CmsService[];
+  onOpenCollection: (collection: Exclude<CmsCollectionKey, "overview">) => void;
+  onOpenPage: (page: CmsPage) => void;
+}) {
+  const corePages = pages.filter((page) => corePageSlugs.includes(page.slug)).sort((left, right) => corePageSlugs.indexOf(left.slug) - corePageSlugs.indexOf(right.slug));
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {counts.map((entry) => {
+          const meta = collectionMeta[entry.key];
+          const Icon = meta.icon;
+          return (
+            <button
+              key={entry.key}
+              type="button"
+              onClick={() => onOpenCollection(entry.key)}
+              className="rounded-2xl border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary/30"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="inline-flex rounded-full bg-primary/8 p-2 text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-foreground">{meta.label}</p>
+                    <p className="text-sm leading-6 text-muted-foreground">{meta.description}</p>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="mt-6 grid grid-cols-4 gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Total</p>
+                  <p className="mt-1 text-2xl font-black tracking-tight text-foreground">{entry.total}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Live</p>
+                  <p className="mt-1 text-xl font-bold text-emerald-700">{entry.live}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Drafts</p>
+                  <p className="mt-1 text-xl font-bold text-amber-700">{entry.drafts}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Deleted</p>
+                  <p className="mt-1 text-xl font-bold text-rose-700">{entry.deleted}</p>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle>Core Page Dashboards</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            {corePages.map((page) => (
+              <button
+                key={page.id}
+                type="button"
+                onClick={() => onOpenPage(page)}
+                className="rounded-2xl border border-border bg-background p-4 text-left transition-colors hover:border-primary/30"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-foreground">{page.title}</p>
+                    <p className="text-sm text-muted-foreground">/{page.slug === "home" ? "" : page.slug}</p>
+                  </div>
+                  <StatusBadge status={page.status} />
+                </div>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {page.excerpt || "Open this dashboard to manage its hero, sections, SEO, and page content."}
+                </p>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Publishing Workflow</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+              <p className="text-sm font-semibold text-emerald-800">1. Create in Drafts</p>
+              <p className="mt-1 text-sm leading-6 text-emerald-700">New pages and services are saved as drafts first so they never go live by accident.</p>
+            </div>
+            <div className="rounded-2xl border border-sky-100 bg-sky-50 p-4">
+              <p className="text-sm font-semibold text-sky-800">2. Publish when ready</p>
+              <p className="mt-1 text-sm leading-6 text-sky-700">Set the status to Live and save. If it is a service, also turn on homepage or navigation visibility where needed.</p>
+            </div>
+            <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+              <p className="text-sm font-semibold text-amber-800">3. Keep deleted items recoverable</p>
+              <p className="mt-1 text-sm leading-6 text-amber-700">Deleting now moves records into a Deleted view first so they can be restored before permanent removal.</p>
+            </div>
+            {draftServices.length > 0 && (
+              <div className="rounded-2xl border border-border p-4">
+                <p className="text-sm font-semibold text-foreground">{draftServices.length} service draft{draftServices.length > 1 ? "s" : ""} waiting for review</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {draftServices.slice(0, 4).map((service) => (
+                    <Badge key={service.id} variant="secondary">
+                      {service.title}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function PagesOverviewPanel({
+  pages,
+  onOpen,
+}: {
+  pages: CmsPage[];
+  onOpen: (page: CmsPage) => void;
+}) {
+  const corePages = pages.filter((page) => corePageSlugs.includes(page.slug)).sort((left, right) => corePageSlugs.indexOf(left.slug) - corePageSlugs.indexOf(right.slug));
+  const otherPages = pages.filter((page) => !corePageSlugs.includes(page.slug));
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Page Dashboards</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {corePages.map((page) => (
+            <button
+              key={page.id}
+              type="button"
+              onClick={() => onOpen(page)}
+              className="rounded-2xl border border-border bg-background p-4 text-left transition-colors hover:border-primary/30"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-semibold text-foreground">{page.title}</p>
+                <StatusBadge status={page.status} />
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">/{page.slug === "home" ? "" : page.slug}</p>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                {page.excerpt || "Open this dashboard to manage sections, content, SEO, and layout data for this page."}
+              </p>
+            </button>
+          ))}
+        </CardContent>
+      </Card>
+
+      {otherPages.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Other Pages</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {otherPages.map((page) => (
+              <button
+                key={page.id}
+                type="button"
+                onClick={() => onOpen(page)}
+                className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:border-primary/30"
+              >
+                <div>
+                  <p className="font-medium text-foreground">{page.title}</p>
+                  <p className="text-sm text-muted-foreground">/{page.slug}</p>
+                </div>
+                <StatusBadge status={page.status} />
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function ServicesOverviewPanel({
+  services,
+  onOpen,
+}: {
+  services: CmsService[];
+  onOpen: (service: CmsService) => void;
+}) {
+  const liveCount = services.filter((service) => service.status === "published").length;
+  const draftCount = services.filter((service) => service.status === "draft").length;
+  const deletedCount = services.filter((service) => service.status === "deleted").length;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Service Workspace</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+            <p className="text-sm font-semibold text-emerald-800">Live services</p>
+            <p className="mt-2 text-3xl font-black tracking-tight text-emerald-700">{liveCount}</p>
+          </div>
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+            <p className="text-sm font-semibold text-amber-800">Draft services</p>
+            <p className="mt-2 text-3xl font-black tracking-tight text-amber-700">{draftCount}</p>
+          </div>
+          <div className="rounded-2xl border border-rose-100 bg-rose-50 p-4">
+            <p className="text-sm font-semibold text-rose-800">Deleted services</p>
+            <p className="mt-2 text-3xl font-black tracking-tight text-rose-700">{deletedCount}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>What controls the public site</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-2xl border border-border p-4">
+            <p className="font-semibold text-foreground">To show a service publicly</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">Set the service status to Live. That makes the detail page public at <code>/services/your-slug</code>.</p>
+          </div>
+          <div className="rounded-2xl border border-border p-4">
+            <p className="font-semibold text-foreground">To show it on the homepage</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">Turn on <strong>Featured on homepage</strong>. The homepage service section only pulls services with that switch enabled.</p>
+          </div>
+          <div className="rounded-2xl border border-border p-4">
+            <p className="font-semibold text-foreground">To show it in navigation</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">Turn on <strong>Show in navigation</strong> so it appears in the services menu.</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Open a service dashboard</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-2">
+          {services.slice(0, 6).map((service) => (
+            <button
+              key={service.id}
+              type="button"
+              onClick={() => onOpen(service)}
+              className="rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-primary/30"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-semibold text-foreground">{service.title}</p>
+                <StatusBadge status={service.status} />
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">/{service.slug}</p>
+            </button>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function CollectionWorkspace<T extends { id: string; status: CmsStatus }>({
+  collectionKey,
+  title,
+  description,
+  scope,
+  records,
+  selectedKey,
+  createLabel,
+  emptyBody,
+  overview,
+  publicHref,
+  onScopeChange,
+  onSelect,
+  onCreate,
+  onChangeStatus,
+  onPermanentDelete,
+  renderEditor,
+}: {
+  collectionKey: Exclude<CmsCollectionKey, "overview" | "settings">;
+  title: string;
+  description: string;
+  scope: CmsScopeKey;
+  records: Array<CmsWorkspaceRecord<T>>;
+  selectedKey?: string;
+  createLabel: string;
+  emptyBody: string;
+  overview?: React.ReactNode;
+  publicHref?: (item: T) => string | null;
+  onScopeChange: (scope: CmsScopeKey) => void;
+  onSelect: (record: CmsWorkspaceRecord<T>) => void;
+  onCreate: () => Promise<void>;
+  onChangeStatus: (item: T, status: CmsStatus) => Promise<T>;
+  onPermanentDelete: (item: T) => Promise<void>;
+  renderEditor: (item: T) => React.ReactNode;
+}) {
+  const singularLabel = collectionMeta[collectionKey].singularLabel;
+  const [busyAction, setBusyAction] = useState<string | null>(null);
+  const counts = useMemo(
+    () => ({
+      live: records.filter((record) => record.status === "published").length,
+      drafts: records.filter((record) => record.status === "draft").length,
+      deleted: records.filter((record) => record.status === "deleted").length,
+      all: records.length,
+    }),
+    [records],
+  );
+  const filteredRecords = useMemo(
+    () => (scope === "all" ? records : records.filter((record) => matchesScope(record.status, scope))),
+    [records, scope],
+  );
+  const selectedRecord = useMemo(
+    () => records.find((record) => record.key === selectedKey),
+    [records, selectedKey],
+  );
+
+  const runAction = async (label: string, action: () => Promise<void>, successMessage: string) => {
+    try {
+      setBusyAction(label);
+      await action();
+      toast.success(successMessage);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Action failed");
+    } finally {
+      setBusyAction(null);
+    }
+  };
+
+  return (
+    <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+      <Card className="overflow-hidden">
+        <CardHeader className="space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <CardTitle>{title}</CardTitle>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
+            </div>
+            <Button type="button" size="sm" onClick={() => void onCreate()}>
+              <Plus className="mr-2 h-4 w-4" />
+              {createLabel}
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {scopeOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                onClick={() => onScopeChange(option.key)}
+                className={cn(
+                  "rounded-xl border px-3 py-3 text-left transition-colors",
+                  option.key === scope ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/30",
+                )}
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{option.label}</p>
+                <p className="mt-1 text-2xl font-black tracking-tight text-foreground">{counts[option.key]}</p>
+              </button>
+            ))}
+          </div>
+        </CardHeader>
+        <Separator />
+        <ScrollArea className="max-h-[calc(100vh-23rem)]">
+          <CardContent className="space-y-3 p-4">
+            {filteredRecords.length === 0 ? (
+              <div className="rounded-2xl border border-dashed p-5 text-sm leading-6 text-muted-foreground">
+                No items exist in the <strong>{scopeOptions.find((option) => option.key === scope)?.label?.toLowerCase()}</strong> view yet.
+              </div>
+            ) : (
+              filteredRecords.map((record) => (
+                <button
+                  key={record.key}
+                  type="button"
+                  onClick={() => onSelect(record)}
+                  className={cn(
+                    "w-full rounded-2xl border p-4 text-left transition-colors",
+                    record.key === selectedKey ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/30",
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground">{record.title}</p>
+                      {record.subtitle && <p className="mt-1 truncate text-sm text-muted-foreground">{record.subtitle}</p>}
+                    </div>
+                    <StatusBadge status={record.status} />
+                  </div>
+                  {record.description && <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">{record.description}</p>}
+                  {record.chips && record.chips.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {record.chips.slice(0, 3).map((chip) => (
+                        <Badge key={chip} variant="secondary">
+                          {chip}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </button>
+              ))
+            )}
+          </CardContent>
+        </ScrollArea>
+      </Card>
+
+      <div className="space-y-6">
+        {selectedRecord ? (
+          <>
+            <Card>
+              <CardContent className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h2 className="text-xl font-semibold text-foreground">{selectedRecord.title}</h2>
+                    <StatusBadge status={selectedRecord.status} />
+                  </div>
+                  {selectedRecord.subtitle && <p className="text-sm text-muted-foreground">{selectedRecord.subtitle}</p>}
+                  {selectedRecord.chips && selectedRecord.chips.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedRecord.chips.map((chip) => (
+                        <Badge key={chip} variant="secondary">
+                          {chip}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {publicHref && selectedRecord.status === "published" && publicHref(selectedRecord.item) && (
+                    <Button type="button" variant="outline" asChild>
+                      <a href={publicHref(selectedRecord.item) ?? "#"} target="_blank" rel="noreferrer">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        View Live
+                      </a>
+                    </Button>
+                  )}
+                  {selectedRecord.status !== "published" && (
+                    <Button
+                      type="button"
+                      disabled={busyAction !== null}
+                      onClick={() =>
+                        void runAction(
+                          "publish",
+                          async () => {
+                            await onChangeStatus(selectedRecord.item, "published");
+                          },
+                          `${singularLabel} moved to Live.`,
+                        )
+                      }
+                    >
+                      {busyAction === "publish" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
+                      Publish
+                    </Button>
+                  )}
+                  {selectedRecord.status !== "draft" && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={busyAction !== null}
+                      onClick={() =>
+                        void runAction(
+                          "draft",
+                          async () => {
+                            await onChangeStatus(selectedRecord.item, "draft");
+                          },
+                          `${singularLabel} moved to Drafts.`,
+                        )
+                      }
+                    >
+                      {busyAction === "draft" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Undo2 className="mr-2 h-4 w-4" />}
+                      Move to Drafts
+                    </Button>
+                  )}
+                  {selectedRecord.status !== "deleted" && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={busyAction !== null}
+                      onClick={() =>
+                        void runAction(
+                          "trash",
+                          async () => {
+                            await onChangeStatus(selectedRecord.item, "deleted");
+                          },
+                          `${singularLabel} moved to Deleted.`,
+                        )
+                      }
+                    >
+                      {busyAction === "trash" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                      Move to Deleted
+                    </Button>
+                  )}
+                  {selectedRecord.status === "deleted" && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      disabled={busyAction !== null}
+                      onClick={() =>
+                        void runAction(
+                          "permanent-delete",
+                          async () => {
+                            await onPermanentDelete(selectedRecord.item);
+                          },
+                          `${singularLabel} deleted permanently.`,
+                        )
+                      }
+                    >
+                      {busyAction === "permanent-delete" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                      Delete Permanently
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            {renderEditor(selectedRecord.item)}
+          </>
+        ) : overview ? (
+          overview
+        ) : (
+          <CmsEmptyState
+            title={`Select a ${singularLabel.toLowerCase()} to edit`}
+            body={emptyBody}
+            actionLabel={createLabel}
+            onAction={() => void onCreate()}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function CmsManagementPage() {
   const navigate = useNavigate();
-  const { tab } = useParams<{ tab?: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const { data: settings, isLoading } = useCmsSiteSettings();
   const { data: pages = [] } = useCmsPages(true);
   const { data: services = [] } = useCmsServices(true);
@@ -1134,20 +1994,266 @@ export default function CmsManagementPage() {
   const deleteRecord = useDeleteCmsRecord();
   const deleteMedia = useDeleteCmsMediaAsset();
   const seedDefaults = useSeedCmsDefaults();
-  const requestedTab = tab ?? searchParams.get("tab");
-  const activeTab: CmsTabValue = isCmsTabValue(requestedTab) ? requestedTab : "settings";
+
+  const cmsPath = useMemo(
+    () => location.pathname.replace(/^\/cms\/?/, "").split("/").filter(Boolean),
+    [location.pathname],
+  );
+  const legacyTab = useMemo(() => new URLSearchParams(location.search).get("tab"), [location.search]);
+  const requestedCollection = cmsPath[0] ?? (isCmsCollectionKey(legacyTab) ? legacyTab : "overview");
+  const activeCollection: CmsCollectionKey = isCmsCollectionKey(requestedCollection) ? requestedCollection : "overview";
+  const activeScope: CmsScopeKey =
+    activeCollection === "overview" || activeCollection === "settings"
+      ? "all"
+      : isCmsScopeKey(cmsPath[1])
+        ? cmsPath[1]
+        : (collectionMeta[activeCollection].defaultScope ?? "live");
+  const selectedKey = cmsPath[2] ? decodeURIComponent(cmsPath[2]) : undefined;
+
+  useEffect(() => {
+    if (cmsPath.length === 0 && isCmsCollectionKey(legacyTab) && legacyTab !== "overview") {
+      navigate(buildCmsHref(legacyTab, legacyTab === "settings" ? undefined : collectionMeta[legacyTab].defaultScope), { replace: true });
+    }
+  }, [cmsPath.length, legacyTab, navigate]);
+
+  useEffect(() => {
+    if (activeCollection !== "overview" && activeCollection !== "settings" && cmsPath.length === 1) {
+      navigate(buildCmsHref(activeCollection, collectionMeta[activeCollection].defaultScope), { replace: true });
+    }
+  }, [activeCollection, cmsPath.length, navigate]);
+
+  const pageRecords = useMemo(
+    () =>
+      [...pages]
+        .sort((left, right) => {
+          const leftIndex = corePageSlugs.indexOf(left.slug);
+          const rightIndex = corePageSlugs.indexOf(right.slug);
+          const normalizedLeft = leftIndex === -1 ? corePageSlugs.length + left.sortOrder : leftIndex;
+          const normalizedRight = rightIndex === -1 ? corePageSlugs.length + right.sortOrder : rightIndex;
+          return normalizedLeft - normalizedRight;
+        })
+        .map(
+          (page): CmsWorkspaceRecord<CmsPage> => ({
+            key: page.slug,
+            title: page.title,
+            subtitle: `/${page.slug === "home" ? "" : page.slug}`,
+            description: page.excerpt,
+            status: page.status,
+            item: page,
+            chips: [page.pageType, page.showInNavigation ? "In navigation" : "Hidden from navigation"],
+          }),
+        ),
+    [pages],
+  );
+  const serviceRecords = useMemo(
+    () =>
+      [...services]
+        .sort((left, right) => left.sortOrder - right.sortOrder || left.title.localeCompare(right.title))
+        .map(
+          (service): CmsWorkspaceRecord<CmsService> => ({
+            key: service.slug,
+            title: service.title,
+            subtitle: `/services/${service.slug}`,
+            description: service.excerpt || service.summary,
+            status: service.status,
+            item: service,
+            chips: [
+              service.categoryLabel,
+              service.featuredOnHome ? "Homepage" : "Not on homepage",
+              service.featuredInNavigation ? "Navigation" : "Not in navigation",
+            ],
+          }),
+        ),
+    [services],
+  );
+  const postRecords = useMemo(
+    () =>
+      [...posts]
+        .sort((left, right) => left.sortOrder - right.sortOrder || right.publishedAt.localeCompare(left.publishedAt))
+        .map(
+          (post): CmsWorkspaceRecord<CmsBlogPost> => ({
+            key: post.slug,
+            title: post.title,
+            subtitle: `/blog/${post.slug}`,
+            description: post.excerpt,
+            status: post.status,
+            item: post,
+            chips: [post.category, post.publishedAt, post.authorName],
+          }),
+        ),
+    [posts],
+  );
+  const faqRecords = useMemo(
+    () =>
+      [...faqs]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map(
+          (faq): CmsWorkspaceRecord<CmsFaq> => ({
+            key: faq.id,
+            title: faq.question,
+            subtitle: faq.category,
+            description: faq.answer,
+            status: faq.status,
+            item: faq,
+            chips: [faq.pageSlug ? `Page: ${faq.pageSlug}` : faq.serviceSlug ? `Service: ${faq.serviceSlug}` : "General"],
+          }),
+        ),
+    [faqs],
+  );
+  const testimonialRecords = useMemo(
+    () =>
+      [...testimonials]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map(
+          (testimonial): CmsWorkspaceRecord<CmsTestimonial> => ({
+            key: testimonial.id,
+            title: testimonial.name,
+            subtitle: testimonial.role,
+            description: testimonial.quote,
+            status: testimonial.status,
+            item: testimonial,
+            chips: [testimonial.pageSlug ? `Page: ${testimonial.pageSlug}` : testimonial.serviceSlug ? `Service: ${testimonial.serviceSlug}` : "General"],
+          }),
+        ),
+    [testimonials],
+  );
+  const teamRecords = useMemo(
+    () =>
+      [...teamMembers]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map(
+          (member): CmsWorkspaceRecord<CmsTeamMember> => ({
+            key: member.id,
+            title: member.name,
+            subtitle: member.specialty ? `${member.role} • ${member.specialty}` : member.role,
+            description: member.bio,
+            status: member.status,
+            item: member,
+            chips: [member.serviceSlug ? `Service: ${member.serviceSlug}` : "General", member.email ?? "No email"],
+          }),
+        ),
+    [teamMembers],
+  );
+  const legalRecords = useMemo(
+    () =>
+      [...legalDocuments]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map(
+          (document): CmsWorkspaceRecord<CmsLegalDocument> => ({
+            key: document.slug,
+            title: document.title,
+            subtitle: `/policies/${document.slug}`,
+            description: document.summary,
+            status: document.status,
+            item: document,
+            chips: ["Legal page"],
+          }),
+        ),
+    [legalDocuments],
+  );
+  const mediaRecords = useMemo(
+    () =>
+      [...mediaAssets]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map(
+          (asset): CmsWorkspaceRecord<CmsMediaAsset> => ({
+            key: asset.id,
+            title: asset.name,
+            subtitle: asset.folder || asset.type,
+            description: asset.alt || asset.url,
+            status: asset.status,
+            item: asset,
+            chips: [asset.type, ...asset.tags.slice(0, 2)],
+          }),
+        ),
+    [mediaAssets],
+  );
+  const announcementRecords = useMemo(
+    () =>
+      [...announcements]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map(
+          (announcement): CmsWorkspaceRecord<CmsAnnouncement> => ({
+            key: announcement.id,
+            title: announcement.title,
+            subtitle: announcement.href ?? "Announcement bar",
+            description: announcement.body,
+            status: announcement.status,
+            item: announcement,
+            chips: [announcement.buttonLabel ?? "No button label"],
+          }),
+        ),
+    [announcements],
+  );
 
   const contentHealth = useMemo(
     () => [
-      { label: "Pages", value: pages.length },
-      { label: "Services", value: services.length },
-      { label: "Blog Posts", value: posts.length },
-      { label: "FAQs", value: faqs.length },
-      { label: "Testimonials", value: testimonials.length },
-      { label: "Media Assets", value: mediaAssets.length },
+      { key: "pages" as const, total: pages.length, live: pages.filter((item) => item.status === "published").length, drafts: pages.filter((item) => item.status === "draft").length, deleted: pages.filter((item) => item.status === "deleted").length },
+      { key: "services" as const, total: services.length, live: services.filter((item) => item.status === "published").length, drafts: services.filter((item) => item.status === "draft").length, deleted: services.filter((item) => item.status === "deleted").length },
+      { key: "blog" as const, total: posts.length, live: posts.filter((item) => item.status === "published").length, drafts: posts.filter((item) => item.status === "draft").length, deleted: posts.filter((item) => item.status === "deleted").length },
+      { key: "faqs" as const, total: faqs.length, live: faqs.filter((item) => item.status === "published").length, drafts: faqs.filter((item) => item.status === "draft").length, deleted: faqs.filter((item) => item.status === "deleted").length },
+      { key: "testimonials" as const, total: testimonials.length, live: testimonials.filter((item) => item.status === "published").length, drafts: testimonials.filter((item) => item.status === "draft").length, deleted: testimonials.filter((item) => item.status === "deleted").length },
+      { key: "team" as const, total: teamMembers.length, live: teamMembers.filter((item) => item.status === "published").length, drafts: teamMembers.filter((item) => item.status === "draft").length, deleted: teamMembers.filter((item) => item.status === "deleted").length },
+      { key: "legal" as const, total: legalDocuments.length, live: legalDocuments.filter((item) => item.status === "published").length, drafts: legalDocuments.filter((item) => item.status === "draft").length, deleted: legalDocuments.filter((item) => item.status === "deleted").length },
+      { key: "media" as const, total: mediaAssets.length, live: mediaAssets.filter((item) => item.status === "published").length, drafts: mediaAssets.filter((item) => item.status === "draft").length, deleted: mediaAssets.filter((item) => item.status === "deleted").length },
+      { key: "announcements" as const, total: announcements.length, live: announcements.filter((item) => item.status === "published").length, drafts: announcements.filter((item) => item.status === "draft").length, deleted: announcements.filter((item) => item.status === "deleted").length },
     ],
-    [faqs.length, mediaAssets.length, pages.length, posts.length, services.length, testimonials.length],
+    [announcements, faqs, legalDocuments, mediaAssets, pages, posts, services, teamMembers, testimonials],
   );
+
+  const openCollection = (collection: Exclude<CmsCollectionKey, "overview">) => {
+    navigate(buildCmsHref(collection, collection === "settings" ? undefined : collectionMeta[collection].defaultScope));
+  };
+
+  const openRecord = (collection: Exclude<CmsCollectionKey, "overview" | "settings">, scope: CmsScopeKey, key: string) => {
+    navigate(buildCmsHref(collection, scope, key));
+  };
+
+  const savePageAndRoute = async (page: CmsPage) => {
+    const saved = await savePage.mutateAsync(page);
+    navigate(buildCmsHref("pages", getScopeFromStatus(saved.status), saved.slug));
+    return saved;
+  };
+  const saveServiceAndRoute = async (service: CmsService) => {
+    const saved = await saveService.mutateAsync(service);
+    navigate(buildCmsHref("services", getScopeFromStatus(saved.status), saved.slug));
+    return saved;
+  };
+  const savePostAndRoute = async (post: CmsBlogPost) => {
+    const saved = await savePost.mutateAsync(post);
+    navigate(buildCmsHref("blog", getScopeFromStatus(saved.status), saved.slug));
+    return saved;
+  };
+  const saveFaqAndRoute = async (faq: CmsFaq) => {
+    const saved = await saveFaq.mutateAsync(faq);
+    navigate(buildCmsHref("faqs", getScopeFromStatus(saved.status), saved.id));
+    return saved;
+  };
+  const saveTestimonialAndRoute = async (testimonial: CmsTestimonial) => {
+    const saved = await saveTestimonial.mutateAsync(testimonial);
+    navigate(buildCmsHref("testimonials", getScopeFromStatus(saved.status), saved.id));
+    return saved;
+  };
+  const saveTeamMemberAndRoute = async (member: CmsTeamMember) => {
+    const saved = await saveTeamMember.mutateAsync(member);
+    navigate(buildCmsHref("team", getScopeFromStatus(saved.status), saved.id));
+    return saved;
+  };
+  const saveLegalAndRoute = async (document: CmsLegalDocument) => {
+    const saved = await saveLegal.mutateAsync(document);
+    navigate(buildCmsHref("legal", getScopeFromStatus(saved.status), saved.slug));
+    return saved;
+  };
+  const saveMediaAndRoute = async (asset: CmsMediaAsset) => {
+    const saved = await saveMedia.mutateAsync(asset);
+    navigate(buildCmsHref("media", getScopeFromStatus(saved.status), saved.id));
+    return saved;
+  };
+  const saveAnnouncementAndRoute = async (announcement: CmsAnnouncement) => {
+    const saved = await saveAnnouncement.mutateAsync(announcement);
+    navigate(buildCmsHref("announcements", getScopeFromStatus(saved.status), saved.id));
+    return saved;
+  };
 
   if (isLoading || !settings) {
     return (
@@ -1159,168 +2265,351 @@ export default function CmsManagementPage() {
     );
   }
 
-  return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Website CMS</h1>
-            <p className="text-muted-foreground">Manage pages, services, FAQs, testimonials, blog posts, legal pages, media, navigation, branding, and SEO.</p>
-            <p className="mt-2 text-sm text-muted-foreground">Set an item to <span className="font-semibold text-foreground">published</span> and click <span className="font-semibold text-foreground">Save</span> to make it live. Draft items stay hidden from the public website.</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={async () => {
-                try {
-                  await seedDefaults.mutateAsync(undefined as never);
-                  toast.success("CMS defaults seeded");
-                } catch (error) {
-                  toast.error(error instanceof Error ? error.message : "Seed failed");
-                }
-              }}
-            >
-              <RefreshCcw className="mr-2 h-4 w-4" />
-              Seed Starter Content
-            </Button>
-          </div>
-        </div>
+  let workspace: React.ReactNode = null;
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-          {contentHealth.map((entry) => (
-            <Card key={entry.label}>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">{entry.label}</p>
-                <p className="mt-2 text-3xl font-black tracking-tight">{entry.value}</p>
+  if (activeCollection === "overview") {
+    workspace = (
+      <CmsOverviewDashboard
+        counts={contentHealth}
+        pages={pages}
+        draftServices={services.filter((service) => service.status === "draft")}
+        onOpenCollection={openCollection}
+        onOpenPage={(page) => openRecord("pages", getScopeFromStatus(page.status), page.slug)}
+      />
+    );
+  } else if (activeCollection === "settings") {
+    workspace = <SiteSettingsEditor value={settings} onSave={(next) => saveSettings.mutateAsync(next)} />;
+  } else if (activeCollection === "pages") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="pages"
+        title="Pages"
+        description={collectionMeta.pages.description}
+        scope={activeScope}
+        records={pageRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Page"
+        emptyBody="Each page has its own dashboard. Select a page from the left to edit it, or create a new draft page."
+        overview={<PagesOverviewPanel pages={pages} onOpen={(page) => openRecord("pages", getScopeFromStatus(page.status), page.slug)} />}
+        publicHref={(page) => (page.slug === "home" ? "/" : `/${page.slug}`)}
+        onScopeChange={(scope) => navigate(buildCmsHref("pages", scope))}
+        onSelect={(record) => openRecord("pages", activeScope, record.key)}
+        onCreate={async () => {
+          const saved = await savePageAndRoute(createBlankPage());
+          toast.success(`Draft page "${saved.title}" created.`);
+        }}
+        onChangeStatus={(item, status) => savePageAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_pages", id: item.id });
+          navigate(buildCmsHref("pages", "deleted"));
+        }}
+        renderEditor={(item) => <PageEditorCard value={item} onSave={savePageAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "services") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="services"
+        title="Services"
+        description={collectionMeta.services.description}
+        scope={activeScope}
+        records={serviceRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Service"
+        emptyBody="Create a new service draft, then publish it when the content and settings are ready."
+        overview={<ServicesOverviewPanel services={services} onOpen={(service) => openRecord("services", getScopeFromStatus(service.status), service.slug)} />}
+        publicHref={(service) => `/services/${service.slug}`}
+        onScopeChange={(scope) => navigate(buildCmsHref("services", scope))}
+        onSelect={(record) => openRecord("services", activeScope, record.key)}
+        onCreate={async () => {
+          const saved = await saveServiceAndRoute(createBlankService());
+          toast.success(`Draft service "${saved.title}" created.`);
+        }}
+        onChangeStatus={(item, status) => saveServiceAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_services", id: item.id });
+          navigate(buildCmsHref("services", "deleted"));
+        }}
+        renderEditor={(item) => <ServiceEditorCard value={item} onSave={saveServiceAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "blog") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="blog"
+        title="Blog"
+        description={collectionMeta.blog.description}
+        scope={activeScope}
+        records={postRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Blog Post"
+        emptyBody="Pick a blog post from the left or create a new draft post to start writing."
+        publicHref={(post) => `/blog/${post.slug}`}
+        onScopeChange={(scope) => navigate(buildCmsHref("blog", scope))}
+        onSelect={(record) => openRecord("blog", activeScope, record.key)}
+        onCreate={async () => {
+          const saved = await savePostAndRoute(createBlankPost());
+          toast.success(`Draft post "${saved.title}" created.`);
+        }}
+        onChangeStatus={(item, status) => savePostAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_blog_posts", id: item.id });
+          navigate(buildCmsHref("blog", "deleted"));
+        }}
+        renderEditor={(item) => <BlogEditorCard value={item} onSave={savePostAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "faqs") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="faqs"
+        title="FAQs"
+        description={collectionMeta.faqs.description}
+        scope={activeScope}
+        records={faqRecords}
+        selectedKey={selectedKey}
+        createLabel="Add FAQ"
+        emptyBody="Create FAQs here, then connect them to a page or service using the slug fields."
+        onScopeChange={(scope) => navigate(buildCmsHref("faqs", scope))}
+        onSelect={(record) => openRecord("faqs", activeScope, record.key)}
+        onCreate={async () => {
+          const saved = await saveFaqAndRoute(createBlankFaq());
+          toast.success(`Draft FAQ created.`);
+          return saved;
+        }}
+        onChangeStatus={(item, status) => saveFaqAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_faqs", id: item.id });
+          navigate(buildCmsHref("faqs", "deleted"));
+        }}
+        renderEditor={(item) => <FaqEditorCard value={item} onSave={saveFaqAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "testimonials") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="testimonials"
+        title="Testimonials"
+        description={collectionMeta.testimonials.description}
+        scope={activeScope}
+        records={testimonialRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Testimonial"
+        emptyBody="Create testimonials and assign them to a page or service so they appear in the correct frontend section."
+        onScopeChange={(scope) => navigate(buildCmsHref("testimonials", scope))}
+        onSelect={(record) => openRecord("testimonials", activeScope, record.key)}
+        onCreate={async () => {
+          await saveTestimonialAndRoute(createBlankTestimonial());
+          toast.success("Draft testimonial created.");
+        }}
+        onChangeStatus={(item, status) => saveTestimonialAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_testimonials", id: item.id });
+          navigate(buildCmsHref("testimonials", "deleted"));
+        }}
+        renderEditor={(item) => <TestimonialEditorCard value={item} onSave={saveTestimonialAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "team") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="team"
+        title="Team"
+        description={collectionMeta.team.description}
+        scope={activeScope}
+        records={teamRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Team Member"
+        emptyBody="Create a team member profile here and connect it to a service slug where needed."
+        onScopeChange={(scope) => navigate(buildCmsHref("team", scope))}
+        onSelect={(record) => openRecord("team", activeScope, record.key)}
+        onCreate={async () => {
+          await saveTeamMemberAndRoute(createBlankTeamMember());
+          toast.success("Draft team member created.");
+        }}
+        onChangeStatus={(item, status) => saveTeamMemberAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_team_members", id: item.id });
+          navigate(buildCmsHref("team", "deleted"));
+        }}
+        renderEditor={(item) => <TeamEditorCard value={item} onSave={saveTeamMemberAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "legal") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="legal"
+        title="Policies"
+        description={collectionMeta.legal.description}
+        scope={activeScope}
+        records={legalRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Policy Page"
+        emptyBody="Create legal or policy pages here, then publish them when they are approved."
+        publicHref={(document) => `/policies/${document.slug}`}
+        onScopeChange={(scope) => navigate(buildCmsHref("legal", scope))}
+        onSelect={(record) => openRecord("legal", activeScope, record.key)}
+        onCreate={async () => {
+          const saved = await saveLegalAndRoute(createBlankLegal());
+          toast.success(`Draft policy "${saved.title}" created.`);
+        }}
+        onChangeStatus={(item, status) => saveLegalAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_legal_documents", id: item.id });
+          navigate(buildCmsHref("legal", "deleted"));
+        }}
+        renderEditor={(item) => <LegalEditorCard value={item} onSave={saveLegalAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "media") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="media"
+        title="Media"
+        description={collectionMeta.media.description}
+        scope={activeScope}
+        records={mediaRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Media Asset"
+        emptyBody="Use the media library to upload assets centrally, then choose them from page, service, or settings editors."
+        publicHref={(asset) => asset.url}
+        onScopeChange={(scope) => navigate(buildCmsHref("media", scope))}
+        onSelect={(record) => openRecord("media", activeScope, record.key)}
+        onCreate={async () => {
+          const saved = await saveMediaAndRoute(createBlankMediaAsset());
+          toast.success(`Draft media asset "${saved.name}" created.`);
+        }}
+        onChangeStatus={(item, status) => saveMediaAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteMedia.mutateAsync(item);
+          navigate(buildCmsHref("media", "deleted"));
+        }}
+        renderEditor={(item) => <MediaEditorCard value={item} onSave={saveMediaAndRoute} />}
+      />
+    );
+  } else if (activeCollection === "announcements") {
+    workspace = (
+      <CollectionWorkspace
+        collectionKey="announcements"
+        title="Announcements"
+        description={collectionMeta.announcements.description}
+        scope={activeScope}
+        records={announcementRecords}
+        selectedKey={selectedKey}
+        createLabel="Add Announcement"
+        emptyBody="Use announcements for the public notice bar and short important updates."
+        onScopeChange={(scope) => navigate(buildCmsHref("announcements", scope))}
+        onSelect={(record) => openRecord("announcements", activeScope, record.key)}
+        onCreate={async () => {
+          await saveAnnouncementAndRoute(createBlankAnnouncement());
+          toast.success("Draft announcement created.");
+        }}
+        onChangeStatus={(item, status) => saveAnnouncementAndRoute({ ...item, status })}
+        onPermanentDelete={async (item) => {
+          await deleteRecord.mutateAsync({ table: "cms_announcements", id: item.id });
+          navigate(buildCmsHref("announcements", "deleted"));
+        }}
+        renderEditor={(item) => <AnnouncementEditorCard value={item} onSave={saveAnnouncementAndRoute} />}
+      />
+    );
+  }
+
+  return (
+    <CmsMediaLibraryContext.Provider value={{ mediaAssets }}>
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Website CMS</h1>
+              <p className="text-muted-foreground">Separate workspaces for pages, services, blog, media, and other website content.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Create in <span className="font-semibold text-foreground">Drafts</span>, review, then move the item to <span className="font-semibold text-foreground">Live</span>. Deleted items stay recoverable until permanently removed.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await seedDefaults.mutateAsync(undefined as never);
+                    toast.success("CMS defaults seeded");
+                  } catch (error) {
+                    toast.error(error instanceof Error ? error.message : "Seed failed");
+                  }
+                }}
+              >
+                <RefreshCcw className="mr-2 h-4 w-4" />
+                Seed Starter Content
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
+            <Card className="h-fit">
+              <CardHeader>
+                <CardTitle>CMS Navigation</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {collectionOrder.map((entry) => {
+                  if (entry === "overview") {
+                    return (
+                      <button
+                        key={entry}
+                        type="button"
+                        onClick={() => navigate("/cms")}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-colors",
+                          activeCollection === "overview" ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/30",
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="rounded-full bg-primary/8 p-2 text-primary">
+                            <LayoutDashboard className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-foreground">Overview</p>
+                            <p className="text-xs text-muted-foreground">Collection summaries and page dashboards</p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  }
+
+                  const meta = collectionMeta[entry];
+                  const Icon = meta.icon;
+                  const countEntry = contentHealth.find((item) => item.key === entry);
+
+                  return (
+                    <button
+                      key={entry}
+                      type="button"
+                      onClick={() => openCollection(entry)}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-colors",
+                        activeCollection === entry ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/30",
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-full bg-primary/8 p-2 text-primary">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">{meta.label}</p>
+                          <p className="text-xs text-muted-foreground">{countEntry?.live ?? 0} live / {countEntry?.drafts ?? 0} drafts</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  );
+                })}
               </CardContent>
             </Card>
-          ))}
+
+            <div className="space-y-6">{workspace}</div>
+          </div>
         </div>
-
-        <Tabs
-          value={activeTab}
-          onValueChange={(nextValue) => {
-            const nextTab = isCmsTabValue(nextValue) ? nextValue : "settings";
-            if (tab) {
-              navigate(`/cms/${nextTab}`, { replace: true });
-              return;
-            }
-
-            const nextParams = new URLSearchParams(searchParams);
-            nextParams.set("tab", nextTab);
-            setSearchParams(nextParams, { replace: true });
-          }}
-          className="space-y-4"
-        >
-          <TabsList className="flex h-auto flex-wrap justify-start gap-2 bg-transparent p-0">
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-            <TabsTrigger value="pages">Pages</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
-            <TabsTrigger value="blog">Blog</TabsTrigger>
-            <TabsTrigger value="faqs">FAQs</TabsTrigger>
-            <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
-            <TabsTrigger value="team">Team</TabsTrigger>
-            <TabsTrigger value="legal">Policies</TabsTrigger>
-            <TabsTrigger value="media">Media</TabsTrigger>
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="settings" className="space-y-4">
-            <SiteSettingsEditor value={settings} onSave={(next) => saveSettings.mutateAsync(next)} />
-          </TabsContent>
-
-          <TabsContent value="pages" className="space-y-4">
-            <Button type="button" onClick={() => savePage.mutateAsync(createBlankPage())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Page
-            </Button>
-            {pages.map((page) => (
-              <PageEditorCard key={page.id} value={page} onSave={(next) => savePage.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_pages", id: page.id })} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="services" className="space-y-4">
-            <Button type="button" onClick={() => saveService.mutateAsync(createBlankService())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Service
-            </Button>
-            {services.map((service) => (
-              <ServiceEditorCard key={service.id} value={service} onSave={(next) => saveService.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_services", id: service.id })} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="blog" className="space-y-4">
-            <Button type="button" onClick={() => savePost.mutateAsync(createBlankPost())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Blog Post
-            </Button>
-            {posts.map((post) => (
-              <BlogEditorCard key={post.id} value={post} onSave={(next) => savePost.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_blog_posts", id: post.id })} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="faqs" className="space-y-4">
-            <Button type="button" onClick={() => saveFaq.mutateAsync(createBlankFaq())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add FAQ
-            </Button>
-            {faqs.map((faq) => (
-              <FaqEditorCard key={faq.id} value={faq} onSave={(next) => saveFaq.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_faqs", id: faq.id })} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="testimonials" className="space-y-4">
-            <Button type="button" onClick={() => saveTestimonial.mutateAsync(createBlankTestimonial())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Testimonial
-            </Button>
-            {testimonials.map((testimonial) => (
-              <TestimonialEditorCard key={testimonial.id} value={testimonial} onSave={(next) => saveTestimonial.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_testimonials", id: testimonial.id })} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="team" className="space-y-4">
-            <Button type="button" onClick={() => saveTeamMember.mutateAsync(createBlankTeamMember())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Team Member
-            </Button>
-            {teamMembers.map((member) => (
-              <TeamEditorCard key={member.id} value={member} onSave={(next) => saveTeamMember.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_team_members", id: member.id })} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="legal" className="space-y-4">
-            <Button type="button" onClick={() => saveLegal.mutateAsync(createBlankLegal())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Legal Page
-            </Button>
-            {legalDocuments.map((document) => (
-              <LegalEditorCard key={document.id} value={document} onSave={(next) => saveLegal.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_legal_documents", id: document.id })} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="media" className="space-y-4">
-            <Button type="button" onClick={() => saveMedia.mutateAsync(createBlankMediaAsset())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Media Asset
-            </Button>
-            {mediaAssets.map((asset) => (
-              <MediaEditorCard key={asset.id} value={asset} onSave={(next) => saveMedia.mutateAsync(next)} onDelete={() => deleteMedia.mutateAsync(asset)} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="announcements" className="space-y-4">
-            <Button type="button" onClick={() => saveAnnouncement.mutateAsync(createBlankAnnouncement())}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Announcement
-            </Button>
-            {announcements.map((announcement) => (
-              <AnnouncementEditorCard key={announcement.id} value={announcement} onSave={(next) => saveAnnouncement.mutateAsync(next)} onDelete={() => deleteRecord.mutateAsync({ table: "cms_announcements", id: announcement.id })} />
-            ))}
-          </TabsContent>
-        </Tabs>
-      </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </CmsMediaLibraryContext.Provider>
   );
 }
