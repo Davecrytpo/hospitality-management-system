@@ -1,5 +1,15 @@
 import { supabase } from "@/integrations/supabase/client";
 import { cmsDefaults } from "./defaults";
+import {
+  normalizeCmsBlogPost,
+  normalizeCmsLegalDocument,
+  normalizeCmsMediaAsset,
+  normalizeCmsPage,
+  normalizeCmsService,
+  normalizeCmsSiteSettings,
+  normalizeCmsTeamMember,
+  normalizeCmsTestimonial,
+} from "./normalizers";
 import type {
   CmsAnnouncement,
   CmsBlogPost,
@@ -104,19 +114,22 @@ function collectionFallback<K extends keyof CmsSeedBundle>(key: K): CmsSeedBundl
   return cloneCmsValue(cmsDefaults[key]);
 }
 
-async function fetchSingleton<T>(table: CmsTableName, id: string, fallback: T): Promise<T> {
+async function fetchSingleton<T>(table: CmsTableName, id: string, fallback: T, normalize: (value: T) => T = (value) => value): Promise<T> {
   const { data, error } = await cmsTable<T>(table).select("content").eq("id", id).maybeSingle();
   if (error) {
-    if (isRecoverableCmsError(error)) return cloneCmsValue(fallback);
+    if (isRecoverableCmsError(error)) return normalize(cloneCmsValue(fallback));
     throw error;
   }
-  return data?.content && Object.keys(data.content as Record<string, unknown>).length > 0 ? cloneCmsValue(data.content as T) : cloneCmsValue(fallback);
+  return data?.content && Object.keys(data.content as Record<string, unknown>).length > 0
+    ? normalize(cloneCmsValue(data.content as T))
+    : normalize(cloneCmsValue(fallback));
 }
 
 async function fetchCollection<T extends CmsFilterableContent>(
   table: CmsTableName,
   fallback: T[],
   options?: { filter?: Record<string, string | undefined>; includeDrafts?: boolean; singleSlug?: string },
+  normalize: (value: T) => T = (value) => value,
 ): Promise<T[]> {
   let query = cmsTable<CmsDocumentRow<T>>(table).select("content").order("sort_order", { ascending: true });
 
@@ -144,7 +157,7 @@ async function fetchCollection<T extends CmsFilterableContent>(
       if (options?.filter?.page_slug) results = results.filter((item) => item.pageSlug === options.filter?.page_slug);
       if (options?.filter?.service_slug) results = results.filter((item) => item.serviceSlug === options.filter?.service_slug);
       if (options?.singleSlug) results = results.filter((item) => item.slug === options.singleSlug);
-      return sortByOrder(results);
+      return sortByOrder(results.map(normalize));
     }
     throw error;
   }
@@ -155,10 +168,10 @@ async function fetchCollection<T extends CmsFilterableContent>(
     if (options?.filter?.page_slug) results = results.filter((item) => item.pageSlug === options.filter?.page_slug);
     if (options?.filter?.service_slug) results = results.filter((item) => item.serviceSlug === options.filter?.service_slug);
     if (options?.singleSlug) results = results.filter((item) => item.slug === options.singleSlug);
-    return sortByOrder(results);
+    return sortByOrder(results.map(normalize));
   }
 
-  const content = data.map((row: CmsDocumentRow<T>) => row.content);
+  const content = data.map((row: CmsDocumentRow<T>) => normalize(row.content));
   return sortByOrder(content);
 }
 
@@ -176,33 +189,33 @@ function collectionRow<T extends { id: string; status?: string; sortOrder?: numb
 }
 
 export async function fetchCmsSiteSettings(): Promise<CmsSiteSettings> {
-  return fetchSingleton<CmsSiteSettings>("cms_site_settings", "default", cmsDefaults.settings);
+  return fetchSingleton<CmsSiteSettings>("cms_site_settings", "default", cmsDefaults.settings, normalizeCmsSiteSettings);
 }
 
 export async function fetchCmsPages(includeDrafts = false): Promise<CmsPage[]> {
-  return fetchCollection<CmsPage>("cms_pages", collectionFallback("pages"), { includeDrafts });
+  return fetchCollection<CmsPage>("cms_pages", collectionFallback("pages"), { includeDrafts }, normalizeCmsPage);
 }
 
 export async function fetchCmsPageBySlug(slug: string): Promise<CmsPage | null> {
-  const pages = await fetchCollection<CmsPage>("cms_pages", collectionFallback("pages"), { singleSlug: slug });
+  const pages = await fetchCollection<CmsPage>("cms_pages", collectionFallback("pages"), { singleSlug: slug }, normalizeCmsPage);
   return pages[0] ?? null;
 }
 
 export async function fetchCmsServices(includeDrafts = false): Promise<CmsService[]> {
-  return fetchCollection<CmsService>("cms_services", collectionFallback("services"), { includeDrafts });
+  return fetchCollection<CmsService>("cms_services", collectionFallback("services"), { includeDrafts }, normalizeCmsService);
 }
 
 export async function fetchCmsServiceBySlug(slug: string): Promise<CmsService | null> {
-  const services = await fetchCollection<CmsService>("cms_services", collectionFallback("services"), { singleSlug: slug });
+  const services = await fetchCollection<CmsService>("cms_services", collectionFallback("services"), { singleSlug: slug }, normalizeCmsService);
   return services[0] ?? null;
 }
 
 export async function fetchCmsBlogPosts(includeDrafts = false): Promise<CmsBlogPost[]> {
-  return fetchCollection<CmsBlogPost>("cms_blog_posts", collectionFallback("posts"), { includeDrafts });
+  return fetchCollection<CmsBlogPost>("cms_blog_posts", collectionFallback("posts"), { includeDrafts }, normalizeCmsBlogPost);
 }
 
 export async function fetchCmsBlogPostBySlug(slug: string): Promise<CmsBlogPost | null> {
-  const posts = await fetchCollection<CmsBlogPost>("cms_blog_posts", collectionFallback("posts"), { singleSlug: slug });
+  const posts = await fetchCollection<CmsBlogPost>("cms_blog_posts", collectionFallback("posts"), { singleSlug: slug }, normalizeCmsBlogPost);
   return posts[0] ?? null;
 }
 
@@ -223,7 +236,7 @@ export async function fetchCmsTestimonials(options?: { pageSlug?: string; servic
       page_slug: options?.pageSlug,
       service_slug: options?.serviceSlug,
     },
-  });
+  }, normalizeCmsTestimonial);
 }
 
 export async function fetchCmsTeamMembers(options?: { serviceSlug?: string; includeDrafts?: boolean }) {
@@ -232,20 +245,20 @@ export async function fetchCmsTeamMembers(options?: { serviceSlug?: string; incl
     filter: {
       service_slug: options?.serviceSlug,
     },
-  });
+  }, normalizeCmsTeamMember);
 }
 
 export async function fetchCmsLegalDocuments(includeDrafts = false) {
-  return fetchCollection<CmsLegalDocument>("cms_legal_documents", collectionFallback("legalDocuments"), { includeDrafts });
+  return fetchCollection<CmsLegalDocument>("cms_legal_documents", collectionFallback("legalDocuments"), { includeDrafts }, normalizeCmsLegalDocument);
 }
 
 export async function fetchCmsLegalDocumentBySlug(slug: string) {
-  const docs = await fetchCollection<CmsLegalDocument>("cms_legal_documents", collectionFallback("legalDocuments"), { singleSlug: slug });
+  const docs = await fetchCollection<CmsLegalDocument>("cms_legal_documents", collectionFallback("legalDocuments"), { singleSlug: slug }, normalizeCmsLegalDocument);
   return docs[0] ?? null;
 }
 
 export async function fetchCmsMediaAssets(includeDrafts = false) {
-  return fetchCollection<CmsMediaAsset>("cms_media_assets", collectionFallback("mediaAssets"), { includeDrafts });
+  return fetchCollection<CmsMediaAsset>("cms_media_assets", collectionFallback("mediaAssets"), { includeDrafts }, normalizeCmsMediaAsset);
 }
 
 export async function fetchCmsAnnouncements(includeDrafts = false) {
@@ -253,51 +266,55 @@ export async function fetchCmsAnnouncements(includeDrafts = false) {
 }
 
 export async function saveCmsSiteSettings(content: CmsSiteSettings) {
+  const normalizedContent = normalizeCmsSiteSettings(content);
   const payload: CmsSingletonRow<CmsSiteSettings> = {
-    id: content.id,
-    content,
+    id: normalizedContent.id,
+    content: normalizedContent,
   };
   const { error } = await cmsTable("cms_site_settings").upsert(payload, { onConflict: "id" });
   if (error) throw error;
-  return content;
+  return normalizedContent;
 }
 
 export async function saveCmsPage(page: CmsPage) {
+  const normalizedPage = normalizeCmsPage(page);
   const { error } = await cmsTable("cms_pages").upsert(
     {
-      ...collectionRow(page, { slug: page.slug, page_type: page.pageType }),
-      slug: page.slug,
-      page_type: page.pageType,
+      ...collectionRow(normalizedPage, { slug: normalizedPage.slug, page_type: normalizedPage.pageType }),
+      slug: normalizedPage.slug,
+      page_type: normalizedPage.pageType,
     },
     { onConflict: "slug" },
   );
   if (error) throw error;
-  return page;
+  return normalizedPage;
 }
 
 export async function saveCmsService(service: CmsService) {
+  const normalizedService = normalizeCmsService(service);
   const { error } = await cmsTable("cms_services").upsert(
     {
-      ...collectionRow(service, { slug: service.slug }),
-      slug: service.slug,
+      ...collectionRow(normalizedService, { slug: normalizedService.slug }),
+      slug: normalizedService.slug,
     },
     { onConflict: "slug" },
   );
   if (error) throw error;
-  return service;
+  return normalizedService;
 }
 
 export async function saveCmsBlogPost(post: CmsBlogPost) {
+  const normalizedPost = normalizeCmsBlogPost(post);
   const { error } = await cmsTable("cms_blog_posts").upsert(
     {
-      ...collectionRow(post, { slug: post.slug, published_at: post.publishedAt }),
-      slug: post.slug,
-      published_at: post.publishedAt,
+      ...collectionRow(normalizedPost, { slug: normalizedPost.slug, published_at: normalizedPost.publishedAt }),
+      slug: normalizedPost.slug,
+      published_at: normalizedPost.publishedAt,
     },
     { onConflict: "slug" },
   );
   if (error) throw error;
-  return post;
+  return normalizedPost;
 }
 
 export async function saveCmsFaq(faq: CmsFaq) {
@@ -314,51 +331,55 @@ export async function saveCmsFaq(faq: CmsFaq) {
 }
 
 export async function saveCmsTestimonial(testimonial: CmsTestimonial) {
+  const normalizedTestimonial = normalizeCmsTestimonial(testimonial);
   const { error } = await cmsTable("cms_testimonials").upsert(
     {
-      ...collectionRow(testimonial, { page_slug: testimonial.pageSlug ?? null, service_slug: testimonial.serviceSlug ?? null }),
-      page_slug: testimonial.pageSlug ?? null,
-      service_slug: testimonial.serviceSlug ?? null,
+      ...collectionRow(normalizedTestimonial, { page_slug: normalizedTestimonial.pageSlug ?? null, service_slug: normalizedTestimonial.serviceSlug ?? null }),
+      page_slug: normalizedTestimonial.pageSlug ?? null,
+      service_slug: normalizedTestimonial.serviceSlug ?? null,
     },
     { onConflict: "id" },
   );
   if (error) throw error;
-  return testimonial;
+  return normalizedTestimonial;
 }
 
 export async function saveCmsTeamMember(member: CmsTeamMember) {
+  const normalizedMember = normalizeCmsTeamMember(member);
   const { error } = await cmsTable("cms_team_members").upsert(
     {
-      ...collectionRow(member, { service_slug: member.serviceSlug ?? null }),
-      service_slug: member.serviceSlug ?? null,
+      ...collectionRow(normalizedMember, { service_slug: normalizedMember.serviceSlug ?? null }),
+      service_slug: normalizedMember.serviceSlug ?? null,
     },
     { onConflict: "id" },
   );
   if (error) throw error;
-  return member;
+  return normalizedMember;
 }
 
 export async function saveCmsLegalDocument(document: CmsLegalDocument) {
+  const normalizedDocument = normalizeCmsLegalDocument(document);
   const { error } = await cmsTable("cms_legal_documents").upsert(
     {
-      ...collectionRow(document, { slug: document.slug }),
-      slug: document.slug,
+      ...collectionRow(normalizedDocument, { slug: normalizedDocument.slug }),
+      slug: normalizedDocument.slug,
     },
     { onConflict: "slug" },
   );
   if (error) throw error;
-  return document;
+  return normalizedDocument;
 }
 
 export async function saveCmsMediaAsset(asset: CmsMediaAsset) {
+  const normalizedAsset = normalizeCmsMediaAsset(asset);
   const { error } = await cmsTable("cms_media_assets").upsert(
     {
-      ...collectionRow(asset),
+      ...collectionRow(normalizedAsset),
     },
     { onConflict: "id" },
   );
   if (error) throw error;
-  return asset;
+  return normalizedAsset;
 }
 
 export async function saveCmsAnnouncement(announcement: CmsAnnouncement) {

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="56" viewBox="0 0 260 56" role="img" aria-labelledby="title">
+  <title>CareFirst</title>
+  <rect width="260" height="56" fill="none"/>
+  <text x="6" y="36" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#1b2b57">CareFirst.</text>
+  <g transform="translate(146 18)" fill="#2c68c6">
+    <path d="M9 0c4.97 0 9 4.03 9 9s-4.03 9-9 9S0 13.97 0 9 4.03 0 9 0Zm0 4.2A4.8 4.8 0 1 0 9 13.8 4.8 4.8 0 0 0 9 4.2Z"/>
+    <path d="M24 0c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9Zm0 4.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Z"/>
+  </g>
+</svg>
