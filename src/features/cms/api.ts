@@ -44,10 +44,45 @@ interface CmsSingletonRow<T> {
   content: T;
 }
 
-const cmsClient = supabase as any;
+interface CmsMutationResult {
+  error: unknown | null;
+}
+
+interface CmsQueryResult<T> {
+  data: T | null;
+  error: unknown | null;
+}
+
+interface CmsDeleteQuery {
+  eq(column: string, value: unknown): Promise<CmsMutationResult>;
+}
+
+interface CmsQueryBuilder<T> extends PromiseLike<CmsQueryResult<T[]>> {
+  select(columns: string): CmsQueryBuilder<T>;
+  eq(column: string, value: unknown): CmsQueryBuilder<T>;
+  order(column: string, options?: { ascending?: boolean }): CmsQueryBuilder<T>;
+  limit(count: number): CmsQueryBuilder<T>;
+  maybeSingle(): Promise<CmsQueryResult<T>>;
+  upsert(payload: unknown, options?: { onConflict?: string }): Promise<CmsMutationResult>;
+  delete(): CmsDeleteQuery;
+}
+
+interface CmsClient {
+  from<T>(table: CmsTableName): CmsQueryBuilder<T>;
+}
+
+type CmsFilterableContent = {
+  slug?: string;
+  pageSlug?: string;
+  serviceSlug?: string;
+  status?: string;
+  sortOrder?: number;
+};
+
+const cmsClient = supabase as unknown as CmsClient;
 
 function cmsTable<T = unknown>(table: CmsTableName) {
-  return cmsClient.from(table) as any;
+  return cmsClient.from<T>(table);
 }
 
 function isRecoverableCmsError(error: unknown) {
@@ -78,7 +113,7 @@ async function fetchSingleton<T>(table: CmsTableName, id: string, fallback: T): 
   return data?.content && Object.keys(data.content as Record<string, unknown>).length > 0 ? cloneCmsValue(data.content as T) : cloneCmsValue(fallback);
 }
 
-async function fetchCollection<T extends { status?: string; sortOrder?: number }>(
+async function fetchCollection<T extends CmsFilterableContent>(
   table: CmsTableName,
   fallback: T[],
   options?: { filter?: Record<string, string | undefined>; includeDrafts?: boolean; singleSlug?: string },
@@ -106,9 +141,9 @@ async function fetchCollection<T extends { status?: string; sortOrder?: number }
     if (isRecoverableCmsError(error)) {
       let results = cloneCmsValue(fallback);
       if (!options?.includeDrafts) results = publishedOnly(results);
-      if (options?.filter?.page_slug) results = results.filter((item: any) => item.pageSlug === options.filter?.page_slug);
-      if (options?.filter?.service_slug) results = results.filter((item: any) => item.serviceSlug === options.filter?.service_slug);
-      if (options?.singleSlug) results = results.filter((item: any) => item.slug === options.singleSlug);
+      if (options?.filter?.page_slug) results = results.filter((item) => item.pageSlug === options.filter?.page_slug);
+      if (options?.filter?.service_slug) results = results.filter((item) => item.serviceSlug === options.filter?.service_slug);
+      if (options?.singleSlug) results = results.filter((item) => item.slug === options.singleSlug);
       return sortByOrder(results);
     }
     throw error;
@@ -117,9 +152,9 @@ async function fetchCollection<T extends { status?: string; sortOrder?: number }
   if (!data || data.length === 0) {
     let results = cloneCmsValue(fallback);
     if (!options?.includeDrafts) results = publishedOnly(results);
-    if (options?.filter?.page_slug) results = results.filter((item: any) => item.pageSlug === options.filter?.page_slug);
-    if (options?.filter?.service_slug) results = results.filter((item: any) => item.serviceSlug === options.filter?.service_slug);
-    if (options?.singleSlug) results = results.filter((item: any) => item.slug === options.singleSlug);
+    if (options?.filter?.page_slug) results = results.filter((item) => item.pageSlug === options.filter?.page_slug);
+    if (options?.filter?.service_slug) results = results.filter((item) => item.serviceSlug === options.filter?.service_slug);
+    if (options?.singleSlug) results = results.filter((item) => item.slug === options.singleSlug);
     return sortByOrder(results);
   }
 

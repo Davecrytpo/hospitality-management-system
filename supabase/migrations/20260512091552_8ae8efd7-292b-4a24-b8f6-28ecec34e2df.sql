@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS public.cms_site_settings (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_pages (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   slug text NOT NULL UNIQUE,
   page_type text NOT NULL DEFAULT 'standard',
   status text NOT NULL DEFAULT 'draft',
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS public.cms_pages (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_services (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   slug text NOT NULL UNIQUE,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.cms_services (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_blog_posts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   slug text NOT NULL UNIQUE,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS public.cms_blog_posts (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_faqs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
   page_slug text,
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS public.cms_faqs (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_testimonials (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
   page_slug text,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS public.cms_testimonials (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_team_members (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
   service_slug text,
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS public.cms_team_members (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_legal_documents (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   slug text NOT NULL UNIQUE,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS public.cms_legal_documents (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_media_assets (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
   content jsonb NOT NULL DEFAULT '{}'::jsonb,
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS public.cms_media_assets (
 );
 
 CREATE TABLE IF NOT EXISTS public.cms_announcements (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id text PRIMARY KEY,
   status text NOT NULL DEFAULT 'draft',
   sort_order integer NOT NULL DEFAULT 0,
   content jsonb NOT NULL DEFAULT '{}'::jsonb,
