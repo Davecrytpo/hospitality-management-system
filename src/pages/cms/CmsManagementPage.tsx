@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowDown,
   ArrowUp,
@@ -71,6 +72,12 @@ import { cloneCmsValue, createCmsId, createEmptyButton, createEmptyImage, create
 const sectionTypes: CmsSection["type"][] = ["hero", "richText", "featureGrid", "stats", "serviceList", "testimonialList", "faqList", "cta", "teamGrid", "gallery", "timeline", "blogFeed", "contactCards"];
 const sectionThemes: CmsSection["theme"][] = ["light", "muted", "primary", "accent"];
 const dataSources: CmsSection["dataSource"][] = ["manual", "services", "testimonials", "faqs", "team", "blog-posts"];
+const cmsTabValues = ["settings", "pages", "services", "blog", "faqs", "testimonials", "team", "legal", "media", "announcements"] as const;
+type CmsTabValue = (typeof cmsTabValues)[number];
+
+function isCmsTabValue(value: string | null | undefined): value is CmsTabValue {
+  return value ? cmsTabValues.includes(value as CmsTabValue) : false;
+}
 
 function moveItem<T>(items: T[], index: number, direction: -1 | 1) {
   const nextIndex = index + direction;
@@ -1100,6 +1107,9 @@ function SiteSettingsEditor({ value, onSave }: { value: CmsSiteSettings; onSave:
 }
 
 export default function CmsManagementPage() {
+  const navigate = useNavigate();
+  const { tab } = useParams<{ tab?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: settings, isLoading } = useCmsSiteSettings();
   const { data: pages = [] } = useCmsPages(true);
   const { data: services = [] } = useCmsServices(true);
@@ -1124,6 +1134,8 @@ export default function CmsManagementPage() {
   const deleteRecord = useDeleteCmsRecord();
   const deleteMedia = useDeleteCmsMediaAsset();
   const seedDefaults = useSeedCmsDefaults();
+  const requestedTab = tab ?? searchParams.get("tab");
+  const activeTab: CmsTabValue = isCmsTabValue(requestedTab) ? requestedTab : "settings";
 
   const contentHealth = useMemo(
     () => [
@@ -1185,7 +1197,21 @@ export default function CmsManagementPage() {
           ))}
         </div>
 
-        <Tabs defaultValue="settings" className="space-y-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={(nextValue) => {
+            const nextTab = isCmsTabValue(nextValue) ? nextValue : "settings";
+            if (tab) {
+              navigate(`/cms/${nextTab}`, { replace: true });
+              return;
+            }
+
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set("tab", nextTab);
+            setSearchParams(nextParams, { replace: true });
+          }}
+          className="space-y-4"
+        >
           <TabsList className="flex h-auto flex-wrap justify-start gap-2 bg-transparent p-0">
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="pages">Pages</TabsTrigger>

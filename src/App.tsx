@@ -225,6 +225,8 @@ const App = () => (
             <Route path="/blog" element={<PublicBlogPage />} />
             <Route path="/blog/:slug" element={<PublicBlogPostPage />} />
             <Route path="/policies/:slug" element={<PublicPolicyPage />} />
+            <Route path="/pages" element={<CmsRoute><Navigate to="/cms/pages" replace /></CmsRoute>} />
+            <Route path="/pages/*" element={<CmsRoute><Navigate to="/cms/pages" replace /></CmsRoute>} />
             <Route path="/:slug" element={<PublicCmsDynamicPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/patient-register" element={<PatientRegisterPage />} />
@@ -356,6 +358,7 @@ const App = () => (
             <Route path="/support" element={<StaffRoute><SupportPage /></StaffRoute>} />
             <Route path="/notice-board" element={<StaffRoute><InternalNoticeBoard /></StaffRoute>} />
             <Route path="/cms" element={<CmsRoute><CmsManagementPage /></CmsRoute>} />
+            <Route path="/cms/:tab" element={<CmsRoute><CmsManagementPage /></CmsRoute>} />
 
             {/* Patient Portal (protected) */}
             <Route path="/patient-portal" element={<PatientRoute><PatientDashboard /></PatientRoute>} />
