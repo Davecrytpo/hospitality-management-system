@@ -585,31 +585,22 @@ function ImageFields({ label, value, onChange }: { label: string; value?: CmsIma
 
 function ButtonsEditor({ value, onChange }: { value: CmsButton[]; onChange: (next: CmsButton[]) => void }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <FieldLabel>Buttons</FieldLabel>
+        <div className="space-y-1">
+          <FieldLabel>Buttons</FieldLabel>
+          <p className="text-sm text-muted-foreground">Add call-to-action buttons for this section. You can set label, link style, and whether the link opens in a new tab.</p>
+        </div>
         <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptyButton()])}>
           <Plus className="mr-2 h-4 w-4" />
           Add Button
         </Button>
       </div>
-      <div className="space-y-3">
+      <div className="space-y-4">
         {value.map((entry, index) => (
-          <div key={entry.id} className="rounded-lg border border-border p-3">
-            <div className="grid gap-3 lg:grid-cols-[1fr_1fr_180px_auto]">
-              <Input value={entry.label} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, label: event.target.value } : button)))} placeholder="Button label" />
-              <Input value={entry.href} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, href: event.target.value } : button)))} placeholder="/contact or https://..." />
-              <Select value={entry.variant} onValueChange={(variant) => onChange(value.map((button) => (button.id === entry.id ? { ...button, variant: variant as CmsButton["variant"] } : button)))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="primary">Primary</SelectItem>
-                  <SelectItem value="secondary">Secondary</SelectItem>
-                  <SelectItem value="outline">Outline</SelectItem>
-                  <SelectItem value="ghost">Ghost</SelectItem>
-                </SelectContent>
-              </Select>
+          <div key={entry.id} className="space-y-4 rounded-xl border border-border bg-card/50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Badge variant="secondary">Button {index + 1}</Badge>
               <div className="flex gap-2">
                 <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
                   <ArrowUp className="h-4 w-4" />
@@ -623,6 +614,30 @@ function ButtonsEditor({ value, onChange }: { value: CmsButton[]; onChange: (nex
                 <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((button) => button.id !== entry.id))}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
+              </div>
+            </div>
+            <div className="grid gap-3 lg:grid-cols-2">
+              <Input value={entry.label} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, label: event.target.value } : button)))} placeholder="Button label" />
+              <Input value={entry.href} onChange={(event) => onChange(value.map((button) => (button.id === entry.id ? { ...button, href: event.target.value } : button)))} placeholder="/contact, tel:+123..., or https://..." />
+            </div>
+            <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
+              <Select value={entry.variant} onValueChange={(variant) => onChange(value.map((button) => (button.id === entry.id ? { ...button, variant: variant as CmsButton["variant"] } : button)))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="primary">Primary</SelectItem>
+                  <SelectItem value="secondary">Secondary</SelectItem>
+                  <SelectItem value="outline">Outline</SelectItem>
+                  <SelectItem value="ghost">Ghost</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Open in new tab</p>
+                  <p className="text-xs text-muted-foreground">Enable this for external websites or documents.</p>
+                </div>
+                <Switch checked={entry.newTab ?? false} onCheckedChange={(checked) => onChange(value.map((button) => (button.id === entry.id ? { ...button, newTab: checked } : button)))} />
               </div>
             </div>
           </div>
@@ -2001,6 +2016,123 @@ function CollectionWorkspace<T extends { id: string; status: CmsStatus }>({
     }
   };
 
+  if (selectedRecord) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-xl font-semibold text-foreground">{selectedRecord.title}</h2>
+                <StatusBadge status={selectedRecord.status} />
+              </div>
+              {selectedRecord.subtitle && <p className="text-sm text-muted-foreground">{selectedRecord.subtitle}</p>}
+              {selectedRecord.chips && selectedRecord.chips.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedRecord.chips.map((chip) => (
+                    <Badge key={chip} variant="secondary">
+                      {chip}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="outline" onClick={() => onScopeChange(scope)}>
+                <Undo2 className="mr-2 h-4 w-4" />
+                Back to {title}
+              </Button>
+              {publicHref && selectedRecord.status === "published" && publicHref(selectedRecord.item) && (
+                <Button type="button" variant="outline" asChild>
+                  <a href={publicHref(selectedRecord.item) ?? "#"} target="_blank" rel="noreferrer">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    View Live
+                  </a>
+                </Button>
+              )}
+              {selectedRecord.status !== "published" && (
+                <Button
+                  type="button"
+                  disabled={busyAction !== null}
+                  onClick={() =>
+                    void runAction(
+                      "publish",
+                      async () => {
+                        await onChangeStatus(selectedRecord.item, "published");
+                      },
+                      `${singularLabel} moved to Live.`,
+                    )
+                  }
+                >
+                  {busyAction === "publish" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
+                  Publish
+                </Button>
+              )}
+              {selectedRecord.status !== "draft" && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={busyAction !== null}
+                  onClick={() =>
+                    void runAction(
+                      "draft",
+                      async () => {
+                        await onChangeStatus(selectedRecord.item, "draft");
+                      },
+                      `${singularLabel} moved to Drafts.`,
+                    )
+                  }
+                >
+                  {busyAction === "draft" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Undo2 className="mr-2 h-4 w-4" />}
+                  Move to Drafts
+                </Button>
+              )}
+              {selectedRecord.status !== "deleted" && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={busyAction !== null}
+                  onClick={() =>
+                    void runAction(
+                      "trash",
+                      async () => {
+                        await onChangeStatus(selectedRecord.item, "deleted");
+                      },
+                      `${singularLabel} moved to Deleted.`,
+                    )
+                  }
+                >
+                  {busyAction === "trash" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                  Move to Deleted
+                </Button>
+              )}
+              {selectedRecord.status === "deleted" && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={busyAction !== null}
+                  onClick={() =>
+                    void runAction(
+                      "permanent-delete",
+                      async () => {
+                        await onPermanentDelete(selectedRecord.item);
+                      },
+                      `${singularLabel} deleted permanently.`,
+                    )
+                  }
+                >
+                  {busyAction === "permanent-delete" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                  Delete Permanently
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        {renderEditor(selectedRecord.item)}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
       <Card className="overflow-hidden">
@@ -2075,116 +2207,7 @@ function CollectionWorkspace<T extends { id: string; status: CmsStatus }>({
       </Card>
 
       <div className="space-y-6">
-        {selectedRecord ? (
-          <>
-            <Card>
-              <CardContent className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="text-xl font-semibold text-foreground">{selectedRecord.title}</h2>
-                    <StatusBadge status={selectedRecord.status} />
-                  </div>
-                  {selectedRecord.subtitle && <p className="text-sm text-muted-foreground">{selectedRecord.subtitle}</p>}
-                  {selectedRecord.chips && selectedRecord.chips.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {selectedRecord.chips.map((chip) => (
-                        <Badge key={chip} variant="secondary">
-                          {chip}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {publicHref && selectedRecord.status === "published" && publicHref(selectedRecord.item) && (
-                    <Button type="button" variant="outline" asChild>
-                      <a href={publicHref(selectedRecord.item) ?? "#"} target="_blank" rel="noreferrer">
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        View Live
-                      </a>
-                    </Button>
-                  )}
-                  {selectedRecord.status !== "published" && (
-                    <Button
-                      type="button"
-                      disabled={busyAction !== null}
-                      onClick={() =>
-                        void runAction(
-                          "publish",
-                          async () => {
-                            await onChangeStatus(selectedRecord.item, "published");
-                          },
-                          `${singularLabel} moved to Live.`,
-                        )
-                      }
-                    >
-                      {busyAction === "publish" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
-                      Publish
-                    </Button>
-                  )}
-                  {selectedRecord.status !== "draft" && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={busyAction !== null}
-                      onClick={() =>
-                        void runAction(
-                          "draft",
-                          async () => {
-                            await onChangeStatus(selectedRecord.item, "draft");
-                          },
-                          `${singularLabel} moved to Drafts.`,
-                        )
-                      }
-                    >
-                      {busyAction === "draft" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Undo2 className="mr-2 h-4 w-4" />}
-                      Move to Drafts
-                    </Button>
-                  )}
-                  {selectedRecord.status !== "deleted" && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={busyAction !== null}
-                      onClick={() =>
-                        void runAction(
-                          "trash",
-                          async () => {
-                            await onChangeStatus(selectedRecord.item, "deleted");
-                          },
-                          `${singularLabel} moved to Deleted.`,
-                        )
-                      }
-                    >
-                      {busyAction === "trash" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
-                      Move to Deleted
-                    </Button>
-                  )}
-                  {selectedRecord.status === "deleted" && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      disabled={busyAction !== null}
-                      onClick={() =>
-                        void runAction(
-                          "permanent-delete",
-                          async () => {
-                            await onPermanentDelete(selectedRecord.item);
-                          },
-                          `${singularLabel} deleted permanently.`,
-                        )
-                      }
-                    >
-                      {busyAction === "permanent-delete" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
-                      Delete Permanently
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            {renderEditor(selectedRecord.item)}
-          </>
-        ) : overview ? (
+        {overview ? (
           overview
         ) : (
           <CmsEmptyState
