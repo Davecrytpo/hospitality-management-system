@@ -1665,59 +1665,6 @@ function CmsEmptyState({
   );
 }
 
-function CmsSidebarSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-3">
-      <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{title}</p>
-      <div className="space-y-2">{children}</div>
-    </div>
-  );
-}
-
-function CmsSidebarButton({
-  label,
-  description,
-  active,
-  onClick,
-  badge,
-  trailing,
-}: {
-  label: string;
-  description?: string;
-  active?: boolean;
-  onClick: () => void;
-  badge?: React.ReactNode;
-  trailing?: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "w-full rounded-2xl border px-4 py-3 text-left transition-colors",
-        active ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-background hover:border-primary/30",
-      )}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="truncate font-semibold text-foreground">{label}</p>
-            {badge}
-          </div>
-          {description && <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>}
-        </div>
-        {trailing}
-      </div>
-    </button>
-  );
-}
-
 function CmsOverviewDashboard({
   counts,
   pages,
@@ -2494,22 +2441,6 @@ export default function CmsManagementPage() {
   );
 
   const canSeedDefaults = contentHealth.every((entry) => entry.total === 0);
-  const getPageWorkspaceHref = (slug: string) => {
-    const page = pages.find((entry) => entry.slug === slug);
-    return page ? buildCmsHref("pages", getScopeFromStatus(page.status), page.slug) : buildCmsHref("pages", "live");
-  };
-  const getServiceWorkspaceHref = (slug: string) => {
-    const service = services.find((entry) => entry.slug === slug);
-    return service ? buildCmsHref("services", getScopeFromStatus(service.status), service.slug) : buildCmsHref("services", "live");
-  };
-  const sortedSidebarServices = [...services]
-    .filter((service) => service.status !== "deleted")
-    .sort((left, right) => {
-      const leftRank = left.status === "published" ? 0 : 1;
-      const rightRank = right.status === "published" ? 0 : 1;
-      return leftRank - rightRank || left.sortOrder - right.sortOrder || left.title.localeCompare(right.title);
-    });
-  const isPathActive = (href: string, exact = false) => (exact ? location.pathname === href : location.pathname === href || location.pathname.startsWith(`${href}/`));
 
   const openCollection = (collection: Exclude<CmsCollectionKey, "overview">) => {
     navigate(buildCmsHref(collection, collection === "settings" ? undefined : collectionMeta[collection].defaultScope));
@@ -2861,91 +2792,7 @@ export default function CmsManagementPage() {
             )}
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-            <div className="space-y-4 xl:sticky xl:top-6 xl:self-start">
-              <Card className="overflow-hidden">
-                <CardContent className="space-y-5 p-4">
-                  <CmsSidebarSection title="Dashboard">
-                    <CmsSidebarButton
-                      label="CMS Overview"
-                      description="Open the master CMS dashboard."
-                      active={activeCollection === "overview"}
-                      onClick={() => navigate("/cms")}
-                      badge={<Badge variant="secondary">{contentHealth.reduce((total, item) => total + item.total, 0)}</Badge>}
-                    />
-                  </CmsSidebarSection>
-
-                  <Separator />
-
-                  <CmsSidebarSection title="Website Management">
-                    <CmsSidebarButton label="Homepage" active={location.pathname === getPageWorkspaceHref("home")} onClick={() => navigate(getPageWorkspaceHref("home"))} />
-                    <CmsSidebarButton label="About Us" active={location.pathname === getPageWorkspaceHref("about-us")} onClick={() => navigate(getPageWorkspaceHref("about-us"))} />
-                    <CmsSidebarButton label="Services Page" active={location.pathname === getPageWorkspaceHref("services")} onClick={() => navigate(getPageWorkspaceHref("services"))} />
-                    <CmsSidebarButton label="Blog" active={isPathActive(buildCmsHref("blog", "live"))} onClick={() => navigate(buildCmsHref("blog", "live"))} />
-                    <CmsSidebarButton label="Contact" active={location.pathname === getPageWorkspaceHref("contact")} onClick={() => navigate(getPageWorkspaceHref("contact"))} />
-                    <CmsSidebarButton label="FAQ" active={isPathActive(buildCmsHref("faqs", "live"))} onClick={() => navigate(buildCmsHref("faqs", "live"))} />
-                    <CmsSidebarButton label="Testimonials" active={isPathActive(buildCmsHref("testimonials", "live"))} onClick={() => navigate(buildCmsHref("testimonials", "live"))} />
-                    <CmsSidebarButton label="Team" active={isPathActive(buildCmsHref("team", "live"))} onClick={() => navigate(buildCmsHref("team", "live"))} />
-                    <CmsSidebarButton label="SEO" active={isPathActive(buildSettingsHref("seo"))} onClick={() => navigate(buildSettingsHref("seo"))} />
-                    <CmsSidebarButton label="Media Library" active={isPathActive(buildCmsHref("media", "live"))} onClick={() => navigate(buildCmsHref("media", "live"))} />
-                  </CmsSidebarSection>
-
-                  <Separator />
-
-                  <CmsSidebarSection title="Services Management">
-                    <CmsSidebarButton
-                      label="All Services"
-                      description={`${services.filter((service) => service.status === "published").length} live / ${services.filter((service) => service.status === "draft").length} drafts`}
-                      active={activeCollection === "services" && !selectedKey}
-                      onClick={() => navigate(buildCmsHref("services", "live"))}
-                    />
-                    <ScrollArea className="max-h-72 pr-2">
-                      <div className="space-y-2">
-                        {sortedSidebarServices.map((service) => (
-                          <CmsSidebarButton
-                            key={service.id}
-                            label={service.title}
-                            active={activeCollection === "services" && selectedKey === service.slug}
-                            onClick={() => navigate(getServiceWorkspaceHref(service.slug))}
-                            badge={<StatusDot status={service.status} />}
-                          />
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CmsSidebarSection>
-
-                  <Separator />
-
-                  <CmsSidebarSection title="Website Settings">
-                    <CmsSidebarButton label="Navbar" active={isPathActive(buildSettingsHref("navbar"))} onClick={() => navigate(buildSettingsHref("navbar"))} />
-                    <CmsSidebarButton label="Footer" active={isPathActive(buildSettingsHref("footer"))} onClick={() => navigate(buildSettingsHref("footer"))} />
-                    <CmsSidebarButton label="Branding" active={isPathActive(buildSettingsHref("branding"))} onClick={() => navigate(buildSettingsHref("branding"))} />
-                    <CmsSidebarButton label="Social Links" active={isPathActive(buildSettingsHref("social"))} onClick={() => navigate(buildSettingsHref("social"))} />
-                    <CmsSidebarButton label="Theme Settings" active={isPathActive(buildSettingsHref("theme"))} onClick={() => navigate(buildSettingsHref("theme"))} />
-                  </CmsSidebarSection>
-
-                  <Separator />
-
-                  <CmsSidebarSection title="Hospital Operations">
-                    <CmsSidebarButton label="Patients" active={false} onClick={() => navigate("/patients")} />
-                    <CmsSidebarButton label="Doctors" active={false} onClick={() => navigate("/doctors")} />
-                    <CmsSidebarButton label="Billing" active={false} onClick={() => navigate("/billing")} />
-                    <CmsSidebarButton label="Pharmacy" active={false} onClick={() => navigate("/pharmacy")} />
-                    <CmsSidebarButton label="Laboratory" active={false} onClick={() => navigate("/lab")} />
-                  </CmsSidebarSection>
-
-                  <Separator />
-
-                  <CmsSidebarSection title="System Settings">
-                    <CmsSidebarButton label="Platform Settings" active={false} onClick={() => navigate("/settings")} />
-                    <CmsSidebarButton label="Help & Support" active={false} onClick={() => navigate("/support")} />
-                  </CmsSidebarSection>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-6">{workspace}</div>
-          </div>
+          <div className="space-y-6">{workspace}</div>
         </div>
       </DashboardLayout>
     </CmsMediaLibraryContext.Provider>

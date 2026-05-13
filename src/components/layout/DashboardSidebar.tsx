@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useCmsPages, useCmsServices } from "@/features/cms/hooks";
 import {
   LayoutDashboard, Users, Calendar, BedDouble, FileText, Pill,
   FlaskConical, Stethoscope, Activity, Building2, CreditCard,
@@ -16,10 +17,10 @@ interface SidebarProps {
 
 interface NavItem {
   title: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<{ className?: string }>;
   href?: string;
   roles?: string[];
-  children?: { title: string; href: string; roles?: string[] }[];
+  children?: NavItem[];
 }
 
 const navigation: NavItem[] = [
@@ -106,10 +107,6 @@ const navigation: NavItem[] = [
     title: "Notice Board", icon: Megaphone, href: "/notice-board",
     roles: ["admin", "doctor", "nurse", "pharmacist", "lab_tech", "finance", "receptionist"]
   },
-  {
-    title: "Website CMS", icon: LayoutDashboard, href: "/cms",
-    roles: ["admin", "content_manager"]
-  },
 ];
 
 const bottomNavigation: NavItem[] = [
@@ -121,6 +118,9 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const includeCmsDrafts = userRole === "admin" || userRole === "content_manager";
+  const { data: cmsPages = [] } = useCmsPages(includeCmsDrafts);
+  const { data: cmsServices = [] } = useCmsServices(includeCmsDrafts);
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -144,14 +144,155 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
   };
 
   const isActive = (href: string) => location.pathname === href;
-  const isParentActive = (children?: { href: string }[]) =>
-    children?.some(child => location.pathname === child.href);
+  const isPathActive = (href: string) => location.pathname === href || location.pathname.startsWith(`${href}/`);
+  const cmsScopeFromStatus = (status?: string) => {
+    if (status === "deleted") return "deleted";
+    if (status === "draft") return "drafts";
+    return "live";
+  };
 
-  const filteredNavigation = navigation.filter(item => {
+  const cmsNavigation = useMemo<NavItem>(() => {
+    const corePageOrder = ["home", "about-us", "services", "contact", "faq", "blog"];
+    const pageLabelMap: Record<string, string> = {
+      home: "Homepage",
+      "about-us": "About Us",
+      services: "Services Page",
+      contact: "Contact",
+      faq: "FAQ Page",
+      blog: "Blog Landing",
+    };
+    const pageLinks = corePageOrder.map((slug) => {
+      const page = cmsPages.find((entry) => entry.slug === slug);
+      return {
+        title: pageLabelMap[slug] ?? slug,
+        href: page ? `/cms/pages/${cmsScopeFromStatus(page.status)}/${page.slug}` : "/cms/pages/live",
+      };
+    });
+
+    const serviceLinks = cmsServices
+      .filter((service) => service.status !== "deleted")
+      .sort((left, right) => left.sortOrder - right.sortOrder || left.title.localeCompare(right.title))
+      .map((service) => ({
+        title: service.title,
+        href: `/cms/services/${cmsScopeFromStatus(service.status)}/${service.slug}`,
+      }));
+
+    return {
+      title: "Website CMS",
+      icon: LayoutDashboard,
+      roles: ["admin", "content_manager"],
+      children: [
+        { title: "CMS Dashboard", href: "/cms" },
+        {
+          title: "Website Management",
+          children: [
+            ...pageLinks,
+            { title: "Blog Posts", href: "/cms/blog/live" },
+            { title: "FAQs", href: "/cms/faqs/live" },
+            { title: "Testimonials", href: "/cms/testimonials/live" },
+            { title: "Team", href: "/cms/team/live" },
+            { title: "Policies", href: "/cms/legal/live" },
+            { title: "Media Library", href: "/cms/media/live" },
+            { title: "Announcements", href: "/cms/announcements/live" },
+          ],
+        },
+        {
+          title: "Services Management",
+          children: [
+            { title: "All Services", href: "/cms/services/live" },
+            ...serviceLinks,
+          ],
+        },
+        {
+          title: "Website Settings",
+          children: [
+            { title: "Branding", href: "/cms/settings/branding" },
+            { title: "Navbar", href: "/cms/settings/navbar" },
+            { title: "Footer", href: "/cms/settings/footer" },
+            { title: "Contact", href: "/cms/settings/contact" },
+            { title: "Social Links", href: "/cms/settings/social" },
+            { title: "Theme Settings", href: "/cms/settings/theme" },
+            { title: "SEO", href: "/cms/settings/seo" },
+          ],
+        },
+      ],
+    };
+  }, [cmsPages, cmsServices]);
+
+  const isItemActive = (item: NavItem): boolean => {
+    if (item.href && isPathActive(item.href)) return true;
+    return item.children?.some(isItemActive) ?? false;
+  };
+
+  const filteredNavigation = [...navigation, cmsNavigation].filter(item => {
     if (!userRole) return false;
     if (userRole === 'admin') return true;
     return item.roles?.includes(userRole);
   });
+
+  const renderNavItems = (items: NavItem[], depth = 0, parentKey = "root") => (
+    <ul className={cn(depth === 0 ? "space-y-0.5" : "mt-0.5 space-y-0.5 border-l border-sidebar-border pl-3", depth >= 2 && "ml-2")}>
+      {items.map((item) => {
+        const key = `${parentKey}/${item.title}`;
+        const hasChildren = Boolean(item.children?.length);
+        const active = isItemActive(item);
+        const expanded = expandedItems.includes(key) || active;
+        const Icon = item.icon;
+
+        if (hasChildren) {
+          return (
+            <li key={key}>
+              <button
+                type="button"
+                onClick={() => !collapsed && toggleExpand(key)}
+                className={cn(
+                  "flex w-full items-center gap-3 rounded-lg transition-all duration-200",
+                  depth === 0 ? "px-3 py-2 text-[13px] font-medium" : "px-3 py-2 text-[12px] font-medium",
+                  active
+                    ? depth === 0
+                      ? "bg-sidebar-primary/10 text-sidebar-primary"
+                      : "bg-sidebar-accent text-sidebar-foreground"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                )}
+              >
+                {depth === 0 && Icon ? <Icon className="h-[18px] w-[18px] flex-shrink-0" /> : <span className="h-1.5 w-1.5 rounded-full bg-current opacity-50" />}
+                {!collapsed && (
+                  <>
+                    <span className="flex-1 text-left truncate">{item.title}</span>
+                    <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200 opacity-50", expanded && "rotate-180")} />
+                  </>
+                )}
+              </button>
+
+              {!collapsed && expanded && item.children && renderNavItems(item.children, depth + 1, key)}
+            </li>
+          );
+        }
+
+        return (
+          <li key={key}>
+            <Link
+              to={item.href!}
+              className={cn(
+                "flex items-center gap-3 rounded-lg transition-all duration-200",
+                depth === 0 ? "px-3 py-2 text-[13px] font-medium" : depth === 1 ? "px-3 py-1.5 text-[12px]" : "px-3 py-1.5 text-[11px]",
+                active
+                  ? depth === 0
+                    ? "bg-sidebar-primary text-white shadow-glow-sm"
+                    : "bg-sidebar-primary text-white font-semibold"
+                  : depth === 0
+                    ? "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    : "text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+              )}
+            >
+              {depth === 0 && Icon ? <Icon className="h-[18px] w-[18px] flex-shrink-0" /> : <span className="h-1.5 w-1.5 rounded-full bg-current opacity-50" />}
+              {!collapsed && <span className="truncate">{item.title}</span>}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
     <>
@@ -193,69 +334,7 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-3 px-3">
-          <ul className="space-y-0.5">
-            {filteredNavigation.map((item) => (
-              <li key={item.title}>
-                {item.children ? (
-                  <div>
-                    <button type="button"
-                      onClick={() => !collapsed && toggleExpand(item.title)}
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200",
-                        isParentActive(item.children)
-                          ? "bg-sidebar-primary/10 text-sidebar-primary"
-                          : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                      )}
-                    >
-                      <item.icon className="h-[18px] w-[18px] flex-shrink-0" />
-                      {!collapsed && (
-                        <>
-                          <span className="flex-1 text-left truncate">{item.title}</span>
-                          <ChevronDown className={cn(
-                            "h-3.5 w-3.5 transition-transform duration-200 opacity-50",
-                            expandedItems.includes(item.title) && "rotate-180"
-                          )} />
-                        </>
-                      )}
-                    </button>
-
-                    {!collapsed && (expandedItems.includes(item.title) || isParentActive(item.children)) && (
-                      <ul className="mt-0.5 ml-[18px] space-y-0.5 border-l border-sidebar-border pl-3">
-                        {item.children.map((child) => (
-                          <li key={child.href}>
-                            <Link
-                              to={child.href}
-                              className={cn(
-                                "block rounded-md px-3 py-1.5 text-[12px] transition-all duration-200",
-                                isActive(child.href)
-                                  ? "bg-sidebar-primary text-white font-semibold"
-                                  : "text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                              )}
-                            >
-                              {child.title}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  <Link
-                    to={item.href!}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200",
-                      isActive(item.href!)
-                        ? "bg-sidebar-primary text-white shadow-glow-sm"
-                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                    )}
-                  >
-                    <item.icon className="h-[18px] w-[18px] flex-shrink-0" />
-                    {!collapsed && <span className="truncate">{item.title}</span>}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
+          {renderNavItems(filteredNavigation)}
         </nav>
 
         {/* Bottom nav */}
