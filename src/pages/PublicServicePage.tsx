@@ -10,7 +10,7 @@ import { useCmsService, useCmsServices, useCmsSiteSettings } from "@/features/cm
 import { buildServicePageContent } from "@/features/cms/originalSiteAdapters";
 import { serviceLooksLikePlaceholder, settingsTextLooksLikePlaceholder } from "@/features/cms/publicContent";
 import { useCmsSeo } from "@/features/cms/seo";
-import { getServicePageContent, type ServiceAction, type ServiceBadge, type ServiceBulletPanel, type ServiceChoicePanel, type ServiceCtaPanel, type ServiceFooterColumn, type ServiceOffering, type ServicePageContent } from "@/data/servicePageContent";
+import { getServicePageContent, type ServiceAction, type ServiceBadge, type ServiceBulletPanel, type ServiceChoice, type ServiceChoicePanel, type ServiceCtaPanel, type ServiceFooterColumn, type ServiceOffering, type ServicePageContent } from "@/data/servicePageContent";
 import { cn } from "@/lib/utils";
 
 function getOfferingGridClassName(rowLength: number) {
@@ -66,7 +66,7 @@ function renderAction(action: ServiceAction | undefined, onAppointment: () => vo
 
 function BadgeChip({ badge }: { badge: ServiceBadge }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-start gap-3">
       <div
         className={cn(
           "flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full",
@@ -75,8 +75,28 @@ function BadgeChip({ badge }: { badge: ServiceBadge }) {
       >
         <badge.icon className="h-6 w-6" strokeWidth={1.9} />
       </div>
-      <span className="max-w-[125px] text-[0.92rem] font-semibold leading-7 text-[#13306b]">{badge.label}</span>
+      <span className="text-[0.92rem] font-semibold leading-7 text-[#13306b]">{badge.label}</span>
     </div>
+  );
+}
+
+function HeroOverlayCard({ choices }: { choices: ServiceChoice[] }) {
+  return (
+    <article className="overflow-hidden rounded-[18px] border border-[#e3eaf7] bg-white shadow-[0_26px_52px_-38px_rgba(19,48,107,0.3)]">
+      <div className="grid sm:grid-cols-2">
+        {choices.map((choice, index) => (
+          <div key={choice.title} className={cn("flex items-start gap-4 px-5 py-5", index < choices.length - 1 && "border-b border-[#e3eaf7] sm:border-b-0 sm:border-r")}>
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#fff0f0] text-[#13306b]">
+              <choice.icon className="h-7 w-7" strokeWidth={1.7} />
+            </div>
+            <div>
+              <h3 className="text-[1.08rem] font-black leading-tight text-[#13306b]">{choice.title}</h3>
+              <p className="mt-2 text-[0.92rem] leading-7 text-[#13306b]">{choice.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </article>
   );
 }
 
@@ -228,7 +248,7 @@ export default function PublicServicePage() {
   const { data: cmsSettings } = useCmsSiteSettings();
   const settings = cmsSettings && !settingsTextLooksLikePlaceholder(cmsSettings) ? cmsSettings : cmsDefaults.settings;
   const services = cmsServices.length > 0 ? cmsServices : cmsDefaults.services;
-  const service = cmsService ? buildServicePageContent(cmsService) : fallbackService;
+  const service = cmsService && !serviceLooksLikePlaceholder(cmsService) ? buildServicePageContent(cmsService) : fallbackService;
   const serviceSeo = cmsService && !serviceLooksLikePlaceholder(cmsService) ? cmsService.seo : cmsDefaults.services.find((entry) => entry.slug === slug)?.seo;
 
   useCmsSeo(serviceSeo, settings);
@@ -239,6 +259,7 @@ export default function PublicServicePage() {
 
   const longestRow = Math.max(...service.offeringRows.map((row) => row.length));
   const hasStageItems = service.stageBand.items.length > 0;
+  const hasHeroOverlay = (service.heroOverlayChoices?.length ?? 0) > 0;
 
   return (
     <div className="min-h-screen bg-white text-[#13306b]">
@@ -247,7 +268,7 @@ export default function PublicServicePage() {
       <main className="overflow-x-hidden bg-white pb-8">
         <section className="pt-5 lg:pt-7">
           <div className={shellClassName}>
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:items-start">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start lg:gap-10">
               <div className="pt-2">
                 <nav className="mb-6 flex flex-wrap items-center gap-2 text-[0.9rem] text-[#4f6796]">
                   <Link to="/" className="hover:text-[#ef2027]">
@@ -271,21 +292,34 @@ export default function PublicServicePage() {
                 <div className="mt-4 h-[4px] w-16 rounded-full bg-[#ef2027]" />
                 {service.subtitle.length > 0 && <p className="mt-5 text-[1.18rem] font-medium leading-9 text-[#ef2027]">{service.subtitle}</p>}
                 <p className="mt-4 max-w-[520px] text-[1rem] leading-8 text-[#13306b]">{service.description}</p>
-
-                <div className="mt-8 flex flex-wrap gap-x-5 gap-y-4">
-                  {service.heroBadges.map((badge) => (
-                    <BadgeChip key={badge.label} badge={badge} />
-                  ))}
-                </div>
               </div>
 
               <div className="justify-self-end">
                 <div className="relative overflow-hidden">
-                  <img src={service.heroImage} alt={service.breadcrumbLabel} className="w-full max-w-[580px]" loading="eager" />
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-9 bg-gradient-to-r from-white via-white/80 to-transparent" />
+                  <img src={service.heroImage} alt={service.breadcrumbLabel} className="w-full max-w-[720px] object-cover" loading="eager" />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-14 bg-gradient-to-r from-white via-white/80 to-transparent" />
                 </div>
               </div>
             </div>
+
+            {hasHeroOverlay ? (
+              <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,0.86fr)_minmax(360px,0.74fr)] lg:items-end">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+                  {service.heroBadges.map((badge) => (
+                    <BadgeChip key={badge.label} badge={badge} />
+                  ))}
+                </div>
+                <div className="lg:-mt-20 lg:justify-self-end">
+                  <HeroOverlayCard choices={service.heroOverlayChoices ?? []} />
+                </div>
+              </div>
+            ) : (
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {service.heroBadges.map((badge) => (
+                  <BadgeChip key={badge.label} badge={badge} />
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

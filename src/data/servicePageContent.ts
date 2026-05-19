@@ -149,6 +149,7 @@ export interface ServicePageContent {
   description: string;
   heroImage: string;
   heroBadges: ServiceBadge[];
+  heroOverlayChoices?: ServiceChoice[];
   sectionTitle: string;
   sectionSubtitle: string;
   offeringsStyle: "outlined" | "split" | "condition";
@@ -1279,6 +1280,18 @@ const servicePages: ServicePageContent[] = [
       { label: "Extended Hours", icon: CalendarDays, accent: "red" },
       { label: "Experienced Providers", icon: Users2, accent: "blue" },
       { label: "Quality Care You Can Trust", icon: ShieldCheck, accent: "red" },
+    ],
+    heroOverlayChoices: [
+      {
+        title: "Telehealth Available",
+        description: "Get care from the comfort of your home.",
+        icon: Stethoscope,
+      },
+      {
+        title: "In-Person Care Available",
+        description: "Visit our clinic for fast, convenient treatment.",
+        icon: Users2,
+      },
     ],
     sectionTitle: "Our Urgent Care Services",
     sectionSubtitle: "Treatment for a wide range of non-life-threatening illnesses and injuries.",

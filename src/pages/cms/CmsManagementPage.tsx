@@ -91,6 +91,50 @@ import { cn } from "@/lib/utils";
 const sectionTypes: CmsSection["type"][] = ["hero", "richText", "featureGrid", "stats", "serviceList", "testimonialList", "faqList", "cta", "teamGrid", "gallery", "timeline", "blogFeed", "contactCards"];
 const sectionThemes: CmsSection["theme"][] = ["light", "muted", "primary", "accent"];
 const dataSources: CmsSection["dataSource"][] = ["manual", "services", "testimonials", "faqs", "team", "blog-posts"];
+const sectionTypeLabels: Record<CmsSection["type"], string> = {
+  hero: "Hero Banner",
+  richText: "Text / Bullet Panel",
+  featureGrid: "Feature Grid",
+  stats: "Stage Band / Stats",
+  serviceList: "Service List",
+  testimonialList: "Testimonials",
+  faqList: "FAQs",
+  cta: "CTA Card",
+  teamGrid: "Team Grid",
+  gallery: "Gallery",
+  timeline: "Timeline",
+  blogFeed: "Blog Feed",
+  contactCards: "Contact / Footer Cards",
+};
+
+function getSectionTypeLabel(type: CmsSection["type"]) {
+  return sectionTypeLabels[type];
+}
+
+function getSectionEditorHint(section: CmsSection) {
+  switch (section.type) {
+    case "hero":
+      return "Hero section: title controls the main page heading. Use line breaks in the title for multi-line service headings. Subtitle becomes the red lead line, body becomes the main intro, the first items become icon highlights, and the section image is the hero image.";
+    case "featureGrid":
+      return "Feature grid: each item becomes a service card, condition card, or content card. Use multiple feature-grid sections when you need separate rows.";
+    case "richText":
+      return "Text panel: title and body drive the left information panel. Each item becomes one bullet. Use the subtitle field when you need the small note under the bullets.";
+    case "stats":
+      return "Stage band / stats: title and body appear on the left, while each item becomes an icon-based point on the right. Leave items empty if you only need a simple band message.";
+    case "cta":
+      return "CTA card: title, body, button, and optional subtitle power the dark call-to-action panel.";
+    case "contactCards":
+      return "Contact / footer cards: 2 items render as a choice card, 3 items render as the bottom footer strip. Name the section \"Hero Overlay Choices\" if you want the urgent-care availability card beside the hero image.";
+    case "faqList":
+      return "FAQ sections pull from the FAQ collection when the data source is set to FAQs.";
+    case "testimonialList":
+      return "Testimonial sections pull from the testimonials collection for the current page or service.";
+    case "teamGrid":
+      return "Team sections pull from the team collection. Attach each team member to the right service to keep this clean.";
+    default:
+      return "Use this section to control the matching content block on the public website.";
+  }
+}
 
 function moveItem<T>(items: T[], index: number, direction: -1 | 1) {
   const nextIndex = index + direction;
@@ -276,6 +320,8 @@ interface CmsEditorAssistContextValue {
   buttonLabelOptions: CmsPresetOption[];
   navigationLabelOptions: CmsPresetOption[];
   socialLabelOptions: CmsPresetOption[];
+  pageSlugOptions: CmsPresetOption[];
+  serviceSlugOptions: CmsPresetOption[];
 }
 
 const CmsEditorAssistContext = createContext<CmsEditorAssistContextValue | null>(null);
@@ -561,6 +607,8 @@ function useCmsEditorAssist() {
       buttonLabelOptions: buttonLabelPresetOptions,
       navigationLabelOptions: navigationLabelPresetOptions,
       socialLabelOptions: socialLabelPresetOptions,
+      pageSlugOptions: [],
+      serviceSlugOptions: [],
     }
   );
 }
@@ -603,6 +651,39 @@ function PresetSelect({
         <SelectContent>
           <SelectItem value={presetSelectSentinels.empty}>No preset selected</SelectItem>
           <SelectItem value={presetSelectSentinels.custom}>Keep manual value</SelectItem>
+          {options.map((option) => (
+            <SelectItem key={`${label}-${option.value}`} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function OptionalSlugSelect({
+  label,
+  value,
+  options,
+  placeholder,
+  onValueChange,
+}: {
+  label: string;
+  value?: string;
+  options: CmsPresetOption[];
+  placeholder: string;
+  onValueChange: (next?: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <FieldLabel>{label}</FieldLabel>
+      <Select value={value ?? presetSelectSentinels.empty} onValueChange={(next) => onValueChange(next === presetSelectSentinels.empty ? undefined : next)}>
+        <SelectTrigger>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={presetSelectSentinels.empty}>None</SelectItem>
           {options.map((option) => (
             <SelectItem key={`${label}-${option.value}`} value={option.value}>
               {option.label}
@@ -970,7 +1051,7 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
           <AccordionItem key={sectionValue.id} value={sectionValue.id} className="overflow-hidden rounded-2xl border border-border bg-card/50 px-0">
             <AccordionTrigger className="px-4 py-4 hover:no-underline">
               <div className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                <Badge variant="secondary">{sectionValue.type}</Badge>
+                <Badge variant="secondary">{getSectionTypeLabel(sectionValue.type)}</Badge>
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-foreground">{sectionValue.name}</p>
                   <p className="truncate text-sm text-muted-foreground">{sectionValue.title || "Untitled section"}</p>
@@ -1006,6 +1087,10 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
                   </div>
                 </div>
 
+                <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-3 text-sm leading-6 text-muted-foreground">
+                  {getSectionEditorHint(sectionValue)}
+                </div>
+
                 <div className="grid gap-3 lg:grid-cols-4">
                   <Input value={sectionValue.name} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, name: event.target.value } : entry)))} placeholder="Section name" />
                   <Select value={sectionValue.type} onValueChange={(nextType) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, type: nextType as CmsSection["type"] } : entry)))}>
@@ -1015,7 +1100,7 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
                     <SelectContent>
                       {sectionTypes.map((entryType) => (
                         <SelectItem key={entryType} value={entryType}>
-                          {entryType}
+                          {getSectionTypeLabel(entryType)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1255,6 +1340,7 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
 
 function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
+  const designTemplate = cmsDefaults.services.find((service) => service.slug === draft.slug);
   useEffect(() => setDraft(value), [value]);
 
   return (
@@ -1296,7 +1382,7 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
                   ))}
                 </SelectContent>
               </Select>
-              <Input value={draft.categoryLabel} onChange={(event) => setDraft({ ...draft, categoryLabel: event.target.value })} placeholder="Category" />
+              <Input value={`/services/${draft.slug}`} readOnly placeholder="Public URL" className="bg-muted/40" />
             </div>
           </WorkspacePanel>
 
@@ -1321,6 +1407,33 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
         </TabsContent>
 
         <TabsContent value="content" className="space-y-5">
+          <WorkspacePanel title="Approved Template" description="For the core service pages, you can restore the approved design structure and copy without rebuilding the page manually.">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <p className="max-w-[760px] text-sm leading-6 text-muted-foreground">
+                Restore the exact approved layout, headings, icon groups, benefits panel, stage band, and footer cards for this service. This keeps the current record id, status, and visibility settings intact.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!designTemplate}
+                onClick={() => {
+                  if (!designTemplate) return;
+                  setDraft({
+                    ...cloneCmsValue(designTemplate),
+                    id: draft.id,
+                    status: draft.status,
+                    sortOrder: draft.sortOrder,
+                    featuredOnHome: draft.featuredOnHome,
+                    featuredInNavigation: draft.featuredInNavigation,
+                  });
+                  toast.success("Service content restored from the approved design template.");
+                }}
+              >
+                <RefreshCcw className="mr-2 h-4 w-4" />
+                Restore Design Template
+              </Button>
+            </div>
+          </WorkspacePanel>
           <WorkspacePanel title="Service Sections" description="Manage hero, benefits, FAQs, CTA blocks, doctors, testimonials, and other service content sections.">
             <SectionsEditor value={draft.sections} onChange={(next) => setDraft({ ...draft, sections: next })} />
           </WorkspacePanel>
@@ -1440,15 +1553,18 @@ function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument;
 
 function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (faq: CmsFaq) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
+  const { pageSlugOptions, serviceSlugOptions } = useCmsEditorAssist();
   useEffect(() => setDraft(value), [value]);
 
   return (
     <DocumentCard title={draft.question} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
-      <div className="grid gap-3 lg:grid-cols-4">
+      <div className="grid gap-3 lg:grid-cols-2">
         <Input value={draft.question} onChange={(event) => setDraft({ ...draft, question: event.target.value })} placeholder="Question" />
         <Input value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })} placeholder="Category" />
-        <Input value={draft.pageSlug ?? ""} onChange={(event) => setDraft({ ...draft, pageSlug: event.target.value || undefined })} placeholder="Page slug (optional)" />
-        <Input value={draft.serviceSlug ?? ""} onChange={(event) => setDraft({ ...draft, serviceSlug: event.target.value || undefined })} placeholder="Service slug (optional)" />
+      </div>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <OptionalSlugSelect label="Page" value={draft.pageSlug} options={pageSlugOptions} placeholder="Attach this FAQ to a page" onValueChange={(next) => setDraft({ ...draft, pageSlug: next })} />
+        <OptionalSlugSelect label="Service" value={draft.serviceSlug} options={serviceSlugOptions} placeholder="Attach this FAQ to a service" onValueChange={(next) => setDraft({ ...draft, serviceSlug: next })} />
       </div>
       <div className="grid gap-3 lg:grid-cols-2">
         <Select value={draft.status} onValueChange={(status) => setDraft({ ...draft, status: status as CmsFaq["status"] })}>
@@ -1468,15 +1584,18 @@ function FaqEditorCard({ value, onSave, onDelete }: { value: CmsFaq; onSave: (fa
 
 function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimonial; onSave: (testimonial: CmsTestimonial) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
+  const { pageSlugOptions, serviceSlugOptions } = useCmsEditorAssist();
   useEffect(() => setDraft(value), [value]);
 
   return (
     <DocumentCard title={draft.name} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
-      <div className="grid gap-3 lg:grid-cols-4">
+      <div className="grid gap-3 lg:grid-cols-2">
         <Input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="Name" />
         <Input value={draft.role} onChange={(event) => setDraft({ ...draft, role: event.target.value })} placeholder="Role" />
-        <Input value={draft.pageSlug ?? ""} onChange={(event) => setDraft({ ...draft, pageSlug: event.target.value || undefined })} placeholder="Page slug (optional)" />
-        <Input value={draft.serviceSlug ?? ""} onChange={(event) => setDraft({ ...draft, serviceSlug: event.target.value || undefined })} placeholder="Service slug (optional)" />
+      </div>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <OptionalSlugSelect label="Page" value={draft.pageSlug} options={pageSlugOptions} placeholder="Attach this testimonial to a page" onValueChange={(next) => setDraft({ ...draft, pageSlug: next })} />
+        <OptionalSlugSelect label="Service" value={draft.serviceSlug} options={serviceSlugOptions} placeholder="Attach this testimonial to a service" onValueChange={(next) => setDraft({ ...draft, serviceSlug: next })} />
       </div>
       <div className="grid gap-3 lg:grid-cols-2">
         <Select value={draft.status} onValueChange={(status) => setDraft({ ...draft, status: status as CmsTestimonial["status"] })}>
@@ -1498,16 +1617,17 @@ function TestimonialEditorCard({ value, onSave, onDelete }: { value: CmsTestimon
 
 function TeamEditorCard({ value, onSave, onDelete }: { value: CmsTeamMember; onSave: (member: CmsTeamMember) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const [draft, setDraft] = useState(value);
+  const { serviceSlugOptions } = useCmsEditorAssist();
   useEffect(() => setDraft(value), [value]);
 
   return (
     <DocumentCard title={draft.name} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
-      <div className="grid gap-3 lg:grid-cols-4">
+      <div className="grid gap-3 lg:grid-cols-3">
         <Input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="Name" />
         <Input value={draft.role} onChange={(event) => setDraft({ ...draft, role: event.target.value })} placeholder="Role" />
         <Input value={draft.specialty ?? ""} onChange={(event) => setDraft({ ...draft, specialty: event.target.value })} placeholder="Specialty" />
-        <Input value={draft.serviceSlug ?? ""} onChange={(event) => setDraft({ ...draft, serviceSlug: event.target.value || undefined })} placeholder="Service slug (optional)" />
       </div>
+      <OptionalSlugSelect label="Service" value={draft.serviceSlug} options={serviceSlugOptions} placeholder="Attach this team member to a service" onValueChange={(next) => setDraft({ ...draft, serviceSlug: next })} />
       <div className="grid gap-3 lg:grid-cols-4">
         <Input value={draft.email ?? ""} onChange={(event) => setDraft({ ...draft, email: event.target.value })} placeholder="Email" />
         <Input value={draft.phone ?? ""} onChange={(event) => setDraft({ ...draft, phone: event.target.value })} placeholder="Phone" />
@@ -2828,6 +2948,18 @@ export default function CmsManagementPage() {
       buttonLabelOptions: buttonLabelPresetOptions,
       navigationLabelOptions: navigationLabelPresetOptions,
       socialLabelOptions: socialLabelPresetOptions,
+      pageSlugOptions: [...pages]
+        .sort((left, right) => left.sortOrder - right.sortOrder || left.title.localeCompare(right.title))
+        .map((page) => ({
+          label: `${page.title} (/${page.slug === "home" ? "" : page.slug})`,
+          value: page.slug,
+        })),
+      serviceSlugOptions: [...services]
+        .sort((left, right) => left.sortOrder - right.sortOrder || left.title.localeCompare(right.title))
+        .map((service) => ({
+          label: `${service.title} (/services/${service.slug})`,
+          value: service.slug,
+        })),
     }),
     [legalDocuments, pages, services, settings],
   );

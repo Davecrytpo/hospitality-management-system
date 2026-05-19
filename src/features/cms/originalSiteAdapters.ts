@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
-import { getServicePageContent, serviceDirectoryCards, type ServiceAction, type ServiceBadge, type ServiceBulletPanel, type ServiceChoicePanel, type ServiceDirectoryCard, type ServiceFooterColumn, type ServiceOffering, type ServicePageContent, type ServicePanel, type ServiceStageBandItem } from "@/data/servicePageContent";
+import { getServicePageContent, serviceDirectoryCards, type ServiceAction, type ServiceBadge, type ServiceBulletPanel, type ServiceChoice, type ServiceChoicePanel, type ServiceDirectoryCard, type ServiceFooterColumn, type ServiceOffering, type ServicePageContent, type ServicePanel, type ServiceStageBandItem } from "@/data/servicePageContent";
 import { getCmsIcon } from "./icons";
-import { preferPublicCopy, sectionLooksLikePlaceholder } from "./publicContent";
+import { preferPublicCopy, sectionLooksLikePlaceholder, serviceLooksLikePlaceholder } from "./publicContent";
 import type { CmsButton, CmsItem, CmsSection, CmsService } from "./types";
 
 function toIcon(name: CmsItem["icon"] | CmsService["icon"] | undefined, fallback: LucideIcon) {
@@ -58,6 +58,38 @@ function mapItemsToBadges(items: CmsItem[], fallbackBadges: ServiceBadge[]) {
   });
 }
 
+function parseTitleLines(title: string | undefined, fallback: ServicePageContent["titleLines"]): ServicePageContent["titleLines"] {
+  const normalized = title?.trim();
+  if (!normalized) return fallback;
+
+  const lines = normalized
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (lines.length === 0) return fallback;
+
+  return lines.map((line) => ({
+    text: line,
+    ...(line.startsWith("(") && line.endsWith(")") ? { size: "small" as const } : {}),
+  }));
+}
+
+function mapItemsToChoices(items: CmsItem[], fallbackChoices: ServiceChoice[] | undefined) {
+  if (!fallbackChoices || fallbackChoices.length === 0) return undefined;
+  if (items.length === 0) return fallbackChoices;
+
+  return items.map((item, index) => {
+    const fallback = fallbackChoices[index] ?? fallbackChoices[fallbackChoices.length - 1];
+
+    return {
+      title: preferPublicCopy(item.title, fallback?.title || ""),
+      description: preferPublicCopy(item.description, fallback?.description || ""),
+      icon: toIcon(item.icon, fallback?.icon ?? fallbackChoices[0]?.icon),
+    } satisfies ServiceChoice;
+  });
+}
+
 function mapBulletPanel(section: CmsSection | undefined, fallback: ServiceBulletPanel): ServiceBulletPanel {
   if (!section) return fallback;
 
@@ -65,6 +97,7 @@ function mapBulletPanel(section: CmsSection | undefined, fallback: ServiceBullet
     ...fallback,
     title: preferPublicCopy(section.title, fallback.title),
     intro: preferPublicCopy(section.body, fallback.intro || ""),
+    note: preferPublicCopy(section.subtitle, fallback.note || ""),
     bullets:
       section.items.length > 0
         ? section.items.map((item) => {
@@ -149,7 +182,9 @@ function mapFooterColumns(section: CmsSection | undefined, fallback: ServicePage
       icon: toIcon(item.icon, defaultColumn.icon),
       emphasis: preferPublicCopy(item.value, defaultColumn.emphasis || ""),
       action: item.href
-        ? item.href.startsWith("tel:")
+        ? item.href === "appointment"
+          ? { kind: "appointment", label: item.badge || defaultColumn.action?.label || "Book Appointment" }
+          : item.href.startsWith("tel:")
           ? { kind: "phone", label: item.badge || defaultColumn.action?.label || "Call Now", href: item.href }
           : { kind: "link", label: item.badge || defaultColumn.action?.label || "Learn More", href: item.href }
         : defaultColumn.action,
@@ -169,6 +204,7 @@ export function findSectionByName(sections: CmsSection[], matcher: RegExp) {
 
 export function buildServiceDirectoryCard(service: CmsService, index: number): ServiceDirectoryCard {
   const fallback = serviceDirectoryCards.find((card) => card.href === `/services/${service.slug}`) ?? serviceDirectoryCards[index] ?? serviceDirectoryCards[0];
+  const isPlaceholder = serviceLooksLikePlaceholder(service);
   const featureBullets = service.sections
     .filter((section) => section.type === "featureGrid" && !sectionLooksLikePlaceholder(section))
     .flatMap((section) => section.items.map((item) => item.title))
@@ -178,10 +214,10 @@ export function buildServiceDirectoryCard(service: CmsService, index: number): S
   return {
     ...fallback,
     number: `${index + 1}.`,
-    title: preferPublicCopy(service.title, fallback.title),
-    description: preferPublicCopy(service.excerpt, fallback.description),
+    title: isPlaceholder ? fallback.title : preferPublicCopy(service.title, fallback.title),
+    description: isPlaceholder ? fallback.description : preferPublicCopy(service.excerpt, fallback.description),
     icon: toIcon(service.icon, fallback.icon),
-    bullets: featureBullets.length > 0 ? featureBullets : fallback.bullets,
+    bullets: isPlaceholder ? fallback.bullets : featureBullets.length > 0 ? featureBullets : fallback.bullets,
     href: `/services/${service.slug}`,
     featuredOnHome: service.featuredOnHome,
   };
@@ -199,23 +235,31 @@ export function buildServicePageContent(service: CmsService): ServicePageContent
   const richTextSection = findSectionByType(sections, "richText");
   const ctaSection = findSectionByType(sections, "cta");
   const stageSection = findSectionByType(sections, "stats") ?? findSectionByName(sections, /stage|journey|schedule|care/i);
-  const contactSections = sections.filter((section) => section.type === "contactCards" && !sectionLooksLikePlaceholder(section));
-  const choiceSection = contactSections.find((section) => section.items.length === 2);
+  const heroOverlaySection = findSectionByName(sections, /hero overlay|hero availability|hero care options/i);
+  const contactSections = sections.filter((section) => section.type === "contactCards" && section.id !== heroOverlaySection?.id && !sectionLooksLikePlaceholder(section));
+  const choiceSection = findSectionByName(contactSections, /choice|care options/i) ?? contactSections.find((section) => section.items.length === 2);
   const footerSection = [...contactSections].reverse().find((section) => section.items.length >= 3);
   const safeHeroSection = heroSection && !sectionLooksLikePlaceholder(heroSection) ? heroSection : undefined;
   const safeRichTextSection = richTextSection && !sectionLooksLikePlaceholder(richTextSection) ? richTextSection : undefined;
   const safeCtaSection = ctaSection && !sectionLooksLikePlaceholder(ctaSection) ? ctaSection : undefined;
   const safeStageSection = stageSection && !sectionLooksLikePlaceholder(stageSection) ? stageSection : undefined;
+  const safeHeroOverlaySection = heroOverlaySection && !sectionLooksLikePlaceholder(heroOverlaySection) ? heroOverlaySection : undefined;
+  const serviceTitle = preferPublicCopy(service.title, fallback.breadcrumbLabel);
+  const breadcrumbOverride = preferPublicCopy(safeHeroSection?.eyebrow, "");
+  const breadcrumbLabel =
+    breadcrumbOverride ||
+    (fallback.breadcrumbLabel.length > serviceTitle.length && fallback.breadcrumbLabel.startsWith(serviceTitle) ? fallback.breadcrumbLabel : serviceTitle);
 
   return {
     ...fallback,
     navLabel: preferPublicCopy(service.shortTitle, preferPublicCopy(service.title, fallback.navLabel)),
-    breadcrumbLabel: preferPublicCopy(service.title, fallback.breadcrumbLabel),
-    titleLines: [{ text: preferPublicCopy(service.title, fallback.breadcrumbLabel) }],
+    breadcrumbLabel,
+    titleLines: parseTitleLines(safeHeroSection?.title, fallback.titleLines),
     subtitle: preferPublicCopy(safeHeroSection?.subtitle, fallback.subtitle),
     description: preferPublicCopy(safeHeroSection?.body, preferPublicCopy(service.summary, preferPublicCopy(service.excerpt, fallback.description))),
     heroImage: safeHeroSection?.image?.url || service.previewImage?.url || fallback.heroImage,
     heroBadges: mapItemsToBadges(safeHeroSection?.items ?? [], fallback.heroBadges),
+    heroOverlayChoices: mapItemsToChoices(safeHeroOverlaySection?.items ?? [], fallback.heroOverlayChoices),
     sectionTitle: preferPublicCopy(offeringSections[0]?.title, fallback.sectionTitle),
     sectionSubtitle: preferPublicCopy(offeringSections[0]?.subtitle, fallback.sectionSubtitle),
     offeringRows:

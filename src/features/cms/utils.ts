@@ -57,20 +57,37 @@ export function createEmptyItem(): CmsItem {
 }
 
 export function createEmptySection(type: CmsSectionType = "richText"): CmsSection {
+  const sectionDefaults: Record<CmsSectionType, Pick<CmsSection, "name" | "title" | "columns" | "style">> = {
+    hero: { name: "Hero Banner", title: "Hero Title", columns: 1, style: "grid" },
+    richText: { name: "Text Panel", title: "Section Title", columns: 1, style: "grid" },
+    featureGrid: { name: "Feature Grid", title: "Section Title", columns: 3, style: "grid" },
+    stats: { name: "Stage Band", title: "Band Title", columns: 4, style: "band" },
+    serviceList: { name: "Service List", title: "Section Title", columns: 3, style: "grid" },
+    testimonialList: { name: "Testimonials", title: "Section Title", columns: 3, style: "grid" },
+    faqList: { name: "FAQs", title: "Section Title", columns: 1, style: "grid" },
+    cta: { name: "CTA Card", title: "CTA Title", columns: 1, style: "grid" },
+    teamGrid: { name: "Team Grid", title: "Section Title", columns: 3, style: "grid" },
+    gallery: { name: "Gallery", title: "Section Title", columns: 3, style: "grid" },
+    timeline: { name: "Timeline", title: "Section Title", columns: 4, style: "grid" },
+    blogFeed: { name: "Blog Feed", title: "Section Title", columns: 3, style: "grid" },
+    contactCards: { name: "Contact / Footer Cards", title: "Section Title", columns: 3, style: "grid" },
+  };
+  const defaults = sectionDefaults[type];
+
   return {
     id: createCmsId("section"),
     type,
-    name: "New section",
+    name: defaults.name,
     isVisible: true,
     theme: "light",
     dataSource: "manual",
-    title: "Section title",
+    title: defaults.title,
     subtitle: "",
     body: "",
     buttons: [],
     items: [],
-    columns: 3,
-    style: "grid",
+    columns: defaults.columns,
+    style: defaults.style,
   };
 }
 

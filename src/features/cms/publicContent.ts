@@ -21,6 +21,16 @@ const placeholderPatterns = [
   /live from cms/i,
   /cms-first/i,
   /cms-managed/i,
+  /what this service covers/i,
+  /care delivery highlights/i,
+  /why patients choose this service/i,
+  /need help deciding what to book/i,
+  /supports editable messaging/i,
+  /program updates/i,
+  /without rebuilding the frontend/i,
+  /without redesigning the page/i,
+  /without route-level rewrites/i,
+  /operational anchor/i,
 ];
 
 function textListHasPlaceholder(values: Array<string | undefined | null>) {

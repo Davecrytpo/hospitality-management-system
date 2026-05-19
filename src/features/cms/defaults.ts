@@ -7,15 +7,49 @@ import heroImage from "@/assets/mockup-hero-doctor-patient.jpg";
 import logoImage from "@/assets/logo-ontime.png";
 import resourceImage from "@/assets/mockup-resources-woman.jpg";
 import secondaryImage from "@/assets/services-family-banner.jpg";
-import serviceChronicHero from "@/assets/service-page-chronic-hero.png";
-import serviceGeriatricHero from "@/assets/service-page-geriatric-hero.png";
-import serviceMentalHero from "@/assets/service-page-mental-hero.png";
-import serviceMensHero from "@/assets/service-page-mens-hero.png";
-import servicePreventiveHero from "@/assets/service-page-preventive-hero.png";
-import servicePrimaryHero from "@/assets/service-page-primary-hero.png";
-import serviceSubstanceHero from "@/assets/service-page-substance-hero.png";
-import serviceUrgentHero from "@/assets/service-page-urgent-hero.png";
-import serviceWomensHero from "@/assets/service-page-womens-hero.png";
+import {
+  Activity,
+  Bandage,
+  BookOpenText,
+  Brain,
+  CalendarDays,
+  ClipboardCheck,
+  ClipboardList,
+  Clock3,
+  Ear,
+  Eye,
+  HandHeart,
+  Heart,
+  HeartHandshake,
+  HeartPulse,
+  Lock,
+  MapPin,
+  MoonStar,
+  NotebookPen,
+  Phone,
+  Pill,
+  ShieldCheck,
+  Stethoscope,
+  Syringe,
+  TestTube2,
+  UserRound,
+  Users,
+  Users2,
+  type LucideIcon,
+} from "lucide-react";
+import {
+  getServicePageContent,
+  serviceDirectoryCards,
+  type ServiceAction,
+  type ServiceBadge,
+  type ServiceBullet,
+  type ServiceBulletPanel,
+  type ServiceChoice,
+  type ServiceFooterColumn,
+  type ServiceOffering,
+  type ServicePageSlug,
+  type ServiceStageBandItem,
+} from "@/data/servicePageContent";
 import { createCmsId } from "./utils";
 import type {
   CmsAnnouncement,
@@ -216,71 +250,191 @@ function gallerySection(title: string, itemsList: CmsItem[], overrides: Partial<
   return section("gallery", title, { items: itemsList, columns: 3, ...overrides }, "light");
 }
 
-const globalServiceSectionButtons = [button("Request an Appointment", "/services"), button("Call the Clinic", "tel:+14107544343", "outline")];
+const cmsServiceIconMap = new Map<LucideIcon, CmsService["icon"]>([
+  [Activity, "activity"],
+  [Bandage, "bandage"],
+  [BookOpenText, "book-open"],
+  [Brain, "brain"],
+  [CalendarDays, "calendar"],
+  [ClipboardCheck, "clipboard-check"],
+  [ClipboardList, "clipboard-list"],
+  [Clock3, "clock"],
+  [Ear, "ear"],
+  [Eye, "eye"],
+  [HandHeart, "hand-heart"],
+  [Heart, "heart"],
+  [HeartHandshake, "heart-handshake"],
+  [HeartPulse, "heart-pulse"],
+  [Lock, "lock"],
+  [MapPin, "map-pin"],
+  [MoonStar, "moon-star"],
+  [NotebookPen, "notebook-pen"],
+  [Phone, "phone"],
+  [Pill, "pill"],
+  [ShieldCheck, "shield"],
+  [Stethoscope, "stethoscope"],
+  [Syringe, "syringe"],
+  [TestTube2, "test-tube"],
+  [UserRound, "user-round"],
+  [Users, "users"],
+  [Users2, "users-2"],
+]);
 
-function buildService(
-  config: {
-    slug: string;
-    title: string;
-    shortTitle: string;
-    excerpt: string;
-    summary: string;
-    icon: CmsService["icon"];
-    previewImage: CmsImage;
-    heroCopy: string;
-    features: CmsItem[];
-    benefits: CmsItem[];
-    statItems: CmsItem[];
-    seoDescription: string;
-  },
-): CmsService {
+function iconName(icon: LucideIcon, fallback: CmsService["icon"] = "sparkles"): CmsService["icon"] {
+  return cmsServiceIconMap.get(icon) ?? fallback;
+}
+
+function accentBadge(accent: "red" | "blue") {
+  return accent;
+}
+
+function buttonFromAction(action: ServiceAction): CmsButton {
+  switch (action.kind) {
+    case "appointment":
+      return button(action.label, "appointment");
+    case "phone":
+      return button(action.label, action.href, "outline");
+    default:
+      return button(action.label, action.href, action.href.startsWith("/") ? "primary" : "outline");
+  }
+}
+
+function itemFromBadge(badge: ServiceBadge): CmsItem {
+  return item(badge.label, "", {
+    icon: iconName(badge.icon),
+    badge: accentBadge(badge.accent),
+  });
+}
+
+function itemFromOffering(offering: ServiceOffering): CmsItem {
+  return item(offering.title, offering.description, {
+    icon: iconName(offering.icon),
+    badge: accentBadge(offering.accent),
+    bullets: offering.bullets ?? [],
+  });
+}
+
+function itemFromBullet(bullet: ServiceBullet): CmsItem {
+  return item(bullet.label ?? "", bullet.text, {
+    subtitle: bullet.label ? bullet.text : "",
+  });
+}
+
+function itemFromChoice(choice: ServiceChoice): CmsItem {
+  return item(choice.title, choice.description, {
+    icon: iconName(choice.icon),
+  });
+}
+
+function itemFromStage(stage: ServiceStageBandItem): CmsItem {
+  return item(stage.label, "", {
+    icon: iconName(stage.icon),
+    badge: accentBadge(stage.accent),
+  });
+}
+
+function itemFromFooter(column: ServiceFooterColumn): CmsItem {
+  return item(column.title, column.description, {
+    value: column.emphasis,
+    href: column.action?.kind === "appointment" ? "appointment" : column.action?.href,
+    badge: column.action?.label,
+    icon: iconName(column.icon),
+  });
+}
+
+function richTextSectionFromBulletPanel(panel: ServiceBulletPanel): CmsSection {
+  return richTextSection(panel.title, panel.intro ?? "", {
+    name: panel.title.includes("Approach") ? "Approach Panel" : "Benefits Panel",
+    subtitle: panel.note ?? "",
+    items: panel.bullets.map(itemFromBullet),
+    columns: panel.columns ?? 1,
+  });
+}
+
+function sectionFromChoicePanel(name: string, title: string, intro: string, footnote: string | undefined, options: ServiceChoice[]): CmsSection {
+  return contactCardsSection(title, options.map(itemFromChoice), {
+    name,
+    body: intro,
+    subtitle: footnote ?? "",
+    columns: 2,
+  });
+}
+
+function createCmsServiceFromDesign(slug: ServicePageSlug): CmsService {
+  const page = getServicePageContent(slug);
+  const directoryCard = serviceDirectoryCards.find((card) => card.href === `/services/${slug}`);
+
+  if (!page || !directoryCard) {
+    throw new Error(`Missing service design source for "${slug}".`);
+  }
+
+  const previewImage = image(page.heroImage, `${page.breadcrumbLabel} hero image`);
+  const heroTitle = page.titleLines.map((line) => line.text).join("\n");
+  const sections: CmsSection[] = [
+    heroSection(heroTitle, page.subtitle, previewImage, {
+      name: "Hero Banner",
+      eyebrow: page.breadcrumbLabel,
+      body: page.description,
+      buttons: [],
+      items: page.heroBadges.map(itemFromBadge),
+    }),
+    ...page.offeringRows.map((row, index) =>
+      featureGridSection(index === 0 ? page.sectionTitle : `Service Cards Row ${index + 1}`, row.map(itemFromOffering), {
+        name: page.offeringsStyle === "condition" ? `Condition Cards Row ${index + 1}` : `Service Cards Row ${index + 1}`,
+        subtitle: index === 0 ? page.sectionSubtitle : "",
+        columns: row.length >= 4 ? 4 : row.length === 2 ? 2 : row.length === 1 ? 1 : 3,
+        style: page.offeringsStyle === "split" ? "split" : "grid",
+      }),
+    ),
+    richTextSectionFromBulletPanel(page.lowerLeftPanel),
+  ];
+
+  if (page.heroOverlayChoices?.length) {
+    sections.push(sectionFromChoicePanel("Hero Overlay Choices", "Hero Overlay Choices", "", "", page.heroOverlayChoices));
+  }
+
+  if (page.lowerRightPanel.type === "ctaCard") {
+    sections.push(
+      ctaSection(page.lowerRightPanel.title, page.lowerRightPanel.intro, [buttonFromAction(page.lowerRightPanel.action)], {
+        name: "Side CTA Card",
+        subtitle: page.lowerRightPanel.footnote ?? "",
+      }),
+    );
+  } else {
+    sections.push(sectionFromChoicePanel("Choice Card", page.lowerRightPanel.title, page.lowerRightPanel.intro, page.lowerRightPanel.footnote, page.lowerRightPanel.options));
+  }
+
+  sections.push(
+    statsSection(page.stageBand.title, page.stageBand.items.map(itemFromStage), {
+      name: "Stage Band",
+      body: page.stageBand.description,
+    }),
+  );
+
+  sections.push(
+    contactCardsSection("Footer CTA Cards", page.footerColumns.map(itemFromFooter), {
+      name: "Footer CTA Cards",
+      columns: 3,
+    }),
+  );
+
   return {
     id: createCmsId("service"),
-    slug: config.slug,
-    title: config.title,
-    shortTitle: config.shortTitle,
-    categoryLabel: "Clinical Service",
+    slug,
+    title: directoryCard.title,
+    shortTitle: page.navLabel,
+    categoryLabel:
+      slug === "mental-health-services" || slug === "substance-use-treatment" ? "Behavioral Health Service" : "Clinical Service",
     status: "published",
     sortOrder: 0,
-    featuredOnHome: true,
+    featuredOnHome: directoryCard.featuredOnHome ?? false,
     featuredInNavigation: true,
-    excerpt: config.excerpt,
-    summary: config.summary,
-    icon: config.icon,
-    previewImage: config.previewImage,
-    seo: seo(config.title, config.seoDescription, `services/${config.slug}`, config.previewImage),
-    sections: [
-      heroSection(config.title, config.excerpt, config.previewImage, {
-        body: config.heroCopy,
-        buttons: [button("Book This Service", "/services"), button("Contact Care Team", "/contact", "outline")],
-        items: [
-          item("Same-week access", "", { icon: "calendar" }),
-          item("Coordinated follow-up", "", { icon: "users" }),
-          item("Digital updates", "", { icon: "message-square" }),
-        ],
-      }),
-      featureGridSection("What this service covers", config.features, {
-        subtitle: "Care details, treatment options, and next steps for this service.",
-      }),
-      statsSection("Care delivery highlights", config.statItems),
-      featureGridSection("Why patients choose this service", config.benefits, {
-        subtitle: "Reasons patients choose this service for timely, coordinated care.",
-      }),
-      teamSection("Meet the clinicians behind this service", "Meet members of the care team who support this service.", {
-        dataSource: "team",
-      }),
-      testimonialSection("Patient feedback", "Display service-specific testimonials without hardcoding them into the page.", {
-        dataSource: "testimonials",
-      }),
-      faqSection("Frequently asked questions", "Common questions about this service and what patients can expect.", {
-        dataSource: "faqs",
-      }),
-      ctaSection(
-        "Need help deciding what to book?",
-        "Contact the care team if you need help choosing the right service or next step.",
-        globalServiceSectionButtons,
-      ),
-    ],
+    excerpt: directoryCard.description,
+    summary: page.description,
+    icon: iconName(directoryCard.icon, "stethoscope"),
+    previewImage,
+    seo: seo(directoryCard.title, `${page.subtitle} ${page.description}`.trim(), `services/${slug}`, previewImage),
+    sections,
   };
 }
 
@@ -652,255 +806,14 @@ const pages: CmsPage[] = [
   },
 ];
 
-const services: CmsService[] = [
-  buildService({
-    slug: "primary-care",
-    title: "Primary Care",
-    shortTitle: "Primary Care",
-    excerpt: "Personalized everyday care for preventive health, routine concerns, and long-term care coordination.",
-    summary: "Personalized care for routine visits, preventive screenings, and long-term health support.",
-    icon: "stethoscope",
-    previewImage: image(servicePrimaryHero, "Primary care illustration"),
-    heroCopy: "Primary care becomes the operational anchor for long-term relationships, preventive planning, medication review, and coordinated referrals.",
-    features: [
-      item("Annual checkups", "Support for preventive visits, routine screenings, and longitudinal care planning.", { icon: "calendar" }),
-      item("Same-day visits", "Promote urgent but non-emergency appointment access directly from the service page.", { icon: "clock" }),
-      item("Medication management", "Coordinate refills, follow-up care, and treatment adjustments with less friction.", { icon: "pill" }),
-      item("Referral coordination", "Link patients into specialty pathways while keeping primary care at the center of continuity.", { icon: "users" }),
-    ],
-    benefits: [
-      item("Relationship-based care", "A consistent provider relationship creates better long-term outcomes and patient trust.", { icon: "heart" }),
-      item("Clear next steps", "Move from consultation to testing, referral, or follow-up with fewer disconnected handoffs.", { icon: "check-circle" }),
-      item("Scalable digital touchpoints", "Appointments, follow-up messaging, and patient education all connect through one system.", { icon: "globe" }),
-    ],
-    statItems: [
-      item("Typical onboarding flow", "", { value: "< 10 min", icon: "clock" }),
-      item("Appointment access", "", { value: "Same week", icon: "calendar" }),
-      item("Follow-up model", "", { value: "Coordinated", icon: "users" }),
-    ],
-    seoDescription: "Primary care services for routine visits, preventive screenings, medication management, and long-term health support.",
-  }),
-  buildService({
-    slug: "preventive-care",
-    title: "Preventive Care",
-    shortTitle: "Preventive Care",
-    excerpt: "Screenings, wellness planning, vaccinations, and early-detection support tailored to life stage and risk profile.",
-    summary: "Preventive care focused on screenings, wellness visits, vaccinations, and early detection.",
-    icon: "shield",
-    previewImage: image(servicePreventiveHero, "Preventive care illustration"),
-    heroCopy: "Preventive care content can now flex with seasonality, campaign focus, and patient education priorities without restructuring code.",
-    features: [
-      item("Annual wellness visits", "Shape the experience around early detection, personalized screening plans, and recurring follow-up.", { icon: "calendar" }),
-      item("Cancer screenings", "Promote age-appropriate screening pathways and the supporting care journey.", { icon: "shield" }),
-      item("Vaccinations", "Stay current on recommended vaccines and seasonal protection.", { icon: "activity" }),
-      item("Lab-led prevention", "Connect cholesterol, blood-pressure, diabetes, and related testing into a cohesive program message.", { icon: "microscope" }),
-    ],
-    benefits: [
-      item("Earlier intervention", "Updated preventive messaging helps patients understand why screening matters before symptoms appear.", { icon: "target" }),
-      item("Lower downstream risk", "Prevention-focused care reduces avoidable complications and missed care gaps.", { icon: "heart" }),
-      item("Personalized wellness planning", "Tailor screening and prevention plans around age, history, and health goals.", { icon: "sparkles" }),
-    ],
-    statItems: [
-      item("Preventive pathways", "", { value: "Multi-stage", icon: "activity" }),
-      item("Visit planning", "", { value: "Personalized", icon: "target" }),
-      item("Coverage readiness", "", { value: "Insurance-aware", icon: "shield" }),
-    ],
-    seoDescription: "Preventive care services including annual wellness visits, screenings, vaccinations, and proactive health planning.",
-  }),
-  buildService({
-    slug: "chronic-disease-management",
-    title: "Chronic Disease Management",
-    shortTitle: "Chronic Care",
-    excerpt: "Structured support for diabetes, hypertension, thyroid conditions, weight management, and longer-term treatment planning.",
-    summary: "Ongoing support for chronic conditions including diabetes, hypertension, thyroid concerns, and weight management.",
-    icon: "activity",
-    previewImage: image(serviceChronicHero, "Chronic disease management illustration"),
-    heroCopy: "This page can evolve alongside care models, payer expectations, and digital follow-up programs without route-level rewrites.",
-    features: [
-      item("Diabetes care", "Explain treatment, testing cadence, medication review, and education support.", { icon: "activity" }),
-      item("Hypertension management", "Communicate monitoring plans, medication adjustments, and follow-up expectations.", { icon: "heart" }),
-      item("Thyroid and metabolic care", "Support condition-specific programs with their own content emphasis and CTAs.", { icon: "sparkles" }),
-      item("Long-term follow-up", "Present ongoing case review, goal tracking, and digital continuity in one place.", { icon: "users" }),
-    ],
-    benefits: [
-      item("Improved continuity", "Patients understand the full long-term care journey instead of isolated appointments.", { icon: "users" }),
-      item("Stronger education", "Use the page to reinforce monitoring, self-management, and lifestyle support content.", { icon: "book-open" }),
-      item("Goal-focused care planning", "Support follow-up goals, coaching, and lifestyle changes over time.", { icon: "sparkles" }),
-    ],
-    statItems: [
-      item("Care model", "", { value: "Longitudinal", icon: "users" }),
-      item("Review cadence", "", { value: "Ongoing", icon: "calendar" }),
-      item("Digital communication", "", { value: "Included", icon: "message-square" }),
-    ],
-    seoDescription: "Keep chronic-disease management pages current with editable care-program content, FAQs, testimonials, and service SEO settings.",
-  }),
-  buildService({
-    slug: "womens-health",
-    title: "Women's Health",
-    shortTitle: "Women's Health",
-    excerpt: "Comprehensive women's health support spanning preventive care, hormonal care, reproductive planning, and wellness.",
-    summary: "Comprehensive women's health support across preventive care, reproductive wellness, hormonal care, and healthy aging.",
-    icon: "heart",
-    previewImage: image(serviceWomensHero, "Women's health illustration"),
-    heroCopy: "Women's health care should feel compassionate, clear, and supportive through every stage of life.",
-    features: [
-      item("Well-woman exams", "Promote preventive visits and recurring wellness pathways from one editable page.", { icon: "calendar" }),
-      item("Hormonal care", "Manage copy for cycle health, menopause support, and symptom-led follow-up programs.", { icon: "heart" }),
-      item("Family planning", "Update reproductive-health guidance, counseling language, and CTA pathways as needed.", { icon: "users" }),
-      item("Breast and cervical screening", "Support age-specific prevention and referral clarity.", { icon: "shield" }),
-    ],
-    benefits: [
-      item("Life-stage flexibility", "Organize messaging around adolescence, reproductive years, and menopause without redesigning the page.", { icon: "sparkles" }),
-      item("Clear preventive guidance", "Get practical information about screenings, wellness visits, and next steps.", { icon: "book-open" }),
-      item("Integrated care access", "Connect primary care, preventive care, diagnostics, and counseling through one digital journey.", { icon: "activity" }),
-    ],
-    statItems: [
-      item("Care scope", "", { value: "Whole-person", icon: "heart" }),
-      item("Visit options", "", { value: "Virtual + in-person", icon: "globe" }),
-      item("Program flexibility", "", { value: "High", icon: "sparkles" }),
-    ],
-    seoDescription: "Women's health services including well-woman exams, family planning, hormonal care, and preventive screenings.",
-  }),
-  buildService({
-    slug: "mens-health",
-    title: "Men's Health",
-    shortTitle: "Men's Health",
-    excerpt: "Preventive, diagnostic, and lifestyle support tailored to common men's-health needs across adulthood.",
-    summary: "The men's-health service page supports editable messaging around preventive care, labs, cardiovascular risk, and quality-of-life concerns.",
-    icon: "user-round",
-    previewImage: image(serviceMensHero, "Men's health illustration"),
-    heroCopy: "Marketing or clinical staff can update programs, education blocks, and CTA emphasis as service priorities evolve.",
-    features: [
-      item("Routine physicals", "Support annual health reviews and recurring prevention messaging.", { icon: "calendar" }),
-      item("Prostate screening", "Publish tailored guidance for screening readiness and follow-up conversations.", { icon: "shield" }),
-      item("Lab-led evaluation", "Explain testing, interpretation, and next-step pathways more clearly.", { icon: "microscope" }),
-      item("Lifestyle and wellness support", "Tie cardiovascular health, nutrition, and stress support into one service narrative.", { icon: "activity" }),
-    ],
-    benefits: [
-      item("Better engagement", "Reduce friction for topics patients often delay or avoid discussing.", { icon: "message-square" }),
-      item("Clear treatment pathways", "Use structured sections to explain options, timing, and likely next steps.", { icon: "check-circle" }),
-      item("Focused preventive support", "Encourage earlier conversations around screening, labs, and wellness planning.", { icon: "sparkles" }),
-    ],
-    statItems: [
-      item("Support areas", "", { value: "Preventive + diagnostic", icon: "shield" }),
-      item("Access model", "", { value: "Fast consult pathways", icon: "clock" }),
-      item("Education readiness", "", { value: "Editable", icon: "book-open" }),
-    ],
-    seoDescription: "Men's health services including physicals, lab evaluation, screenings, and lifestyle-focused care.",
-  }),
-  buildService({
-    slug: "mental-health-services",
-    title: "Mental Health Services",
-    shortTitle: "Mental Health",
-    excerpt: "Therapy, psychiatric evaluation, stress support, and integrated behavioral-health care within the wider medical ecosystem.",
-    summary: "This service page supports program updates, therapist assignments, and education content without rebuilding the frontend.",
-    icon: "brain",
-    previewImage: image(serviceMentalHero, "Mental health illustration"),
-    heroCopy: "Behavioral health care should feel accessible, compassionate, and connected to your overall wellness.",
-    features: [
-      item("Therapy pathways", "Describe counseling options, intake expectations, and follow-up structure in editable blocks.", { icon: "message-square" }),
-      item("Psychiatric evaluation", "Clarify assessment steps, medication support, and coordination with other care teams.", { icon: "brain" }),
-      item("Stress and resilience care", "Support for stress, anxiety, emotional wellness, and everyday coping.", { icon: "heart" }),
-      item("Integrated care coordination", "Connect mental-health services to primary care and chronic-care pathways.", { icon: "users" }),
-    ],
-    benefits: [
-      item("Better accessibility", "Editable content helps reduce stigma and clarify what getting help looks like.", { icon: "heart" }),
-      item("Flexible care options", "Support in-person visits, virtual care, and coordinated follow-up.", { icon: "sparkles" }),
-      item("Connected patient journey", "Keep referrals, medication follow-up, and education aligned across teams.", { icon: "activity" }),
-    ],
-    statItems: [
-      item("Visit options", "", { value: "Virtual + in-person", icon: "globe" }),
-      item("Care model", "", { value: "Integrated", icon: "users" }),
-      item("Publishing flexibility", "", { value: "High", icon: "sparkles" }),
-    ],
-    seoDescription: "Mental health services including therapy, psychiatric evaluation, stress support, and integrated behavioral health care.",
-  }),
-  buildService({
-    slug: "substance-use-treatment",
-    title: "Substance Use Treatment",
-    shortTitle: "Recovery Support",
-    excerpt: "Evidence-based treatment, counseling, medication-assisted treatment, and recovery support with a structured digital presence.",
-    summary: "The recovery-support page is built for evolving programs, clinician assignments, community resources, and compassionate editorial control.",
-    icon: "hand-heart",
-    previewImage: image(serviceSubstanceHero, "Substance use treatment illustration"),
-    heroCopy: "Recovery support should be compassionate, clear, and focused on each patient's path forward.",
-    features: [
-      item("Assessment and intake", "Describe confidential entry points and first-step expectations clearly.", { icon: "message-square" }),
-      item("Medication-assisted treatment", "Evidence-based medication support as part of a broader recovery plan.", { icon: "pill" }),
-      item("Counseling and support", "Highlight therapy, family support, and peer recovery pathways.", { icon: "users" }),
-      item("Aftercare planning", "Ongoing support, community resources, and follow-up planning for continued recovery.", { icon: "globe" }),
-    ],
-    benefits: [
-      item("Confidential, patient-first messaging", "Give staff control over tone and clarity as programs evolve.", { icon: "shield" }),
-      item("Program adaptability", "Update services, support models, and CTA pathways without redesign work.", { icon: "sparkles" }),
-      item("Stronger resource visibility", "Promote support options, community resources, and follow-up expectations.", { icon: "book-open" }),
-    ],
-    statItems: [
-      item("Care model", "", { value: "Evidence-based", icon: "shield" }),
-      item("Support depth", "", { value: "Assessment to aftercare", icon: "users" }),
-      item("Care approach", "", { value: "Coordinated", icon: "sparkles" }),
-    ],
-    seoDescription: "Substance use treatment services including assessment, counseling, medication-assisted treatment, and recovery support.",
-  }),
-  buildService({
-    slug: "geriatric-care",
-    title: "Geriatric Care",
-    shortTitle: "Geriatric Care",
-    excerpt: "Comprehensive support for aging adults, caregivers, memory concerns, chronic conditions, and independence planning.",
-    summary: "Comprehensive care for aging adults, caregivers, memory concerns, chronic conditions, and healthy aging.",
-    icon: "users",
-    previewImage: image(serviceGeriatricHero, "Geriatric care illustration"),
-    heroCopy: "Geriatric care should support both patients and caregivers with practical guidance, planning, and long-term coordination.",
-    features: [
-      item("Comprehensive assessments", "Explain functional, cognitive, and preventive reviews in a clearer way.", { icon: "stethoscope" }),
-      item("Caregiver coordination", "Add service-specific resources, caregiver tips, or support pathways as needed.", { icon: "users" }),
-      item("Memory support", "Publish evolving content for cognitive screening, follow-up, and referral options.", { icon: "brain" }),
-      item("Healthy-aging planning", "Highlight fall prevention, medication review, and independence support.", { icon: "activity" }),
-    ],
-    benefits: [
-      item("Patient and caregiver clarity", "Keep page copy understandable for families coordinating longer-term care.", { icon: "message-square" }),
-      item("Program-specific education", "Helpful information for healthy aging, safety, memory support, and caregiver coordination.", { icon: "book-open" }),
-      item("Flexible support content", "Support home-based, virtual, or in-office care models without route rewrites.", { icon: "sparkles" }),
-    ],
-    statItems: [
-      item("Care audience", "", { value: "Patients + caregivers", icon: "users" }),
-      item("Support model", "", { value: "Long-term", icon: "activity" }),
-      item("Care focus", "", { value: "Aging well", icon: "sparkles" }),
-    ],
-    seoDescription: "Geriatric care services supporting aging adults, caregivers, memory concerns, and long-term wellness.",
-  }),
-  buildService({
-    slug: "urgent-care",
-    title: "Urgent Care",
-    shortTitle: "Urgent Care",
-    excerpt: "Fast, non-emergency care for minor illnesses and injuries, with telehealth and in-person pathways.",
-    summary: "Fast, non-emergency care for minor illnesses and injuries with in-person and virtual support.",
-    icon: "clock",
-    previewImage: image(serviceUrgentHero, "Urgent care illustration"),
-    heroCopy: "When you need prompt care for a non-emergency illness or injury, our urgent care team is here to help.",
-    features: [
-      item("Cold and flu care", "Prompt evaluation and treatment for common illnesses and seasonal symptoms.", { icon: "activity" }),
-      item("Minor injuries", "Keep treatment and triage explanations current as workflows change.", { icon: "shield" }),
-      item("Rapid testing", "Promote available tests, timelines, and telehealth follow-up processes.", { icon: "microscope" }),
-      item("Telehealth screening", "Let the team pivot messaging between virtual and in-person capacity as needed.", { icon: "globe" }),
-    ],
-    benefits: [
-      item("Operational responsiveness", "Adjust access language and CTAs quickly when demand patterns shift.", { icon: "clock" }),
-      item("Clearer patient routing", "Help visitors understand whether urgent care or another service fits best.", { icon: "check-circle" }),
-      item("Seasonal agility", "Use the block builder for flu season, school physicals, or public-health campaigns.", { icon: "sparkles" }),
-    ],
-    statItems: [
-      item("Care type", "", { value: "Non-emergency", icon: "shield" }),
-      item("Access options", "", { value: "Virtual + walk-in", icon: "globe" }),
-      item("Access support", "", { value: "Same-day guidance", icon: "sparkles" }),
-    ],
-    seoDescription: "Urgent care services for minor illnesses, injuries, rapid testing, and same-day guidance.",
-  }),
-];
-
-services.forEach((service, index) => {
-  service.sortOrder = index + 1;
-  service.featuredOnHome = index < 6;
+const services: CmsService[] = serviceDirectoryCards.map((card, index) => {
+  const slug = card.href.replace("/services/", "") as ServicePageSlug;
+  const service = createCmsServiceFromDesign(slug);
+  return {
+    ...service,
+    sortOrder: index + 1,
+    featuredOnHome: card.featuredOnHome ?? false,
+  };
 });
 
 const posts: CmsBlogPost[] = [
