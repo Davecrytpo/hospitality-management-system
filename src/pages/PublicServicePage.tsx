@@ -31,11 +31,11 @@ const heroBadgeLayouts: Partial<Record<ServicePageSlug, HeroBadgeLayout>> = {
     imageFadeClassName: "w-24 xl:w-28",
   },
   "preventive-care": {
-    badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
-    badgeLabelClassName: "max-w-[144px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
+    badgeGridClassName: "grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-4",
+    badgeLabelClassName: "max-w-[154px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
     noOverlayWrapperClassName:
-      "relative z-10 mt-8 lg:-mt-1 lg:grid lg:grid-cols-[minmax(0,0.98fr)_minmax(320px,0.66fr)] lg:items-start lg:gap-6",
-    imageFadeClassName: "w-24 xl:w-28",
+      "relative z-10 mt-7 lg:-mt-5 lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(260px,0.5fr)] lg:items-start lg:gap-4",
+    imageFadeClassName: "w-28 xl:w-32",
   },
   "chronic-disease-management": {
     badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
@@ -48,15 +48,15 @@ const heroBadgeLayouts: Partial<Record<ServicePageSlug, HeroBadgeLayout>> = {
     badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
     badgeLabelClassName: "max-w-[142px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
     noOverlayWrapperClassName:
-      "relative z-10 mt-8 lg:-mt-1 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.64fr)] lg:items-start lg:gap-6",
-    imageFadeClassName: "w-24 xl:w-28",
+      "relative z-10 mt-7 lg:-mt-3 lg:grid lg:grid-cols-[minmax(0,1.02fr)_minmax(300px,0.6fr)] lg:items-start lg:gap-5",
+    imageFadeClassName: "w-28 xl:w-32",
   },
   "mens-health": {
     badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
     badgeLabelClassName: "max-w-[140px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
     noOverlayWrapperClassName:
-      "relative z-10 mt-7 lg:-mt-2 lg:grid lg:grid-cols-[minmax(0,0.98fr)_minmax(320px,0.66fr)] lg:items-start lg:gap-6",
-    imageFadeClassName: "w-24 xl:w-28",
+      "relative z-10 mt-7 lg:-mt-4 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.6fr)] lg:items-start lg:gap-5",
+    imageFadeClassName: "w-28 xl:w-32",
   },
   "mental-health-services": {
     badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
@@ -71,6 +71,9 @@ const heroBadgeLayouts: Partial<Record<ServicePageSlug, HeroBadgeLayout>> = {
     noOverlayWrapperClassName:
       "relative z-10 mt-9 lg:mt-1 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(315px,0.64fr)] lg:items-start lg:gap-6",
     imageFadeClassName: "w-24 xl:w-28",
+  },
+  "urgent-care": {
+    imageFadeClassName: "w-28 xl:w-32",
   },
 };
 
