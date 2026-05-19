@@ -10,8 +10,69 @@ import { useCmsService, useCmsServices, useCmsSiteSettings } from "@/features/cm
 import { buildServicePageContent } from "@/features/cms/originalSiteAdapters";
 import { serviceLooksLikePlaceholder, settingsTextLooksLikePlaceholder } from "@/features/cms/publicContent";
 import { useCmsSeo } from "@/features/cms/seo";
-import { getServicePageContent, type ServiceAction, type ServiceBadge, type ServiceBulletPanel, type ServiceChoice, type ServiceChoicePanel, type ServiceCtaPanel, type ServiceFooterColumn, type ServiceOffering, type ServicePageContent } from "@/data/servicePageContent";
+import { getServicePageContent, type ServiceAction, type ServiceBadge, type ServiceBulletPanel, type ServiceChoice, type ServiceChoicePanel, type ServiceCtaPanel, type ServiceFooterColumn, type ServiceOffering, type ServicePageContent, type ServicePageSlug } from "@/data/servicePageContent";
 import { cn } from "@/lib/utils";
+
+type HeroBadgeLayout = {
+  badgeGridClassName?: string;
+  badgeLabelClassName?: string;
+  noOverlayWrapperClassName?: string;
+  imageFadeClassName?: string;
+};
+
+const defaultHeroBadgeGridClassName = "grid gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4";
+const defaultHeroBadgeLabelClassName = "max-w-[128px] text-[0.82rem] font-semibold leading-6 text-[#13306b] xl:max-w-[138px]";
+const defaultNoOverlayWrapperClassName =
+  "relative z-10 mt-6 lg:-mt-8 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.74fr)] lg:items-start lg:gap-5";
+const defaultHeroImageFadeClassName = "w-20 xl:w-24";
+
+const heroBadgeLayouts: Partial<Record<ServicePageSlug, HeroBadgeLayout>> = {
+  "primary-care": {
+    imageFadeClassName: "w-24 xl:w-28",
+  },
+  "preventive-care": {
+    badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
+    badgeLabelClassName: "max-w-[144px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
+    noOverlayWrapperClassName:
+      "relative z-10 mt-8 lg:-mt-1 lg:grid lg:grid-cols-[minmax(0,0.98fr)_minmax(320px,0.66fr)] lg:items-start lg:gap-6",
+    imageFadeClassName: "w-24 xl:w-28",
+  },
+  "chronic-disease-management": {
+    badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
+    badgeLabelClassName: "max-w-[142px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
+    noOverlayWrapperClassName:
+      "relative z-10 mt-8 lg:mt-0 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(315px,0.64fr)] lg:items-start lg:gap-6",
+    imageFadeClassName: "w-24 xl:w-28",
+  },
+  "womens-health": {
+    badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
+    badgeLabelClassName: "max-w-[142px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
+    noOverlayWrapperClassName:
+      "relative z-10 mt-8 lg:-mt-1 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.64fr)] lg:items-start lg:gap-6",
+    imageFadeClassName: "w-24 xl:w-28",
+  },
+  "mens-health": {
+    badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
+    badgeLabelClassName: "max-w-[140px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
+    noOverlayWrapperClassName:
+      "relative z-10 mt-7 lg:-mt-2 lg:grid lg:grid-cols-[minmax(0,0.98fr)_minmax(320px,0.66fr)] lg:items-start lg:gap-6",
+    imageFadeClassName: "w-24 xl:w-28",
+  },
+  "mental-health-services": {
+    badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
+    badgeLabelClassName: "max-w-[146px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
+    noOverlayWrapperClassName:
+      "relative z-10 mt-8 lg:mt-0 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(315px,0.64fr)] lg:items-start lg:gap-6",
+    imageFadeClassName: "w-24 xl:w-28",
+  },
+  "substance-use-treatment": {
+    badgeGridClassName: "grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4",
+    badgeLabelClassName: "max-w-[144px] text-[0.82rem] font-semibold leading-6 text-[#13306b]",
+    noOverlayWrapperClassName:
+      "relative z-10 mt-9 lg:mt-1 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(315px,0.64fr)] lg:items-start lg:gap-6",
+    imageFadeClassName: "w-24 xl:w-28",
+  },
+};
 
 function getOfferingGridClassName(rowLength: number) {
   if (rowLength <= 1) return "grid-cols-1";
@@ -64,7 +125,7 @@ function renderAction(action: ServiceAction | undefined, onAppointment: () => vo
   );
 }
 
-function BadgeChip({ badge }: { badge: ServiceBadge }) {
+function BadgeChip({ badge, labelClassName }: { badge: ServiceBadge; labelClassName?: string }) {
   return (
     <div className="flex min-w-0 items-center gap-3.5">
       <div
@@ -75,7 +136,7 @@ function BadgeChip({ badge }: { badge: ServiceBadge }) {
       >
         <badge.icon className="h-6 w-6" strokeWidth={1.9} />
       </div>
-      <span className="max-w-[128px] text-[0.82rem] font-semibold leading-6 text-[#13306b] xl:max-w-[138px]">{badge.label}</span>
+      <span className={cn(defaultHeroBadgeLabelClassName, labelClassName)}>{badge.label}</span>
     </div>
   );
 }
@@ -260,7 +321,11 @@ export default function PublicServicePage() {
   const longestRow = Math.max(...service.offeringRows.map((row) => row.length));
   const hasStageItems = service.stageBand.items.length > 0;
   const hasHeroOverlay = (service.heroOverlayChoices?.length ?? 0) > 0;
-  const heroBadgeGrid = "grid gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4";
+  const heroBadgeLayout = heroBadgeLayouts[service.slug];
+  const heroBadgeGridClassName = heroBadgeLayout?.badgeGridClassName ?? defaultHeroBadgeGridClassName;
+  const heroBadgeLabelClassName = heroBadgeLayout?.badgeLabelClassName;
+  const noOverlayWrapperClassName = heroBadgeLayout?.noOverlayWrapperClassName ?? defaultNoOverlayWrapperClassName;
+  const heroImageFadeClassName = heroBadgeLayout?.imageFadeClassName ?? defaultHeroImageFadeClassName;
 
   return (
     <div className="min-h-screen bg-white text-[#13306b]">
@@ -303,16 +368,16 @@ export default function PublicServicePage() {
                     className="h-[300px] w-full max-w-[760px] object-cover sm:h-[360px] lg:h-[430px] xl:h-[470px]"
                     loading="eager"
                   />
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white via-white/82 to-transparent" />
+                  <div className={cn("pointer-events-none absolute inset-y-0 left-0 bg-gradient-to-r from-white via-white/82 to-transparent", heroImageFadeClassName)} />
                 </div>
               </div>
             </div>
 
             {hasHeroOverlay ? (
               <div className="relative z-10 mt-5 grid gap-5 lg:-mt-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.74fr)] lg:items-end">
-                <div className={heroBadgeGrid}>
+                <div className={heroBadgeGridClassName}>
                   {service.heroBadges.map((badge) => (
-                    <BadgeChip key={badge.label} badge={badge} />
+                    <BadgeChip key={badge.label} badge={badge} labelClassName={heroBadgeLabelClassName} />
                   ))}
                 </div>
                 <div className="lg:-mt-20 lg:justify-self-end">
@@ -320,10 +385,10 @@ export default function PublicServicePage() {
                 </div>
               </div>
             ) : (
-              <div className="relative z-10 mt-6 lg:-mt-8 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.74fr)] lg:items-start lg:gap-5">
-                <div className={cn(heroBadgeGrid, "lg:pr-4 xl:pr-8")}>
+              <div className={noOverlayWrapperClassName}>
+                <div className={cn(heroBadgeGridClassName, "lg:pr-4 xl:pr-8")}>
                   {service.heroBadges.map((badge) => (
-                    <BadgeChip key={badge.label} badge={badge} />
+                    <BadgeChip key={badge.label} badge={badge} labelClassName={heroBadgeLabelClassName} />
                   ))}
                 </div>
                 <div className="hidden lg:block" />
