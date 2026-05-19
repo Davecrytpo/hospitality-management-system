@@ -1,34 +1,57 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
+  Apple,
+  Atom,
   Bandage,
+  BicepsFlexed,
+  Bone,
   BookOpenText,
   Brain,
+  BrainCircuit,
+  BriefcaseMedical,
   CalendarDays,
-  CheckSquare,
+  CalendarHeart,
+  CirclePlus,
   ClipboardCheck,
-  ClipboardList,
+  ClipboardPlus,
   Clock3,
+  Droplet,
   Ear,
   Eye,
-  FlaskConical,
+  FilePlus2,
+  Frown,
+  Gauge,
+  Hand,
   HandHeart,
   Heart,
   HeartHandshake,
   HeartPulse,
+  Hospital,
+  Leaf,
   Lock,
   MapPin,
+  MonitorSmartphone,
   MoonStar,
-  NotebookPen,
+  PersonStanding,
   Phone,
   Pill,
+  PillBottle,
+  Ribbon,
   ShieldCheck,
   Stethoscope,
   Syringe,
+  SunMedium,
+  Tablets,
   TestTube2,
+  Thermometer,
   UserRound,
+  UserRoundCheck,
   Users,
   Users2,
+  WalletCards,
+  Weight,
+  Wind,
 } from "lucide-react";
 
 import chronicHeroImage from "@/assets/service-page-chronic-hero.png";
@@ -40,6 +63,7 @@ import primaryHeroImage from "@/assets/service-page-primary-hero.png";
 import substanceHeroImage from "@/assets/service-page-substance-hero.png";
 import urgentHeroImage from "@/assets/service-page-urgent-hero.png";
 import womensHeroImage from "@/assets/service-page-womens-hero.png";
+import { GlucoseMeterIcon, LungsIcon, MaleSymbolIcon, UterusIcon } from "@/components/icons/medicalDesignIcons";
 
 export type ServicePageSlug =
   | "primary-care"
@@ -295,13 +319,13 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Sick Visits (Same-Day)",
           description: "Feeling under the weather? We offer same-day appointments when you need care fast.",
-          icon: ClipboardList,
+          icon: ClipboardPlus,
           accent: "red",
         },
         {
           title: "Medication Management & Refills",
           description: "Safe, effective medication management and convenient prescription refills.",
-          icon: Pill,
+          icon: PillBottle,
           accent: "blue",
         },
       ],
@@ -315,13 +339,13 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Care Coordination",
           description: "We coordinate with specialists and hospitals to ensure you get the right care at the right time.",
-          icon: Users,
+          icon: UserRoundCheck,
           accent: "blue",
         },
         {
           title: "Chronic Condition Follow-Up",
           description: "Ongoing care for diabetes, high blood pressure, asthma, and more.",
-          icon: ClipboardCheck,
+          icon: FilePlus2,
           accent: "red",
         },
       ],
@@ -389,7 +413,7 @@ const servicePages: ServicePageContent[] = [
       { label: "Early Detection Saves Lives", icon: ShieldCheck, accent: "blue" },
       { label: "Care for Every Stage of Life", icon: Users2, accent: "blue" },
       { label: "Better Health Outcomes", icon: HeartPulse, accent: "red" },
-      { label: "Covered by Most Insurance Plans", icon: ClipboardCheck, accent: "blue" },
+      { label: "Covered by Most Insurance Plans", icon: WalletCards, accent: "blue" },
     ],
     sectionTitle: "Our Preventive Services",
     sectionSubtitle: "Comprehensive screenings and preventive care tailored to your age, gender, and health history.",
@@ -399,19 +423,19 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Annual Wellness Visits",
           description: "Yearly wellness exams to review your health, update screenings, and create a personalized prevention plan.",
-          icon: Stethoscope,
+          icon: CalendarHeart,
           accent: "blue",
         },
         {
           title: "Cancer Screenings",
           description: "Early detection is key. We offer screenings for breast, cervical, and colorectal cancers.",
-          icon: ShieldCheck,
+          icon: Ribbon,
           accent: "red",
         },
         {
           title: "Blood Pressure & Cholesterol Screening",
           description: "Quick and easy checks to monitor your heart health and reduce risk of serious conditions.",
-          icon: HeartPulse,
+          icon: Droplet,
           accent: "blue",
         },
       ],
@@ -419,7 +443,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Diabetes Screening",
           description: "Screenings to identify prediabetes or diabetes early - when it's most manageable.",
-          icon: Activity,
+          icon: GlucoseMeterIcon,
           accent: "red",
         },
         {
@@ -509,25 +533,25 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Well-Woman Exams",
           description: "Routine exams to monitor your overall health and catch issues early.",
-          icon: CalendarDays,
+          icon: CalendarHeart,
           accent: "red",
         },
         {
           title: "Pap Smears",
           description: "Cervical cancer screening to help you stay healthy and worry-free.",
-          icon: ShieldCheck,
+          icon: UterusIcon,
           accent: "blue",
         },
         {
           title: "Birth Control Counseling & Management",
           description: "We help you find the right birth control option for your lifestyle and goals.",
-          icon: NotebookPen,
+          icon: Tablets,
           accent: "red",
         },
         {
           title: "Hormonal & Menstrual Care",
           description: "Diagnosis and treatment for irregular periods, PMS, PCOS, and menopause symptoms.",
-          icon: HeartPulse,
+          icon: Atom,
           accent: "blue",
         },
       ],
@@ -541,7 +565,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Breast Health",
           description: "Clinical breast exams and referrals for imaging when needed.",
-          icon: Heart,
+          icon: Ribbon,
           accent: "blue",
         },
         {
@@ -584,10 +608,10 @@ const servicePages: ServicePageContent[] = [
       description: "From your first visit to every milestone after, we're with you every step of the way.",
       items: [
         { label: "Adolescence", icon: UserRound, accent: "red" },
-        { label: "Reproductive Years", icon: Users2, accent: "blue" },
+        { label: "Reproductive Years", icon: UterusIcon, accent: "blue" },
         { label: "Pregnancy Planning", icon: UserRound, accent: "red" },
         { label: "Menopause", icon: UserRound, accent: "blue" },
-        { label: "Beyond", icon: Heart, accent: "red" },
+        { label: "Beyond", icon: HeartHandshake, accent: "red" },
       ],
     },
     footerColumns: [
@@ -621,10 +645,10 @@ const servicePages: ServicePageContent[] = [
       "Our team works with you to create personalized treatment plans, monitor your progress, and provide the support and education you need to stay in control of your health.",
     heroImage: chronicHeroImage,
     heroBadges: [
-      { label: "Personalized Treatment Plans", icon: Users2, accent: "blue" },
+      { label: "Personalized Treatment Plans", icon: UserRoundCheck, accent: "blue" },
       { label: "Regular Monitoring", icon: HeartPulse, accent: "blue" },
       { label: "Prevent Complications", icon: ShieldCheck, accent: "blue" },
-      { label: "Better Health Outcomes", icon: UserRound, accent: "blue" },
+      { label: "Better Health Outcomes", icon: HandHeart, accent: "blue" },
     ],
     sectionTitle: "Conditions We Manage",
     sectionSubtitle: "We provide expert care and ongoing support for a wide range of chronic conditions.",
@@ -634,7 +658,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Diabetes Management",
           description: "We help you manage blood sugar levels, monitor A1c, adjust medications, and prevent complications.",
-          icon: Activity,
+          icon: GlucoseMeterIcon,
           accent: "blue",
           bullets: ["A1c Testing", "Medication Management", "Nutrition & Lifestyle Guidance"],
         },
@@ -648,7 +672,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "High Cholesterol",
           description: "We help manage cholesterol levels to improve heart health and lower cardiovascular risk.",
-          icon: Heart,
+          icon: Droplet,
           accent: "blue",
           bullets: ["Lipid Profile Testing", "Medication Management", "Diet & Exercise Guidance"],
         },
@@ -657,21 +681,21 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Asthma & COPD",
           description: "We provide ongoing care to help you breathe easier and reduce flare-ups.",
-          icon: Stethoscope,
+          icon: LungsIcon,
           accent: "red",
           bullets: ["Symptom Management", "Inhaler & Medication Management", "Action Plan Development"],
         },
         {
           title: "Thyroid Disorders",
           description: "We diagnose and manage thyroid conditions to help maintain energy, mood, and overall wellness.",
-          icon: HeartHandshake,
+          icon: Stethoscope,
           accent: "blue",
           bullets: ["Thyroid Testing", "Medication Management", "Ongoing Monitoring"],
         },
         {
           title: "Weight Management",
           description: "We create personalized plans to help you reach and maintain a healthy weight.",
-          icon: ClipboardList,
+          icon: Weight,
           accent: "red",
           bullets: ["Weight Loss Support", "Nutrition Counseling", "Lifestyle Coaching"],
         },
@@ -740,7 +764,7 @@ const servicePages: ServicePageContent[] = [
     heroBadges: [
       { label: "Personalized Care", icon: UserRound, accent: "red" },
       { label: "Confidential & Respectful", icon: ShieldCheck, accent: "blue" },
-      { label: "Evidence-Based Treatment", icon: Brain, accent: "red" },
+      { label: "Evidence-Based Treatment", icon: BrainCircuit, accent: "red" },
       { label: "Support for Every Step of Your Journey", icon: Users2, accent: "blue" },
     ],
     sectionTitle: "Our Mental Health Services",
@@ -751,7 +775,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Individual Therapy",
           description: "One-on-one sessions to help you manage challenges, build coping skills, and improve your overall well-being.",
-          icon: Brain,
+          icon: UserRound,
           accent: "blue",
         },
         {
@@ -763,7 +787,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Depression Treatment",
           description: "Compassionate care to help you overcome depression and regain a positive outlook.",
-          icon: Activity,
+          icon: Frown,
           accent: "blue",
         },
         {
@@ -777,7 +801,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Trauma & PTSD Support",
           description: "Specialized care to help process trauma and improve emotional resilience.",
-          icon: Brain,
+          icon: BrainCircuit,
           accent: "red",
         },
         {
@@ -795,7 +819,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Ongoing Support & Follow-Up",
           description: "Continuous support and follow-up to help you stay on track and achieve your goals.",
-          icon: HeartHandshake,
+          icon: HandHeart,
           accent: "blue",
         },
       ],
@@ -875,13 +899,13 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Assessment & Evaluation",
           description: "Thorough evaluations to understand your needs and create the right treatment plan.",
-          icon: HeartHandshake,
+          icon: HandHeart,
           accent: "blue",
         },
         {
           title: "Detox Referral & Support",
           description: "Safe, medically supervised detox referrals and support to help you take the first step.",
-          icon: ShieldCheck,
+          icon: CirclePlus,
           accent: "blue",
         },
         {
@@ -919,13 +943,13 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Relapse Prevention",
           description: "Tools and strategies to help you maintain sobriety and prevent relapse.",
-          icon: HeartPulse,
+          icon: Leaf,
           accent: "blue",
         },
         {
           title: "Aftercare & Ongoing Support",
           description: "Continued care and support to help you stay on track and thrive in recovery.",
-          icon: ClipboardList,
+          icon: BriefcaseMedical,
           accent: "red",
         },
         {
@@ -937,7 +961,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Co-Occurring Disorder Treatment",
           description: "Integrated care for mental health and substance use disorders.",
-          icon: HeartHandshake,
+          icon: BrainCircuit,
           accent: "red",
         },
         {
@@ -1029,19 +1053,19 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Prostate Health Screenings",
           description: "Screenings to detect prostate issues early, including PSA testing and exams.",
-          icon: Activity,
+          icon: MaleSymbolIcon,
           accent: "red",
         },
         {
           title: "Testosterone Evaluation & Management",
           description: "Assessment and treatment for low testosterone and related symptoms.",
-          icon: HeartPulse,
+          icon: Gauge,
           accent: "blue",
         },
         {
           title: "Cardiovascular Health",
           description: "Assess and manage risk factors like high blood pressure, high cholesterol, and more.",
-          icon: HeartHandshake,
+          icon: HeartPulse,
           accent: "red",
         },
       ],
@@ -1049,19 +1073,19 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Weight Management",
           description: "Personalized plans to help you achieve and maintain a healthy weight.",
-          icon: ClipboardList,
+          icon: Weight,
           accent: "red",
         },
         {
           title: "Stress & Mental Well-Being",
           description: "Support for stress, mood, and mental well-being to help you feel your best.",
-          icon: Brain,
+          icon: SunMedium,
           accent: "blue",
         },
         {
           title: "Erectile Dysfunction (ED) Treatment",
           description: "Effective, confidential treatments to help improve performance and confidence.",
-          icon: Activity,
+          icon: BicepsFlexed,
           accent: "red",
         },
         {
@@ -1134,7 +1158,7 @@ const servicePages: ServicePageContent[] = [
       "We provide comprehensive, personalized care for older adults to help maintain health, independence, and quality of life. Our experienced team focuses on prevention, early detection, and treatment of age-related conditions with dignity and respect.",
     heroImage: geriatricHeroImage,
     heroBadges: [
-      { label: "Compassionate Care", icon: HeartHandshake, accent: "blue" },
+      { label: "Compassionate Care", icon: HandHeart, accent: "blue" },
       { label: "Safe & Respectful", icon: ShieldCheck, accent: "red" },
       { label: "Comprehensive Support", icon: Users2, accent: "blue" },
       { label: "Focused on Your Quality of Life", icon: HeartPulse, accent: "red" },
@@ -1165,13 +1189,13 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Fall Prevention & Mobility Support",
           description: "Assessments and strategies to improve balance, strength, and reduce fall risk.",
-          icon: Activity,
+          icon: PersonStanding,
           accent: "red",
         },
         {
           title: "Medication Management",
           description: "Medication reviews to prevent interactions and ensure safe, effective treatment.",
-          icon: Pill,
+          icon: PillBottle,
           accent: "blue",
         },
       ],
@@ -1179,19 +1203,19 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Nutrition & Weight Management",
           description: "Guidance to support healthy eating, weight maintenance, and overall wellness.",
-          icon: Activity,
+          icon: Apple,
           accent: "red",
         },
         {
           title: "Mental Health Support",
           description: "Care for anxiety, depression, grief, and other emotional well-being concerns.",
-          icon: Brain,
+          icon: UserRound,
           accent: "blue",
         },
         {
           title: "Bone Health & Osteoporosis",
           description: "Screening, treatment, and prevention to maintain strong bones.",
-          icon: Activity,
+          icon: Bone,
           accent: "red",
         },
         {
@@ -1228,12 +1252,12 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Telehealth",
           description: "Connect with your provider from the comfort of your home.",
-          icon: Activity,
+          icon: MonitorSmartphone,
         },
         {
           title: "In-Person Care",
           description: "Visit our office for personalized, face-to-face care.",
-          icon: MapPin,
+          icon: Hospital,
         },
       ],
       footnote: "Both in-person and telehealth appointments available.",
@@ -1285,12 +1309,12 @@ const servicePages: ServicePageContent[] = [
       {
         title: "Telehealth Available",
         description: "Get care from the comfort of your home.",
-        icon: Stethoscope,
+        icon: MonitorSmartphone,
       },
       {
         title: "In-Person Care Available",
         description: "Visit our clinic for fast, convenient treatment.",
-        icon: Users2,
+        icon: Hospital,
       },
     ],
     sectionTitle: "Our Urgent Care Services",
@@ -1301,13 +1325,13 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Cold, Flu & Sore Throat",
           description: "Relief for common illnesses and seasonal symptoms.",
-          icon: Stethoscope,
+          icon: Thermometer,
           accent: "blue",
         },
         {
           title: "Cough, Congestion & Respiratory Issues",
           description: "Evaluation and treatment for coughs, colds, and breathing concerns.",
-          icon: Activity,
+          icon: Wind,
           accent: "red",
         },
         {
@@ -1333,7 +1357,7 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Rashes & Skin Conditions",
           description: "Diagnosis and treatment for rashes, allergies, and skin irritations.",
-          icon: HandHeart,
+          icon: Hand,
           accent: "red",
         },
         {
@@ -1374,12 +1398,12 @@ const servicePages: ServicePageContent[] = [
         {
           title: "Telehealth Care",
           description: "Connect with a provider securely from your phone, tablet, or computer.",
-          icon: Activity,
+          icon: MonitorSmartphone,
         },
         {
           title: "In-Person Care",
           description: "Visit our clinic for fast, personalized care when you need it.",
-          icon: MapPin,
+          icon: Hospital,
         },
       ],
       footnote: "Same quality care. Same trusted team.",

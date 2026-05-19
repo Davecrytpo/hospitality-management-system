@@ -66,16 +66,16 @@ function renderAction(action: ServiceAction | undefined, onAppointment: () => vo
 
 function BadgeChip({ badge }: { badge: ServiceBadge }) {
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex min-w-0 items-center gap-3.5">
       <div
         className={cn(
-          "flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full",
+          "flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-full",
           badge.accent === "red" ? "bg-[#fff0f0] text-[#ef2027]" : "bg-[#eff5ff] text-[#13306b]",
         )}
       >
         <badge.icon className="h-6 w-6" strokeWidth={1.9} />
       </div>
-      <span className="text-[0.92rem] font-semibold leading-7 text-[#13306b]">{badge.label}</span>
+      <span className="max-w-[170px] text-[0.9rem] font-semibold leading-6 text-[#13306b]">{badge.label}</span>
     </div>
   );
 }
@@ -268,7 +268,7 @@ export default function PublicServicePage() {
       <main className="overflow-x-hidden bg-white pb-8">
         <section className="pt-5 lg:pt-7">
           <div className={shellClassName}>
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start lg:gap-10">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-9 xl:gap-11">
               <div className="pt-2">
                 <nav className="mb-6 flex flex-wrap items-center gap-2 text-[0.9rem] text-[#4f6796]">
                   <Link to="/" className="hover:text-[#ef2027]">
@@ -294,17 +294,22 @@ export default function PublicServicePage() {
                 <p className="mt-4 max-w-[520px] text-[1rem] leading-8 text-[#13306b]">{service.description}</p>
               </div>
 
-              <div className="justify-self-end">
-                <div className="relative overflow-hidden">
-                  <img src={service.heroImage} alt={service.breadcrumbLabel} className="w-full max-w-[720px] object-cover" loading="eager" />
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-14 bg-gradient-to-r from-white via-white/80 to-transparent" />
+              <div className="justify-self-end lg:w-full">
+                <div className="relative overflow-hidden lg:pl-2">
+                  <img
+                    src={service.heroImage}
+                    alt={service.breadcrumbLabel}
+                    className="h-[300px] w-full max-w-[760px] object-cover sm:h-[360px] lg:h-[430px] xl:h-[470px]"
+                    loading="eager"
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white via-white/82 to-transparent" />
                 </div>
               </div>
             </div>
 
             {hasHeroOverlay ? (
-              <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,0.86fr)_minmax(360px,0.74fr)] lg:items-end">
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+              <div className="relative z-10 mt-5 grid gap-5 lg:-mt-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.74fr)] lg:items-end">
+                <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2 xl:grid-cols-4">
                   {service.heroBadges.map((badge) => (
                     <BadgeChip key={badge.label} badge={badge} />
                   ))}
@@ -314,10 +319,12 @@ export default function PublicServicePage() {
                 </div>
               </div>
             ) : (
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {service.heroBadges.map((badge) => (
-                  <BadgeChip key={badge.label} badge={badge} />
-                ))}
+              <div className="relative z-10 mt-5 lg:-mt-4">
+                <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {service.heroBadges.map((badge) => (
+                    <BadgeChip key={badge.label} badge={badge} />
+                  ))}
+                </div>
               </div>
             )}
           </div>

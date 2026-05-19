@@ -6,7 +6,17 @@ import { serviceLooksLikePlaceholder } from "@/features/cms/publicContent";
 import type { CmsService } from "@/features/cms/types";
 
 describe("Service CMS defaults", () => {
-  it.each(["chronic-disease-management", "substance-use-treatment", "urgent-care"] as const)(
+  it.each([
+    "primary-care",
+    "preventive-care",
+    "womens-health",
+    "chronic-disease-management",
+    "mental-health-services",
+    "substance-use-treatment",
+    "mens-health",
+    "geriatric-care",
+    "urgent-care",
+  ] as const)(
     "preserves the approved service design content for %s",
     (slug) => {
       const designPage = getServicePageContent(slug);
