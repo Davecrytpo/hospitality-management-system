@@ -75,7 +75,7 @@ function BadgeChip({ badge }: { badge: ServiceBadge }) {
       >
         <badge.icon className="h-6 w-6" strokeWidth={1.9} />
       </div>
-      <span className="max-w-[170px] text-[0.9rem] font-semibold leading-6 text-[#13306b]">{badge.label}</span>
+      <span className="max-w-[128px] text-[0.82rem] font-semibold leading-6 text-[#13306b] xl:max-w-[138px]">{badge.label}</span>
     </div>
   );
 }
@@ -260,6 +260,7 @@ export default function PublicServicePage() {
   const longestRow = Math.max(...service.offeringRows.map((row) => row.length));
   const hasStageItems = service.stageBand.items.length > 0;
   const hasHeroOverlay = (service.heroOverlayChoices?.length ?? 0) > 0;
+  const heroBadgeGrid = "grid gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4";
 
   return (
     <div className="min-h-screen bg-white text-[#13306b]">
@@ -309,7 +310,7 @@ export default function PublicServicePage() {
 
             {hasHeroOverlay ? (
               <div className="relative z-10 mt-5 grid gap-5 lg:-mt-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.74fr)] lg:items-end">
-                <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div className={heroBadgeGrid}>
                   {service.heroBadges.map((badge) => (
                     <BadgeChip key={badge.label} badge={badge} />
                   ))}
@@ -319,12 +320,13 @@ export default function PublicServicePage() {
                 </div>
               </div>
             ) : (
-              <div className="relative z-10 mt-5 lg:-mt-4">
-                <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="relative z-10 mt-6 lg:-mt-8 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.74fr)] lg:items-start lg:gap-5">
+                <div className={cn(heroBadgeGrid, "lg:pr-4 xl:pr-8")}>
                   {service.heroBadges.map((badge) => (
                     <BadgeChip key={badge.label} badge={badge} />
                   ))}
                 </div>
+                <div className="hidden lg:block" />
               </div>
             )}
           </div>
