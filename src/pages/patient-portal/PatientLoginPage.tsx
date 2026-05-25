@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Building2, Loader2, Lock, Mail, Phone, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Building2, Loader2, Lock, Mail, Phone, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 import { Logo } from "@/components/brand/Logo";
@@ -20,7 +20,9 @@ export default function PatientLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  ... rest of state ...
   const [userId, setUserId] = useState<string | null>(null);
   const [userPhone, setUserPhone] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -207,7 +209,25 @@ export default function PatientLoginPage() {
                     <Label htmlFor="password" className="text-xs font-bold uppercase tracking-[0.18em] text-[#6f85af]">
                       Password
                     </Label>
-                    <Input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" required className="h-12 rounded-xl border-[#d5dff2]" />
+                    <div className="relative">
+                      <Input 
+                        id="password" 
+                        type={showPassword ? "text" : "password"} 
+                        value={password} 
+                        onChange={(event) => setPassword(event.target.value)} 
+                        placeholder="Enter your password" 
+                        required 
+                        className="h-12 rounded-xl border-[#d5dff2] pr-10" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6f85af] hover:text-[#13306b] transition-colors"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <Button type="submit" className="h-12 w-full rounded-xl bg-[#ef2027] text-sm font-bold uppercase text-white hover:bg-[#d61920]" disabled={isLoading}>

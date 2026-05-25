@@ -13,6 +13,8 @@ import {
   Phone,
   ShieldCheck,
   Upload,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -55,6 +57,8 @@ export default function PatientRegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  ... rest of state ...
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -462,10 +466,43 @@ export default function PatientRegisterPage() {
                       </Select>
                     </Field>
                     <Field label="Create Password">
-                      <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-12 rounded-xl border-[#d5dff2]" required minLength={8} />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          value={password} 
+                          onChange={(event) => setPassword(event.target.value)} 
+                          className="h-12 rounded-xl border-[#d5dff2] pr-10" 
+                          required 
+                          minLength={8} 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6f85af] hover:text-[#13306b] transition-colors"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </Field>
                     <Field label="Confirm Password">
-                      <Input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className="h-12 rounded-xl border-[#d5dff2]" required />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          value={confirmPassword} 
+                          onChange={(event) => setConfirmPassword(event.target.value)} 
+                          className="h-12 rounded-xl border-[#d5dff2] pr-10" 
+                          required 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6f85af] hover:text-[#13306b] transition-colors"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </Field>
                     <div className="sm:col-span-2">
                       <Field label="Address">

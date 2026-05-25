@@ -161,6 +161,8 @@ import OnlineBillPaymentPage from "./pages/patient-portal/OnlineBillPaymentPage"
 
 // Auth
 import AuthPage from "./pages/auth/AuthPage";
+import AdminLoginPage from "./pages/auth/AdminLoginPage";
+import AdminSignupPage from "./pages/auth/AdminSignupPage";
 
 const queryClient = new QueryClient();
 
@@ -229,6 +231,8 @@ const App = () => (
             <Route path="/pages/*" element={<CmsRoute><Navigate to="/cms/pages" replace /></CmsRoute>} />
             <Route path="/:slug" element={<PublicCmsDynamicPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/signup" element={<AdminSignupPage />} />
             <Route path="/patient-register" element={<PatientRegisterPage />} />
             <Route path="/kiosk" element={<KioskCheckinPage />} />
             <Route path="/verify" element={<PublicVerificationPage />} />
