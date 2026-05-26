@@ -22,7 +22,6 @@ export default function PatientLoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  ... rest of state ...
   const [userId, setUserId] = useState<string | null>(null);
   const [userPhone, setUserPhone] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
