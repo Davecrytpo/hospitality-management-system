@@ -103,18 +103,18 @@ export function ActivityFeed() {
   const navigate = useNavigate();
 
   return (
-    <div className="rounded-xl border bg-card p-6 shadow-sm">
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-card-foreground">Recent Activity</h3>
+    <div className="rounded-xl border bg-card p-4 sm:p-6 shadow-sm h-full flex flex-col">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base sm:text-lg font-bold text-card-foreground tracking-tight uppercase">Recent Activity</h3>
         <button type="button" 
           onClick={() => navigate("/support")}
-          className="text-sm text-medical-primary hover:underline"
+          className="text-[11px] font-bold uppercase tracking-widest text-medical-primary hover:underline"
         >
-          View All
+          View Full Log
         </button>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-4 flex-1">
         {activities.map((activity) => {
           const Icon = activityIcons[activity.type];
           const colorClass = activityColors[activity.type];
@@ -123,21 +123,24 @@ export function ActivityFeed() {
             <div 
               key={activity.id} 
               onClick={() => navigate(activity.path)}
-              className="flex items-start gap-3 cursor-pointer rounded-lg p-2 -mx-2 hover:bg-muted/50 transition-colors"
+              className="flex items-start gap-4 cursor-pointer rounded-xl p-3 -mx-1 hover:bg-muted/30 transition-all border border-transparent hover:border-border/50 group"
             >
-              <div className={cn("rounded-full p-2", colorClass)}>
+              <div className={cn("rounded-xl p-2.5 shrink-0 shadow-sm transition-transform group-hover:scale-110", colorClass)}>
                 <Icon className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-card-foreground line-clamp-2">
+                <p className="text-[13px] sm:text-sm font-semibold text-card-foreground leading-snug group-hover:text-primary transition-colors">
                   {activity.message}
                 </p>
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{activity.time}</span>
+                <div className="mt-1.5 flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground/60">
+                  <span className="flex items-center gap-1">
+                    <div className="h-1 w-1 rounded-full bg-current opacity-40" />
+                    {activity.time}
+                  </span>
                   {activity.user && (
                     <>
                       <span>•</span>
-                      <span>{activity.user}</span>
+                      <span className="text-primary/70">{activity.user}</span>
                     </>
                   )}
                 </div>
@@ -145,6 +148,12 @@ export function ActivityFeed() {
             </div>
           );
         })}
+      </div>
+      
+      <div className="mt-6 pt-4 border-t border-border/50">
+        <Button variant="ghost" className="w-full h-9 rounded-lg text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary" onClick={() => navigate("/support")}>
+          Refresh Feed
+        </Button>
       </div>
     </div>
   );

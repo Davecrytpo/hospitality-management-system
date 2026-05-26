@@ -115,87 +115,137 @@ export function RecentPatients() {
   };
 
   return (
-    <div className="rounded-xl border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b p-6">
+    <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b p-4 sm:p-6 gap-4 bg-muted/20">
         <div>
-          <h3 className="text-lg font-semibold text-card-foreground">Recent Patients</h3>
-          <p className="text-sm text-muted-foreground">Latest patient registrations and visits</p>
+          <h3 className="text-base sm:text-lg font-bold text-card-foreground tracking-tight uppercase">Recent Patients</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">Latest registrations and clinical visits</p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => navigate("/patients")}>
-          View All
+        <Button variant="outline" size="sm" className="rounded-lg h-9 font-bold text-[11px] uppercase tracking-wider" onClick={() => navigate("/patients")}>
+          View Directory
         </Button>
       </div>
       
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Patient</TableHead>
-            <TableHead>ID</TableHead>
-            <TableHead>Age/Gender</TableHead>
-            <TableHead>Department</TableHead>
-            <TableHead>Last Visit</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="w-12"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {patients.map((patient) => (
-            <TableRow 
-              key={patient.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => handleViewDetails(patient.id)}
-            >
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={patient.avatar} alt={patient.name} />
-                    <AvatarFallback>{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-card-foreground">{patient.name}</p>
-                    <p className="text-sm text-muted-foreground">{patient.phone}</p>
-                  </div>
+      {/* Mobile Card View */}
+      <div className="md:hidden divide-y border-t">
+        {patients.map((patient) => (
+          <div 
+            key={patient.id} 
+            className="p-4 active:bg-muted/50 transition-colors"
+            onClick={() => handleViewDetails(patient.id)}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10 border border-border/50">
+                  <AvatarImage src={patient.avatar} alt={patient.name} />
+                  <AvatarFallback className="bg-primary/5 text-primary font-bold">{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-bold text-card-foreground">{patient.name}</p>
+                  <p className="text-[10px] font-mono uppercase text-muted-foreground mt-0.5">{patient.id}</p>
                 </div>
-              </TableCell>
-              <TableCell className="font-mono text-sm">{patient.id}</TableCell>
-              <TableCell>{patient.age} / {patient.gender}</TableCell>
-              <TableCell>{patient.department}</TableCell>
-              <TableCell>{patient.lastVisit}</TableCell>
-              <TableCell>
-                <Badge variant="outline" className={statusStyles[patient.status]}>
-                  {patient.status}
-                </Badge>
-              </TableCell>
-              <TableCell onClick={(e) => e.stopPropagation()}>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleViewDetails(patient.id)}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      View Details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleEditPatient(patient.id)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit Patient
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="text-medical-danger"
-                      onClick={() => handleDeletePatient(patient.id, patient.name)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+              </div>
+              <Badge variant="outline" className={cn("rounded-full font-bold text-[10px] uppercase tracking-widest px-2", statusStyles[patient.status])}>
+                {patient.status}
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div className="text-muted-foreground font-medium">Department: <span className="text-foreground font-bold">{patient.department}</span></div>
+              <div className="text-muted-foreground font-medium text-right">Age/Sex: <span className="text-foreground font-bold">{patient.age} / {patient.gender[0]}</span></div>
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-border/40">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                Last: <span className="text-foreground">{patient.lastVisit}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={(e) => { e.stopPropagation(); handleViewDetails(patient.id); }}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={(e) => { e.stopPropagation(); handleEditPatient(patient.id); }}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/30">
+              <TableHead className="font-bold uppercase text-[11px] tracking-wider">Patient</TableHead>
+              <TableHead className="font-bold uppercase text-[11px] tracking-wider">ID</TableHead>
+              <TableHead className="font-bold uppercase text-[11px] tracking-wider">Age/Gender</TableHead>
+              <TableHead className="font-bold uppercase text-[11px] tracking-wider">Department</TableHead>
+              <TableHead className="font-bold uppercase text-[11px] tracking-wider">Last Visit</TableHead>
+              <TableHead className="font-bold uppercase text-[11px] tracking-wider">Status</TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {patients.map((patient) => (
+              <TableRow 
+                key={patient.id}
+                className="cursor-pointer hover:bg-muted/50 group"
+                onClick={() => handleViewDetails(patient.id)}
+              >
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-9 w-9 border border-border/50">
+                      <AvatarImage src={patient.avatar} alt={patient.name} />
+                      <AvatarFallback className="bg-primary/5 text-primary font-bold">{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-bold text-card-foreground group-hover:text-primary transition-colors">{patient.name}</p>
+                      <p className="text-xs text-muted-foreground font-medium">{patient.phone}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="font-mono text-[11px] uppercase font-bold text-muted-foreground tracking-tighter">{patient.id}</TableCell>
+                <TableCell className="text-sm font-medium">{patient.age} <span className="text-muted-foreground">/</span> {patient.gender}</TableCell>
+                <TableCell className="text-sm font-bold text-primary/80">{patient.department}</TableCell>
+                <TableCell className="text-xs font-bold text-muted-foreground uppercase">{patient.lastVisit}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={cn("rounded-full font-bold text-[10px] uppercase tracking-widest px-3 py-1", statusStyles[patient.status])}>
+                    {patient.status}
+                  </Badge>
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 p-2">
+                      <DropdownMenuItem onClick={() => handleViewDetails(patient.id)} className="rounded-md">
+                        <Eye className="mr-2 h-4 w-4 text-primary" />
+                        <span className="font-semibold text-sm">View Details</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditPatient(patient.id)} className="rounded-md">
+                        <Edit className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span className="font-semibold text-sm">Edit Patient</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        className="text-medical-danger focus:text-medical-danger focus:bg-medical-danger/5 rounded-md"
+                        onClick={() => handleDeletePatient(patient.id, patient.name)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span className="font-bold text-sm">Delete Record</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

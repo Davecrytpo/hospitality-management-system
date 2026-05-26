@@ -298,37 +298,48 @@ export function DashboardSidebar({ collapsed, onToggle }: SidebarProps) {
     <>
       {/* Mobile overlay */}
       {!collapsed && (
-        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onClick={onToggle} />
+        <div 
+          className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[2px] lg:hidden transition-opacity duration-300" 
+          onClick={onToggle} 
+        />
       )}
 
       <aside className={cn(
         "fixed left-0 top-0 z-50 flex h-screen flex-col transition-all duration-300 ease-in-out",
-        "bg-sidebar border-r border-sidebar-border",
-        collapsed ? "w-[72px] -translate-x-full lg:translate-x-0" : "w-[272px] translate-x-0"
+        "bg-sidebar border-r border-sidebar-border shadow-elevated lg:shadow-none",
+        collapsed ? "w-[72px] -translate-x-full lg:translate-x-0" : "w-[280px] translate-x-0"
       )}>
         {/* Logo area */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border">
+        <div className="flex h-16 items-center justify-between px-4 sm:px-5 border-b border-sidebar-border bg-sidebar-background/50 backdrop-blur">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl shrink-0 bg-gradient-brand shadow-glow">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl shrink-0 bg-gradient-brand shadow-glow ring-1 ring-white/10">
               <Heart className="h-5 w-5 text-white" fill="currentColor" />
             </div>
             {!collapsed && (
               <div className="overflow-hidden">
-                <h1 className="text-sm font-bold text-sidebar-foreground tracking-tight leading-none font-display">On Time Medical</h1>
-                <p className="text-[9px] uppercase tracking-[0.18em] text-sidebar-primary font-semibold mt-1">
-                  {userRole || "Staff"} • Workspace
+                <h1 className="text-sm font-bold text-sidebar-foreground tracking-tight leading-none font-display uppercase">On Time Medical</h1>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-sidebar-primary font-bold mt-1.5 opacity-80">
+                  {userRole || "Staff"} • Portal
                 </p>
               </div>
             )}
           </Link>
           
           {!collapsed && (
-            <button type="button" onClick={onToggle} className="lg:hidden h-7 w-7 flex items-center justify-center rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
-              <X className="h-4 w-4" />
+            <button 
+              type="button" 
+              onClick={onToggle} 
+              className="lg:hidden h-8 w-8 flex items-center justify-center rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all active:scale-90"
+            >
+              <X className="h-5 w-5" />
             </button>
           )}
-          <button type="button" onClick={onToggle} className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
-            {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
+          <button 
+            type="button" 
+            onClick={onToggle} 
+            className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all group"
+          >
+            {collapsed ? <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /> : <ChevronLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />}
           </button>
         </div>
 

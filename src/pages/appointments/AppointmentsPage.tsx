@@ -57,162 +57,212 @@ export default function AppointmentsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="space-y-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-white/40 p-5 sm:p-6 rounded-[24px] border border-border/40 backdrop-blur-sm shadow-sm">
           <div>
-            <h1 className="text-2xl font-bold">All Appointments</h1>
-            <p className="text-muted-foreground">Manage patient appointments and schedules</p>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-widest border border-primary/10 mb-3">
+              <Calendar className="h-3 w-3" />
+              Scheduling Desk
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-foreground tracking-tight uppercase leading-tight">Master <span className="text-primary/40">Appointments</span></h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 font-medium">Coordinate visits and optimize clinic resource allocation</p>
           </div>
-          <Button asChild>
-            <Link to="/appointments/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Appointment
-            </Link>
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Button variant="outline" className="h-11 rounded-xl font-bold text-xs uppercase tracking-wider flex-1 sm:flex-initial" onClick={() => navigate("/appointments/calendar")}>
+              Calendar
+            </Button>
+            <Button className="h-11 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-primary/20 flex-1 sm:flex-initial" asChild>
+              <Link to="/appointments/new">
+                <Plus className="mr-2 h-4 w-4" />
+                New Booking
+              </Link>
+            </Button>
+          </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/appointments/calendar")}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">24</div>
-            </CardContent>
-          </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Filtering confirmed appointments")}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
-              <CheckCircle className="h-4 w-4 text-medical-success" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-medical-success">18</div>
-            </CardContent>
-          </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Filtering pending appointments")}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
-              <AlertCircle className="h-4 w-4 text-medical-warning" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-medical-warning">4</div>
-            </CardContent>
-          </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => toast.info("Filtering cancelled appointments")}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Cancelled</CardTitle>
-              <XCircle className="h-4 w-4 text-medical-danger" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-medical-danger">2</div>
-            </CardContent>
-          </Card>
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: "Today's Total", value: "24", icon: Calendar, color: "text-primary" },
+            { label: "Confirmed", value: "18", icon: CheckCircle, color: "text-medical-success" },
+            { label: "In Queue", value: "4", icon: AlertCircle, color: "text-medical-warning" },
+            { label: "Cancelled", value: "2", icon: XCircle, color: "text-medical-danger" },
+          ].map((stat) => (
+            <Card key={stat.label} className="rounded-2xl border-border/50 shadow-sm">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground truncate">{stat.label}</p>
+                    <p className={cn("mt-1.5 text-xl sm:text-2xl font-extrabold leading-none", stat.color)}>{stat.value}</p>
+                  </div>
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 flex items-center justify-center rounded-xl bg-muted/30">
+                    <stat.icon className={cn("h-5 w-5 sm:h-6 sm:w-6", stat.color)} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Appointment List</CardTitle>
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:flex-initial">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Card className="rounded-[24px] border-border/50 shadow-sm overflow-hidden">
+          <CardHeader className="p-4 sm:p-6 border-b border-border/40 bg-muted/10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <CardTitle className="text-lg font-bold text-foreground uppercase tracking-tight">Active Schedule</CardTitle>
+              <div className="flex items-center gap-3 w-full md:w-auto">
+                <div className="relative flex-1 md:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="Search appointments..." 
-                    className="pl-8 w-full sm:w-64"
+                    placeholder="Search by name, ID or doctor..." 
+                    className="pl-10 h-10 rounded-xl bg-white border-border/60 text-sm font-medium focus:ring-primary/20"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <Button 
                   variant={showFilters ? "default" : "outline"} 
-                  size="icon"
-                  onClick={() => {
-                    setShowFilters(!showFilters);
-                    toast.info(showFilters ? "Filters hidden" : "Filters shown");
-                  }}
+                  size="icon" 
+                  className="h-10 w-10 shrink-0 rounded-xl border-border/60 hover:bg-white"
+                  onClick={() => setShowFilters(!showFilters)}
                 >
-                  <Filter className="h-4 w-4" />
+                  <Filter className={cn("h-4 w-4 text-muted-foreground", showFilters && "text-white")} />
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto -mx-6 px-6">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Patient</TableHead>
-                  <TableHead>Doctor</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-12"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAppointments.map((apt) => (
-                  <TableRow 
-                    key={apt.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => handleView(apt)}
-                  >
-                    <TableCell className="font-medium">{apt.id}</TableCell>
-                    <TableCell>{apt.patient}</TableCell>
-                    <TableCell>{apt.doctor}</TableCell>
-                    <TableCell>{apt.date}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {apt.time}
+          <CardContent className="p-0">
+            {/* Mobile List View */}
+            <div className="md:hidden divide-y">
+              {filteredAppointments.map((apt) => (
+                <div 
+                  key={apt.id} 
+                  className="p-5 active:bg-muted/50 transition-colors"
+                  onClick={() => handleView(apt)}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 flex flex-col items-center justify-center rounded-xl bg-primary/5 text-primary ring-1 ring-primary/10">
+                        <span className="text-[10px] font-bold uppercase">{apt.time.split(':')[0]}</span>
+                        <span className="text-[8px] font-bold opacity-60 leading-none">{apt.time.split(':')[1]}</span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{apt.type}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          apt.status === "Confirmed" ? "default" :
-                          apt.status === "Cancelled" ? "destructive" : "secondary"
-                        }
-                      >
-                        {apt.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleView(apt)}>
-                            <Eye className="mr-2 h-4 w-4" /> View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEdit(apt)}>
-                            <Edit className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive" onClick={() => handleCancel(apt)}>
-                            <Trash2 className="mr-2 h-4 w-4" /> Cancel
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                      <div>
+                        <p className="font-bold text-card-foreground text-base leading-none">{apt.patient}</p>
+                        <p className="text-[10px] font-bold uppercase text-muted-foreground mt-1.5 tracking-wider">{apt.doctor}</p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className={cn("rounded-full font-bold text-[9px] uppercase tracking-widest px-2 py-0.5", 
+                      apt.status === "Confirmed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                      apt.status === "Cancelled" ? "bg-red-50 text-red-700 border-red-200" :
+                      "bg-blue-50 text-blue-700 border-blue-200"
+                    )}>
+                      {apt.status}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-[10px] font-bold uppercase tracking-wider mb-4">
+                    <div className="text-muted-foreground">Type: <span className="text-foreground">{apt.type}</span></div>
+                    <div className="text-muted-foreground text-right">Date: <span className="text-foreground">{apt.date}</span></div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border/40">
+                    <div className="text-[11px] font-bold font-mono text-muted-foreground tracking-tighter">
+                      REF: {apt.id}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={(e) => { e.stopPropagation(); handleView(apt); }}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={(e) => { e.stopPropagation(); handleEdit(apt); }}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {filteredAppointments.length === 0 && (
+                <div className="py-20 text-center text-muted-foreground text-sm font-medium">
+                  No appointments found matching "{searchQuery}"
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="font-bold uppercase text-[11px] tracking-wider pl-6">Ref ID</TableHead>
+                    <TableHead className="font-bold uppercase text-[11px] tracking-wider">Patient</TableHead>
+                    <TableHead className="font-bold uppercase text-[11px] tracking-wider">Practitioner</TableHead>
+                    <TableHead className="font-bold uppercase text-[11px] tracking-wider">Schedule</TableHead>
+                    <TableHead className="font-bold uppercase text-[11px] tracking-wider">Type</TableHead>
+                    <TableHead className="font-bold uppercase text-[11px] tracking-wider">Status</TableHead>
+                    <TableHead className="w-16 pr-6"></TableHead>
                   </TableRow>
-                ))}
-                {filteredAppointments.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      No appointments found matching "{searchQuery}"
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredAppointments.map((apt) => (
+                    <TableRow 
+                      key={apt.id}
+                      className="cursor-pointer hover:bg-muted/50 group"
+                      onClick={() => handleView(apt)}
+                    >
+                      <TableCell className="font-mono text-[11px] uppercase font-bold text-muted-foreground tracking-tighter pl-6">{apt.id}</TableCell>
+                      <TableCell>
+                        <p className="font-bold text-card-foreground group-hover:text-primary transition-colors">{apt.patient}</p>
+                      </TableCell>
+                      <TableCell className="text-sm font-semibold text-primary/70">{apt.doctor}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-sm font-bold text-foreground">{apt.date}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                            <Clock className="h-3 w-3" /> {apt.time}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="rounded-lg font-bold text-[10px] uppercase tracking-widest border-border/60">
+                          {apt.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={apt.status === "Confirmed" ? "default" : apt.status === "Cancelled" ? "destructive" : "secondary"} className="rounded-full font-bold text-[10px] uppercase tracking-widest px-3 py-1">
+                          {apt.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="pr-6" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48 p-2">
+                            <DropdownMenuItem onClick={() => handleView(apt)} className="rounded-md">
+                              <Eye className="mr-2 h-4 w-4 text-primary" />
+                              <span className="font-semibold text-sm">Case Notes</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(apt)} className="rounded-md">
+                              <Edit className="mr-2 h-4 w-4 text-muted-foreground" />
+                              <span className="font-semibold text-sm">Reschedule</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/5 rounded-md" onClick={() => handleCancel(apt)}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span className="font-bold text-sm">Cancel Visit</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredAppointments.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-20 text-muted-foreground font-medium">
+                        No appointments found matching "{searchQuery}"
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>

@@ -84,74 +84,74 @@ export function UpcomingAppointments() {
   };
 
   return (
-    <div className="rounded-xl border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b p-6">
+    <div className="rounded-xl border bg-card shadow-sm h-full flex flex-col overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b p-4 sm:p-6 gap-4 bg-muted/20">
         <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-medical-primary/10 p-2">
+          <div className="rounded-xl bg-medical-primary/10 p-2.5 shadow-sm ring-1 ring-medical-primary/20">
             <Calendar className="h-5 w-5 text-medical-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-card-foreground">Today's Schedule</h3>
-            <p className="text-sm text-muted-foreground">
-              {appointments.length} appointments scheduled
+            <h3 className="text-base sm:text-lg font-bold text-card-foreground tracking-tight uppercase">Today&apos;s Schedule</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
+              {appointments.length} confirmed bookings
             </p>
           </div>
         </div>
         <button type="button" 
           onClick={() => navigate("/appointments/calendar")}
-          className="text-sm font-medium text-medical-primary hover:underline"
+          className="text-[11px] font-bold uppercase tracking-widest text-medical-primary hover:underline"
         >
-          View Calendar
+          Open Calendar
         </button>
       </div>
       
-      <div className="divide-y">
+      <div className="divide-y flex-1">
         {appointments.map((apt) => (
           <div 
             key={apt.id} 
             onClick={() => handleAppointmentClick(apt)}
-            className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors cursor-pointer"
+            className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors cursor-pointer group"
           >
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-medical-surface">
-                <Clock className="h-4 w-4 text-medical-primary" />
-                <span className="text-xs font-semibold text-medical-primary">{apt.time}</span>
+            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+              <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-medical-surface ring-1 ring-border group-hover:ring-primary/30 transition-all shadow-sm">
+                <Clock className="h-3.5 w-3.5 text-medical-primary mb-1" />
+                <span className="text-[10px] font-bold text-medical-primary leading-none uppercase">{apt.time.split(' ')[0]}</span>
+                <span className="text-[8px] font-bold text-medical-primary/60 mt-0.5">{apt.time.split(' ')[1]}</span>
               </div>
               
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-card-foreground">{apt.patientName}</span>
-                  <span className="text-xs text-muted-foreground">({apt.patientId})</span>
+                  <span className="font-bold text-card-foreground truncate">{apt.patientName}</span>
                 </div>
-                <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground font-medium">
                   <span className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    {apt.doctor}
+                    <User className="h-3 w-3 opacity-70" />
+                    {apt.doctor.split(' ').slice(-1)}
                   </span>
                   <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
+                    <MapPin className="h-3 w-3 opacity-70" />
                     {apt.room}
                   </span>
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className={typeStyles[apt.type]}>
+            <div className="flex flex-col items-end gap-2 ml-3">
+              <Badge variant="outline" className={cn("rounded-full font-bold text-[9px] uppercase tracking-widest px-2 py-0.5 border-transparent", typeStyles[apt.type])}>
                 {apt.type}
               </Badge>
-              <span className="text-sm text-muted-foreground">{apt.department}</span>
+              <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tighter hidden xs:block">{apt.department}</span>
             </div>
           </div>
         ))}
       </div>
       
-      <div className="border-t p-4 text-center">
+      <div className="border-t p-4 text-center bg-muted/5">
         <button type="button" 
           onClick={() => navigate("/appointments")}
-          className="text-sm font-medium text-medical-primary hover:underline"
+          className="text-xs font-bold text-medical-primary hover:underline uppercase tracking-widest"
         >
-          Load More Appointments
+          Full Appointment List
         </button>
       </div>
     </div>

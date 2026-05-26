@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface Department {
   name: string;
@@ -21,18 +22,18 @@ export function DepartmentStats() {
   const navigate = useNavigate();
 
   return (
-    <div className="rounded-xl border bg-card p-6 shadow-sm">
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-card-foreground">Department Occupancy</h3>
+    <div className="rounded-xl border bg-card p-4 sm:p-6 shadow-sm h-full flex flex-col">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base sm:text-lg font-bold text-card-foreground tracking-tight uppercase">Occupancy Rates</h3>
         <button type="button" 
           onClick={() => navigate("/departments")}
-          className="text-sm text-medical-primary hover:underline"
+          className="text-[11px] font-bold uppercase tracking-widest text-medical-primary hover:underline"
         >
-          Manage
+          Manage Units
         </button>
       </div>
       
-      <div className="space-y-5">
+      <div className="space-y-5 flex-1">
         {departments.map((dept) => {
           const occupancy = Math.round((dept.patients / dept.capacity) * 100);
           
@@ -40,19 +41,29 @@ export function DepartmentStats() {
             <div 
               key={dept.name}
               onClick={() => navigate(dept.path)}
-              className="cursor-pointer rounded-lg p-2 -mx-2 hover:bg-muted/50 transition-colors"
+              className="cursor-pointer rounded-xl p-3 -mx-1 hover:bg-muted/30 transition-all group border border-transparent hover:border-border/50"
             >
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium text-card-foreground">{dept.name}</span>
-                <span className="text-sm text-muted-foreground">
-                  {dept.patients}/{dept.capacity} beds ({occupancy}%)
+                <span className="text-sm font-bold text-card-foreground group-hover:text-primary transition-colors tracking-tight">{dept.name}</span>
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  {dept.patients}/{dept.capacity} <span className="opacity-40">Beds</span>
                 </span>
               </div>
-              <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted/60">
                 <div 
-                  className={`h-full transition-all ${dept.color}`}
+                  className={cn("h-full transition-all duration-1000 ease-out rounded-full shadow-sm", dept.color)}
                   style={{ width: `${occupancy}%` }}
                 />
+              </div>
+              <div className="mt-1.5 flex justify-end">
+                <span className={cn(
+                  "text-[10px] font-bold px-1.5 py-0.5 rounded-md",
+                  occupancy > 90 ? "text-medical-danger bg-medical-danger/5" : 
+                  occupancy > 70 ? "text-medical-warning bg-medical-warning/5" : 
+                  "text-medical-success bg-medical-success/5"
+                )}>
+                  {occupancy}% Capacity
+                </span>
               </div>
             </div>
           );

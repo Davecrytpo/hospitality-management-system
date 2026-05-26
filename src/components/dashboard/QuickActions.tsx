@@ -9,6 +9,7 @@ import {
   Stethoscope
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const actions = [
   { 
@@ -73,19 +74,28 @@ export function QuickActions() {
   const navigate = useNavigate();
 
   return (
-    <div className="rounded-xl border bg-card p-6 shadow-sm">
-      <h3 className="mb-4 text-lg font-semibold text-card-foreground">Quick Actions</h3>
+    <div className="rounded-xl border bg-card p-4 sm:p-6 shadow-sm h-full">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base sm:text-lg font-bold text-card-foreground tracking-tight">Quick Actions</h3>
+        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground px-2 py-1 bg-muted rounded-md lg:hidden">Staff Tools</span>
+      </div>
       
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
         {actions.map((action) => (
           <button type="button"
             key={action.label}
             onClick={() => navigate(action.path)}
-            className={`flex flex-col items-center justify-center rounded-xl p-4 text-white transition-all hover:scale-105 active:scale-95 cursor-pointer ${action.color}`}
+            className={cn(
+              "flex flex-col items-center justify-center rounded-xl p-3 sm:p-4 text-white transition-all",
+              "hover:brightness-110 active:scale-95 cursor-pointer shadow-sm hover:shadow-md",
+              action.color
+            )}
           >
-            <action.icon className="mb-2 h-6 w-6" />
-            <span className="text-sm font-medium">{action.label}</span>
-            <span className="text-xs opacity-80">{action.description}</span>
+            <div className="mb-2 sm:mb-3 p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+              <action.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+            </div>
+            <span className="text-[11px] sm:text-sm font-bold text-center leading-tight mb-1">{action.label}</span>
+            <span className="text-[9px] sm:text-xs opacity-80 text-center font-medium line-clamp-1">{action.description}</span>
           </button>
         ))}
       </div>
