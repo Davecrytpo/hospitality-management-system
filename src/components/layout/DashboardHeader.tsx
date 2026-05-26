@@ -142,7 +142,9 @@ export function DashboardHeader({ onMenuToggle, sidebarCollapsed }: DashboardHea
             <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground px-2 py-1.5">My Account</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => navigate("/settings")} className="rounded-lg h-10"><User className="mr-2 h-4 w-4 text-muted-foreground" /> Profile</DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/settings")} className="rounded-lg h-10"><Settings className="mr-2 h-4 w-4 text-muted-foreground" /> Settings</DropdownMenuItem>
-            <DropdownMenuItem className="sm:hidden rounded-lg h-10" onClick={() => {}}><ThemeToggle showLabel /></DropdownMenuItem>
+            <DropdownMenuItem className="sm:hidden rounded-lg h-10" onClick={(event) => event.preventDefault()}>
+              <ThemeToggle />
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/5 cursor-pointer rounded-lg h-10 font-medium" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" /> Sign out

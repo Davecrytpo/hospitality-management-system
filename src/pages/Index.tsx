@@ -38,7 +38,7 @@ const Index = () => {
       </div>
 
       {/* Stats Row */}
-      <div className="mb-8 grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Patient Volume"
           value="2,847"

@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users, UserPlus, Search, MoreHorizontal, Eye, Edit, Trash2, RotateCw } from "lucide-react";
+import { Users, UserPlus, Search, MoreHorizontal, Eye, Edit, Trash2, RotateCw, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataStatePanel } from "@/components/ui/data-state-panel";
 import { getErrorMessage, runActionWithFeedback } from "@/lib/action-feedback";
+import { cn } from "@/lib/utils";
 
 type PatientRow = {
   id: string;
@@ -133,7 +135,7 @@ export default function PatientsPage() {
           </Button>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { label: "Total Records", value: stats.total, icon: Users, color: "text-primary" },
             { label: "Pending Setup", value: stats.active, icon: RotateCw, color: "text-medical-info" },

@@ -2,6 +2,7 @@ import { Calendar, Clock, User, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface Appointment {
   id: string;

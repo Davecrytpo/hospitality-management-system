@@ -80,7 +80,7 @@ export function QuickActions() {
         <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground px-2 py-1 bg-muted rounded-md lg:hidden">Staff Tools</span>
       </div>
       
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {actions.map((action) => (
           <button type="button"
             key={action.label}

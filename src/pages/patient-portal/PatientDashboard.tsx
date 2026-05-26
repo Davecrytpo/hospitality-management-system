@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { getPatientPortalContext, type PatientPortalContext } from "@/lib/patient-portal";
+import { cn } from "@/lib/utils";
 
 interface Appointment {
   id: string;
@@ -195,7 +196,7 @@ export default function PatientDashboard() {
         </div>
       }
     >
-      <section className="grid gap-4 grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
           <Card key={card.label} className="rounded-2xl sm:rounded-[22px] border border-[#dbe4f4] bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden group">
             <CardContent className="flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-4 p-4 sm:p-5">

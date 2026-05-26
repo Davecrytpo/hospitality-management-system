@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Calendar, Users, ClipboardList, Clock, Activity, ChevronRight, Stethosc
 import { supabase } from "@/integrations/supabase/client";
 import { DataStatePanel } from "@/components/ui/data-state-panel";
 import { getErrorMessage, runActionWithFeedback } from "@/lib/action-feedback";
+import { cn } from "@/lib/utils";
 
 type AppointmentRow = {
   id: string;
@@ -22,6 +23,7 @@ type AppointmentRow = {
 };
 
 export default function DoctorDashboardPage() {
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -97,7 +99,7 @@ export default function DoctorDashboardPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.label} className="rounded-2xl border-border/50 shadow-sm">
               <CardContent className="p-4 sm:p-6">

@@ -12,8 +12,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const mockAppointments = [
   { id: "A001", patient: "John Smith", doctor: "Dr. Sarah Johnson", date: "2024-01-15", time: "09:00", type: "Consultation", status: "Confirmed" },
@@ -80,7 +82,7 @@ export default function AppointmentsPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Today's Total", value: "24", icon: Calendar, color: "text-primary" },
             { label: "Confirmed", value: "18", icon: CheckCircle, color: "text-medical-success" },
