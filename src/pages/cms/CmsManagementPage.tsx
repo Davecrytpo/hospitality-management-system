@@ -760,12 +760,14 @@ function ImageFields({ label, value, onChange }: { label: string; value?: CmsIma
   const mediaLibrary = useCmsMediaLibrary();
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [mediaSearch, setMediaSearch] = useState("");
   const imageAssets = useMemo(
     () =>
       (mediaLibrary?.mediaAssets ?? [])
         .filter((asset) => asset.type === "image" && asset.status !== "deleted")
+        .filter((asset) => !mediaSearch || asset.name.toLowerCase().includes(mediaSearch.toLowerCase()) || (asset.alt || "").toLowerCase().includes(mediaSearch.toLowerCase()))
         .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0)),
-    [mediaLibrary?.mediaAssets],
+    [mediaLibrary?.mediaAssets, mediaSearch],
   );
 
   return (
@@ -831,6 +833,9 @@ function ImageFields({ label, value, onChange }: { label: string; value?: CmsIma
             <DialogTitle>Select an image</DialogTitle>
             <DialogDescription>Choose an existing image from the CMS media library.</DialogDescription>
           </DialogHeader>
+          <div className="mb-3">
+            <Input placeholder="Search media by name or alt..." value={mediaSearch} onChange={(e) => setMediaSearch(e.target.value)} />
+          </div>
           <ScrollArea className="max-h-[70vh] pr-4">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {imageAssets.map((asset) => (
@@ -895,10 +900,10 @@ function ButtonsEditor({ value, onChange }: { value: CmsButton[]; onChange: (nex
             <div className="flex flex-wrap items-center justify-between gap-3">
               <Badge variant="secondary">Button {index + 1}</Badge>
               <div className="flex gap-2">
-                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
+                <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, -1))}>
                   <ArrowUp className="h-4 w-4" />
                 </Button>
-                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
+                <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, 1))}>
                   <ArrowDown className="h-4 w-4" />
                 </Button>
                 <Button type="button" variant="outline" size="icon" onClick={() => onChange([...value, { ...cloneCmsValue(entry), id: createCmsId("button") }])}>
@@ -986,7 +991,7 @@ function ItemsEditor({ value, onChange }: { value: CmsItem[]; onChange: (next: C
     const newItems = [...value];
     const [moved] = newItems.splice(draggedIndex, 1);
     newItems.splice(index, 0, moved);
-    onChange(newItems);
+    safeOnChange(newItems);
     setDraggedIndex(null);
   };
 
@@ -1020,10 +1025,10 @@ function ItemsEditor({ value, onChange }: { value: CmsItem[]; onChange: (next: C
                 <Badge variant="secondary">Item {index + 1}</Badge>
               </div>
               <div className="flex gap-2">
-                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
+                <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, -1))}>
                   <ArrowUp className="h-4 w-4" />
                 </Button>
-                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
+                <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, 1))}>
                   <ArrowDown className="h-4 w-4" />
                 </Button>
                 <Button type="button" variant="outline" size="icon" onClick={() => onChange([...value, { ...cloneCmsValue(entry), id: createCmsId("item") }])}>
@@ -1084,8 +1089,16 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
   const [undoStack, setUndoStack] = useState<CmsSection[][]>([]);
 
   const safeOnChange = (next: CmsSection[]) => {
-    setUndoStack((s) => [...s.slice(-4), value]); // keep last 5
+    setUndoStack((s) => [...s.slice(-5), [...value]]);
     onChange(next);
+  };
+
+  const undo = () => {
+    if (undoStack.length === 0) return;
+    const previous = undoStack[undoStack.length - 1];
+    setUndoStack((s) => s.slice(0, -1));
+    onChange(previous);
+    toast.success("Undone last change");
   };
 
   const handleDragStart = (index: number) => (e: React.DragEvent) => {
@@ -1107,7 +1120,7 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
     const newItems = [...value];
     const [moved] = newItems.splice(draggedIndex, 1);
     newItems.splice(index, 0, moved);
-    onChange(newItems);
+    safeOnChange(newItems);
     setDraggedIndex(null);
   };
 
@@ -1118,18 +1131,21 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
       <div className="flex items-center justify-between flex-wrap gap-2">
         <FieldLabel>Page Sections</FieldLabel>
         <div className="flex gap-2 flex-wrap">
-          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("hero")])}>
+          <Button type="button" variant="outline" size="sm" onClick={() => safeOnChange([...value, createEmptySection("hero")])}>
             + Hero
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("featureGrid")])}>
+          <Button type="button" variant="outline" size="sm" onClick={() => safeOnChange([...value, createEmptySection("featureGrid")])}>
             + Feature Grid
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("cta")])}>
+          <Button type="button" variant="outline" size="sm" onClick={() => safeOnChange([...value, createEmptySection("cta")])}>
             + CTA
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("richText")])}>
+          <Button type="button" variant="outline" size="sm" onClick={() => safeOnChange([...value, createEmptySection("richText")])}>
             <Plus className="mr-2 h-4 w-4" />
             Add Section
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={undo} disabled={undoStack.length === 0}>
+            <Undo2 className="mr-1 h-4 w-4" /> Undo
           </Button>
         </div>
       </div>
@@ -1174,16 +1190,16 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
                       <Switch checked={sectionValue.isVisible} onCheckedChange={(checked) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, isVisible: checked } : entry)))} />
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
+                      <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, -1))}>
                         <ArrowUp className="h-4 w-4" />
                       </Button>
-                      <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
+                      <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, 1))}>
                         <ArrowDown className="h-4 w-4" />
                       </Button>
-                      <Button type="button" variant="outline" size="icon" onClick={() => onChange([...value, { ...cloneCmsValue(sectionValue), id: createCmsId("section"), name: `${sectionValue.name} Copy` }])}>
+                      <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange([...value, { ...cloneCmsValue(sectionValue), id: createCmsId("section"), name: `${sectionValue.name} Copy` }])}>
                         <Copy className="h-4 w-4" />
                       </Button>
-                      <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((entry) => entry.id !== sectionValue.id))}>
+                      <Button type="button" variant="destructive" size="icon" onClick={() => safeOnChange(value.filter((entry) => entry.id !== sectionValue.id))}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -1327,6 +1343,14 @@ function SeoEditor({ value, onChange }: { value: CmsPage["seo"]; onChange: (next
       <Textarea value={value.metaDescription} onChange={(event) => onChange({ ...value, metaDescription: event.target.value })} placeholder="Meta description" rows={3} />
       <Input value={(value.keywords ?? []).join(", ")} onChange={(event) => onChange({ ...value, keywords: event.target.value.split(",").map((entry) => entry.trim()).filter(Boolean) })} placeholder="Keywords, comma separated" />
       <ImageFields label="OG Image" value={value.ogImage} onChange={(next) => onChange({ ...value, ogImage: next })} />
+
+      {/* Google-like SEO Preview */}
+      <div className="mt-4 rounded-lg border bg-white p-3 text-sm">
+        <div className="text-xs text-green-600 font-medium">Google Search Preview</div>
+        <div className="text-blue-600 text-base font-medium truncate mt-1">{value.metaTitle || "Page Title"}</div>
+        <div className="text-green-700 text-xs truncate">{value.canonicalUrl || "https://example.com/page"}</div>
+        <div className="text-gray-600 text-xs mt-1 line-clamp-2">{value.metaDescription || "Meta description will appear here. Make it compelling and under 160 characters for best results."}</div>
+      </div>
     </div>
   );
 }
@@ -1997,10 +2021,10 @@ function NavigationEditor({ value, onChange }: { value: CmsNavigationItem[]; onC
             <div className="flex flex-wrap items-center justify-between gap-3">
               <Badge variant="secondary">Item {index + 1}</Badge>
               <div className="flex gap-2">
-                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
+                <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, -1))}>
                   <ArrowUp className="h-4 w-4" />
                 </Button>
-                <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
+                <Button type="button" variant="outline" size="icon" onClick={() => safeOnChange(moveItem(value, index, 1))}>
                   <ArrowDown className="h-4 w-4" />
                 </Button>
                 <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((itemValue) => itemValue.id !== entry.id))}>
@@ -2965,10 +2989,24 @@ export default function CmsManagementPage() {
   const deleteMedia = useDeleteCmsMediaAsset();
   const seedDefaults = useSeedCmsDefaults();
 
+  // Keyboard shortcuts for pro CMS feel (Ctrl/Cmd + S to save current if possible)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        // The active save buttons will handle; show hint
+        toast.info("Use the Save button in the active workspace (or focus it and use Ctrl+S in future versions)");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   // Live Preview state for advanced CMS experience
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewSections, setPreviewSections] = useState<CmsSection[]>([]);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
 
   const cmsPath = useMemo(
     () => location.pathname.replace(/^\/cms\/?/, "").split("/").filter(Boolean),
@@ -3617,13 +3655,19 @@ export default function CmsManagementPage() {
           <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
             <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Live Preview — {previewTitle}</DialogTitle>
+                <DialogTitle className="flex items-center justify-between">
+                  Live Preview — {previewTitle}
+                  <div className="flex gap-1 text-xs">
+                    <Button size="sm" variant={previewDevice === "desktop" ? "default" : "outline"} onClick={() => setPreviewDevice("desktop")}>Desktop</Button>
+                    <Button size="sm" variant={previewDevice === "mobile" ? "default" : "outline"} onClick={() => setPreviewDevice("mobile")}>Mobile</Button>
+                  </div>
+                </DialogTitle>
                 <DialogDescription>
                   This is how the content will appear on the public site. Save your changes to publish updates live.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="rounded-2xl border bg-white p-6 shadow-inner text-[#13306b]">
+              <div className={cn("rounded-2xl border bg-white p-6 shadow-inner text-[#13306b] mx-auto transition-all", previewDevice === "mobile" ? "max-w-[380px]" : "max-w-full")}>
                 <div className="mb-6 text-center">
                   <div className="inline-block rounded-full bg-[#eff5ff] px-4 py-1 text-xs font-bold uppercase tracking-widest text-[#13306b]">LIVE PREVIEW • UNSAVED DRAFT</div>
                   <h2 className="mt-3 text-3xl font-black tracking-tight">{previewTitle || "Untitled"}</h2>
