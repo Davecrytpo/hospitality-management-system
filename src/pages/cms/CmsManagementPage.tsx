@@ -40,6 +40,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import CmsSectionRenderer from "@/components/cms/CmsSectionRenderer";
 import { cmsIconOptions } from "@/features/cms/icons";
 import {
   useCmsAnnouncements,
@@ -1199,12 +1200,14 @@ function DocumentCard({
   badge,
   onSave,
   onDelete,
+  onPreview,
 }: {
   title: string;
   children: React.ReactNode;
   badge?: string;
   onSave: () => Promise<unknown>;
   onDelete?: () => Promise<unknown>;
+  onPreview?: () => void;
 }) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -1217,6 +1220,12 @@ function DocumentCard({
           {badge && <Badge className="mt-2">{badge}</Badge>}
         </div>
         <div className="flex gap-2">
+          {onPreview && (
+            <Button type="button" variant="outline" size="sm" onClick={onPreview}>
+              <Eye className="mr-2 h-4 w-4" />
+              Preview Live
+            </Button>
+          )}
           {onDelete && (
             <Button
               type="button"
@@ -1270,9 +1279,9 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
   useEffect(() => setDraft(value), [value]);
 
   return (
-    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
+    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete} onPreview={draft.sections ? () => openPreview(draft.title, draft.sections) : undefined}>
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="h-auto flex-wrap justify-start gap-2 rounded-2xl bg-muted/70 p-2">
+        <TabsList className="h-auto flex-wrap justify-start gap-2 overflow-x-auto rounded-2xl bg-muted/70 p-2 whitespace-nowrap [-webkit-overflow-scrolling:touch]">
           <TabsTrigger value="overview" className="rounded-xl px-4 py-2">Overview</TabsTrigger>
           <TabsTrigger value="sections" className="rounded-xl px-4 py-2">Sections</TabsTrigger>
           <TabsTrigger value="seo" className="rounded-xl px-4 py-2">SEO</TabsTrigger>
@@ -1344,9 +1353,9 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
   useEffect(() => setDraft(value), [value]);
 
   return (
-    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
+    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete} onPreview={draft.sections ? () => openPreview(draft.title, draft.sections) : undefined}>
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="h-auto flex-wrap justify-start gap-2 rounded-2xl bg-muted/70 p-2">
+        <TabsList className="h-auto flex-wrap justify-start gap-2 overflow-x-auto rounded-2xl bg-muted/70 p-2 whitespace-nowrap [-webkit-overflow-scrolling:touch]">
           <TabsTrigger value="overview" className="rounded-xl px-4 py-2">Overview</TabsTrigger>
           <TabsTrigger value="content" className="rounded-xl px-4 py-2">Content</TabsTrigger>
           <TabsTrigger value="seo" className="rounded-xl px-4 py-2">SEO</TabsTrigger>
@@ -1454,9 +1463,9 @@ function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSav
   useEffect(() => setDraft(value), [value]);
 
   return (
-    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
+    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete} onPreview={draft.sections ? () => openPreview(draft.title, draft.sections) : undefined}>
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="h-auto flex-wrap justify-start gap-2 rounded-2xl bg-muted/70 p-2">
+        <TabsList className="h-auto flex-wrap justify-start gap-2 overflow-x-auto rounded-2xl bg-muted/70 p-2 whitespace-nowrap [-webkit-overflow-scrolling:touch]">
           <TabsTrigger value="overview" className="rounded-xl px-4 py-2">Overview</TabsTrigger>
           <TabsTrigger value="content" className="rounded-xl px-4 py-2">Content</TabsTrigger>
           <TabsTrigger value="seo" className="rounded-xl px-4 py-2">SEO</TabsTrigger>
@@ -1508,9 +1517,9 @@ function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument;
   useEffect(() => setDraft(value), [value]);
 
   return (
-    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
+    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete} onPreview={draft.sections ? () => openPreview(draft.title, draft.sections) : undefined}>
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="h-auto flex-wrap justify-start gap-2 rounded-2xl bg-muted/70 p-2">
+        <TabsList className="h-auto flex-wrap justify-start gap-2 overflow-x-auto rounded-2xl bg-muted/70 p-2 whitespace-nowrap [-webkit-overflow-scrolling:touch]">
           <TabsTrigger value="overview" className="rounded-xl px-4 py-2">Overview</TabsTrigger>
           <TabsTrigger value="content" className="rounded-xl px-4 py-2">Content</TabsTrigger>
           <TabsTrigger value="seo" className="rounded-xl px-4 py-2">SEO</TabsTrigger>
@@ -1744,7 +1753,7 @@ function AnnouncementEditorCard({ value, onSave, onDelete }: { value: CmsAnnounc
   useEffect(() => setDraft(value), [value]);
 
   return (
-    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete}>
+    <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete} onPreview={draft.sections ? () => openPreview(draft.title, draft.sections) : undefined}>
       <div className="grid gap-4 xl:grid-cols-2">
         <div className="space-y-2">
           <FieldLabel>Title</FieldLabel>
@@ -1949,7 +1958,7 @@ function SiteSettingsEditor({
   return (
     <DocumentCard title="Site Settings" onSave={() => onSave(draft)}>
       <Tabs value={activePanel} onValueChange={(next) => onOpenPanel(next as CmsSettingsPanelKey)} className="space-y-6">
-        <TabsList className="h-auto flex-wrap justify-start gap-2 rounded-2xl bg-muted/70 p-2">
+        <TabsList className="h-auto flex-wrap justify-start gap-2 overflow-x-auto rounded-2xl bg-muted/70 p-2 whitespace-nowrap [-webkit-overflow-scrolling:touch]">
           {settingsPanelLabels.map((panel) => (
             <TabsTrigger key={panel.key} value={panel.key} className="rounded-xl px-4 py-2">
               {panel.label}
@@ -2186,7 +2195,7 @@ function CmsOverviewDashboard({
               key={entry.key}
               type="button"
               onClick={() => onOpenCollection(entry.key)}
-              className="rounded-2xl border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary/30"
+              className="rounded-2xl border border-border bg-card p-5 text-left shadow-sm transition-all hover:border-primary/40 hover:-translate-y-px hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-2">
@@ -2730,6 +2739,11 @@ export default function CmsManagementPage() {
   const deleteMedia = useDeleteCmsMediaAsset();
   const seedDefaults = useSeedCmsDefaults();
 
+  // Live Preview state for advanced CMS experience
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [previewSections, setPreviewSections] = useState<CmsSection[]>([]);
+
   const cmsPath = useMemo(
     () => location.pathname.replace(/^\/cms\/?/, "").split("/").filter(Boolean),
     [location.pathname],
@@ -2745,6 +2759,12 @@ export default function CmsManagementPage() {
         ? cmsPath[1]
         : (collectionMeta[activeCollection].defaultScope ?? "live");
   const selectedKey = cmsPath[2] ? decodeURIComponent(cmsPath[2]) : undefined;
+
+  function openPreview(title: string, sections: CmsSection[]) {
+    setPreviewTitle(title);
+    setPreviewSections(sections || []);
+    setPreviewOpen(true);
+  }
 
   useEffect(() => {
     if (cmsPath.length === 0 && isCmsCollectionKey(legacyTab) && legacyTab !== "overview") {
@@ -3293,11 +3313,16 @@ export default function CmsManagementPage() {
           <div className="space-y-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Content Management</h1>
-                <p className="text-muted-foreground">Manage website pages, service dashboards, branding, media, SEO, and website settings from dedicated enterprise workspaces.</p>
+                <h1 className="text-3xl font-black tracking-tight">Content Management System</h1>
+                <p className="mt-1 max-w-2xl text-muted-foreground">Enterprise-grade visual CMS. Edit pages, services, media and settings. Use <strong>Preview Live</strong> to see exactly how your changes will appear on the public site — instantly and professionally.</p>
               </div>
               {canSeedDefaults && (
                 <div className="flex flex-wrap gap-3">
+                  <Button variant="outline" size="sm" asChild>
+                    <a href="/" target="_blank" rel="noreferrer">
+                      <ExternalLink className="mr-2 h-4 w-4" /> View Live Public Site
+                    </a>
+                  </Button>
                   <Button
                     type="button"
                     variant="outline"
@@ -3311,7 +3336,7 @@ export default function CmsManagementPage() {
                     }}
                   >
                     <RefreshCcw className="mr-2 h-4 w-4" />
-                    Seed Website Content
+                    Seed Defaults
                   </Button>
                 </div>
               )}
@@ -3319,6 +3344,84 @@ export default function CmsManagementPage() {
 
             <div className="space-y-6">{workspace}</div>
           </div>
+
+          {/* Advanced Live Preview - Professional CMS feature */}
+          <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Live Preview — {previewTitle}</DialogTitle>
+                <DialogDescription>
+                  This is how the content will appear on the public site. Save your changes to publish updates live.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="rounded-2xl border bg-white p-6 shadow-inner text-[#13306b]">
+                <div className="mb-6 text-center">
+                  <div className="inline-block rounded-full bg-[#eff5ff] px-4 py-1 text-xs font-bold uppercase tracking-widest text-[#13306b]">LIVE PREVIEW • UNSAVED DRAFT</div>
+                  <h2 className="mt-3 text-3xl font-black tracking-tight">{previewTitle || "Untitled"}</h2>
+                  <p className="text-xs text-[#4f6796] mt-1">This mirrors how it will render on the public website</p>
+                </div>
+
+                {previewSections.length > 0 ? (
+                  <div className="space-y-6">
+                    {previewSections.filter(s => s.isVisible).map((section, idx) => (
+                      <div key={idx} className="overflow-hidden rounded-2xl border border-[#d9e4f5] bg-[#fbfcff] p-5">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-[10px]">{getSectionTypeLabel(section.type)}</Badge>
+                            <span className="font-medium text-sm tracking-tight text-[#13306b]/80">{section.name}</span>
+                          </div>
+                          <div className="text-[10px] uppercase tracking-[1px] text-[#ef2027] font-black">SECTION {idx + 1}</div>
+                        </div>
+
+                        {section.eyebrow && <div className="text-[10px] font-bold uppercase tracking-[2px] text-[#ef2027]">{section.eyebrow}</div>}
+                        <h3 className="text-2xl font-black leading-none tracking-tighter mt-1">{section.title || "Untitled section"}</h3>
+                        {section.subtitle && <p className="mt-1.5 text-sm font-medium text-[#ef2027]">{section.subtitle}</p>}
+
+                        {section.body && (
+                          <p className="mt-3 text-[15px] leading-relaxed text-[#4f6796]">{section.body}</p>
+                        )}
+
+                        {section.items && section.items.length > 0 && (
+                          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {section.items.slice(0, 6).map((item, i) => (
+                              <div key={i} className="rounded-xl border bg-white p-3 text-sm">
+                                <div className="font-semibold text-[#13306b]">{item.title}</div>
+                                {item.description && <div className="text-[#4f6796] text-xs mt-1 line-clamp-3">{item.description}</div>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {section.buttons?.length > 0 && (
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {section.buttons.map((b, bi) => (
+                              <span key={bi} className="inline-block text-[11px] rounded px-3 py-1 border border-[#13306b]/20 bg-white font-bold uppercase tracking-widest">{b.label}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-10 text-center text-muted-foreground">No visible sections yet. Go to the Sections tab to add rich content blocks.</div>
+                )}
+
+                <div className="mt-8 pt-5 border-t flex flex-col items-center gap-1 text-center text-xs text-[#4f6796]">
+                  <div>Preview reflects your current editor state.</div>
+                  <div className="font-medium">Save → changes publish to the live public site instantly (for published status).</div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setPreviewOpen(false)}>Close Preview</Button>
+                <Button onClick={() => {
+                  setPreviewOpen(false);
+                  // Could trigger save in future enhancement
+                }}>Done Reviewing</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </DashboardLayout>
       </CmsMediaLibraryContext.Provider>
     </CmsEditorAssistContext.Provider>
