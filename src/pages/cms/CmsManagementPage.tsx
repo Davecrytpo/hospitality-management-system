@@ -1045,7 +1045,7 @@ function ItemsEditor({ value, onChange }: { value: CmsItem[]; onChange: (next: C
               <Input value={entry.subtitle ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, subtitle: event.target.value } : itemValue)))} placeholder="Subtitle" />
             </div>
             <RichTextField value={entry.description ?? ""} onChange={(v) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, description: v } : itemValue)))} placeholder="Description" />
-            <div className="grid gap-3 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Input value={entry.value ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, value: event.target.value } : itemValue)))} placeholder="Value / stat" />
               <Input value={entry.href ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, href: event.target.value } : itemValue)))} placeholder="Link" />
               <Input value={entry.badge ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, badge: event.target.value } : itemValue)))} placeholder="Badge" />
@@ -1210,7 +1210,7 @@ function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (n
                     {getSectionEditorHint(sectionValue)}
                   </div>
 
-                  <div className="grid gap-3 lg:grid-cols-4">
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <Input value={sectionValue.name} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, name: event.target.value } : entry)))} placeholder="Section name" />
                     <Select value={sectionValue.type} onValueChange={(nextType) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, type: nextType as CmsSection["type"] } : entry)))}>
                       <SelectTrigger>
@@ -1456,7 +1456,7 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
               <Input value={draft.navigationLabel} onChange={(event) => setDraft({ ...draft, navigationLabel: event.target.value })} placeholder="Navigation label" />
               <Input value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value, seo: { ...draft.seo, slug: event.target.value } })} placeholder="Slug" />
             </div>
-            <div className="grid gap-3 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Select value={draft.pageType} onValueChange={(pageType) => setDraft({ ...draft, pageType: pageType as CmsPage["pageType"] })}>
                 <SelectTrigger>
                   <SelectValue />
@@ -1564,13 +1564,13 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
 
         <TabsContent value="overview" className="space-y-5">
           <WorkspacePanel title="Service Identity" description="Set the name, slug, category, icon, and publication state for this service page.">
-            <div className="grid gap-3 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} placeholder="Service title" />
               <Input value={draft.shortTitle} onChange={(event) => setDraft({ ...draft, shortTitle: event.target.value })} placeholder="Short title" />
               <Input value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value, seo: { ...draft.seo, slug: event.target.value } })} placeholder="Slug" />
               <Input value={draft.categoryLabel} onChange={(event) => setDraft({ ...draft, categoryLabel: event.target.value })} placeholder="Category label" />
             </div>
-            <div className="grid gap-3 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Select value={draft.status} onValueChange={(status) => setDraft({ ...draft, status: status as CmsService["status"] })}>
                 <SelectTrigger>
                   <SelectValue />
@@ -1674,7 +1674,7 @@ function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSav
 
         <TabsContent value="overview" className="space-y-5">
           <WorkspacePanel title="Post Details" description="Manage the post title, slug, category, author, and publishing schedule.">
-            <div className="grid gap-3 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} placeholder="Post title" />
               <Input value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value, seo: { ...draft.seo, slug: event.target.value } })} placeholder="Slug" />
               <Input value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })} placeholder="Category" />
@@ -1745,7 +1745,7 @@ function LegalEditorCard({ value, onSave, onDelete }: { value: CmsLegalDocument;
 
         <TabsContent value="overview" className="space-y-5">
           <WorkspacePanel title="Policy Setup" description="Manage the title, slug, order, and publication status for this legal page.">
-            <div className="grid gap-3 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} placeholder="Title" />
               <Input value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value, seo: { ...draft.seo, slug: event.target.value } })} placeholder="Slug" />
               <Select value={draft.status} onValueChange={(status) => setDraft({ ...draft, status: status as CmsLegalDocument["status"] })}>
@@ -2545,7 +2545,7 @@ function CmsOverviewDashboard({
               <div className="rounded-2xl border border-border p-4">
                 <p className="text-sm font-semibold text-foreground">{draftServices.length} service draft{draftServices.length > 1 ? "s" : ""} waiting for review</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {draftServices.slice(0, 4).map((service) => (
+                  {draftServices.map((service) => (
                     <Badge key={service.id} variant="secondary">
                       {service.title}
                     </Badge>
@@ -2682,7 +2682,7 @@ function ServicesOverviewPanel({
           <CardTitle>Open a service dashboard</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2">
-          {services.slice(0, 6).map((service) => (
+          {services.map((service) => (
             <button
               key={service.id}
               type="button"
@@ -2887,7 +2887,7 @@ function CollectionWorkspace<T extends { id: string; status: CmsStatus }>({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+    <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
       <Card className="overflow-hidden">
         <CardHeader className="space-y-4">
           <div className="flex items-start justify-between gap-4">
@@ -2918,7 +2918,7 @@ function CollectionWorkspace<T extends { id: string; status: CmsStatus }>({
           </div>
         </CardHeader>
         <Separator />
-        <ScrollArea className="max-h-[calc(100vh-23rem)]">
+        <ScrollArea className="max-h-[60vh] lg:max-h-[calc(100vh-280px)]">
           <CardContent className="space-y-3 p-4">
             {filteredRecords.length === 0 ? (
               <div className="rounded-2xl border border-dashed p-5 text-sm leading-6 text-muted-foreground">
@@ -3620,8 +3620,37 @@ export default function CmsManagementPage() {
               )}
             </div>
 
+            {/* Mobile Collection Selector */}
+            <div className="lg:hidden -mx-1">
+              <div className="overflow-x-auto pb-2">
+                <div className="flex gap-1.5 min-w-max px-1">
+                  {collectionOrder.map((key) => {
+                    const meta = collectionMeta[key as Exclude<CmsCollectionKey, "overview">] || { label: key, icon: FileText };
+                    const Icon = meta.icon || FileText;
+                    const isActive = activeCollection === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          const href = key === "settings" ? buildSettingsHref("branding") : buildCmsHref(key as any, (collectionMeta as any)[key]?.defaultScope);
+                          navigate(href);
+                        }}
+                        className={cn(
+                          "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap transition",
+                          isActive ? "bg-primary text-primary-foreground border-primary" : "bg-card hover:bg-muted border-border"
+                        )}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span>{meta.label || key}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
             {/* Advanced CMS Sidebar + Main Content */}
-            <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+            <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
               {/* Sidebar Navigation */}
               <div className="hidden lg:block">
                 <Card className="sticky top-4">

@@ -38,17 +38,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       
       <div className={cn(
         "flex flex-1 flex-col transition-all duration-300 w-full min-w-0",
-        !sidebarCollapsed && !isMobile ? "lg:ml-[272px]" : sidebarCollapsed && !isMobile ? "lg:ml-[72px]" : "ml-0"
+        !sidebarCollapsed && !isMobile ? "lg:ml-[272px]" : sidebarCollapsed && !isMobile ? "lg:ml-[72px]" : "ml-0",
+        isMobile && !sidebarCollapsed && "overflow-hidden"
       )}>
         <DashboardHeader 
           onMenuToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           sidebarCollapsed={sidebarCollapsed}
         />
         
-        <main className="flex-1 p-4 md:p-6 w-full max-w-full overflow-x-hidden">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden">
           <div className="mx-auto w-full max-w-[1600px]">
             <NotificationBanner audience="staff" />
-            <div className="h-4" />
+            <div className="h-3 sm:h-4" />
             {children}
           </div>
         </main>
