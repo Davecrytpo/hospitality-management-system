@@ -332,7 +332,7 @@ export default function PublicServicePage() {
     return <Navigate to="/services" replace />;
   }
 
-  const offeringRows = offeringRows && offeringRows.length > 0 ? offeringRows : [];
+  const offeringRows = (service.offeringRows && service.offeringRows.length > 0) ? service.offeringRows : [];
   const longestRow = offeringRows.length > 0 ? Math.max(...offeringRows.map((row) => row.length)) : 0;
   const hasStageItems = (service.stageBand?.items?.length ?? 0) > 0;
   const hasHeroOverlay = (service.heroOverlayChoices?.length ?? 0) > 0;

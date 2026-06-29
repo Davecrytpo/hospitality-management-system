@@ -88,6 +88,7 @@ import type {
   CmsTestimonial,
 } from "@/features/cms/types";
 import { cloneCmsValue, createCmsId, createEmptyButton, createEmptyImage, createEmptyItem, createEmptySection } from "@/features/cms/utils";
+import { cmsDefaults } from "@/features/cms/defaults";
 import { cn } from "@/lib/utils";
 
 const sectionTypes: CmsSection["type"][] = ["hero", "richText", "featureGrid", "stats", "serviceList", "testimonialList", "faqList", "cta", "teamGrid", "gallery", "timeline", "blogFeed", "contactCards"];
@@ -1536,21 +1537,10 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
 
 function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
   const designTemplate = cmsDefaults.services.find((service) => service.slug === value.slug);
-  const initial = designTemplate && (!value.sections || value.sections.length === 0)
-    ? {
-        ...cloneCmsValue(designTemplate),
-        id: value.id,
-        status: value.status,
-        sortOrder: value.sortOrder,
-        featuredOnHome: value.featuredOnHome,
-        featuredInNavigation: value.featuredInNavigation,
-      }
-    : value;
-  const [draft, setDraft] = useState(initial);
-  useEffect(() => setDraft(initial), [initial]);
+  const [draft, setDraft] = useState(value);
 
-  // Auto-restore design content if sections are missing/blank so editor never looks empty
   useEffect(() => {
+    setDraft(value);
     if (designTemplate && (!value.sections || value.sections.length === 0)) {
       setDraft({
         ...cloneCmsValue(designTemplate),
@@ -1561,7 +1551,7 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
         featuredInNavigation: value.featuredInNavigation,
       });
     }
-  }, [designTemplate, value.sections?.length]);
+  }, [value, designTemplate]);
 
   return (
     <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete} onPreview={draft.sections ? () => openPreview(draft.title, draft.sections) : undefined}>
@@ -1640,11 +1630,11 @@ function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onS
                   if (!designTemplate) return;
                   setDraft({
                     ...cloneCmsValue(designTemplate),
-                    id: draft.id,
-                    status: draft.status,
-                    sortOrder: draft.sortOrder,
-                    featuredOnHome: draft.featuredOnHome,
-                    featuredInNavigation: draft.featuredInNavigation,
+                    id: value.id,
+                    status: value.status,
+                    sortOrder: value.sortOrder,
+                    featuredOnHome: value.featuredOnHome,
+                    featuredInNavigation: value.featuredInNavigation,
                   });
                   toast.success("Service content restored from the approved design template.");
                 }}
