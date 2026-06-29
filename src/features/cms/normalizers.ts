@@ -120,7 +120,7 @@ export function normalizeCmsService(service: CmsService): CmsService {
     ...service,
     previewImage: normalizeCmsImage(service.previewImage) ?? service.previewImage,
     seo: normalizeCmsSeo(service.seo),
-    sections: service.sections.map(normalizeCmsSection),
+    sections: (service.sections || []).map(normalizeCmsSection),
   };
 }
 
@@ -129,7 +129,7 @@ export function normalizeCmsBlogPost(post: CmsBlogPost): CmsBlogPost {
     ...post,
     coverImage: normalizeCmsImage(post.coverImage) ?? post.coverImage,
     seo: normalizeCmsSeo(post.seo),
-    sections: post.sections.map(normalizeCmsSection),
+    sections: (post.sections || []).map(normalizeCmsSection),
   };
 }
 
@@ -151,7 +151,7 @@ export function normalizeCmsLegalDocument(document: CmsLegalDocument): CmsLegalD
   return {
     ...document,
     seo: normalizeCmsSeo(document.seo),
-    sections: document.sections.map(normalizeCmsSection),
+    sections: (document.sections || []).map(normalizeCmsSection),
   };
 }
 

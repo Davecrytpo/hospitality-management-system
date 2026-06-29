@@ -1535,9 +1535,33 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
 }
 
 function ServiceEditorCard({ value, onSave, onDelete }: { value: CmsService; onSave: (service: CmsService) => Promise<unknown>; onDelete?: () => Promise<unknown> }) {
-  const [draft, setDraft] = useState(value);
-  const designTemplate = cmsDefaults.services.find((service) => service.slug === draft.slug);
-  useEffect(() => setDraft(value), [value]);
+  const designTemplate = cmsDefaults.services.find((service) => service.slug === value.slug);
+  const initial = designTemplate && (!value.sections || value.sections.length === 0)
+    ? {
+        ...cloneCmsValue(designTemplate),
+        id: value.id,
+        status: value.status,
+        sortOrder: value.sortOrder,
+        featuredOnHome: value.featuredOnHome,
+        featuredInNavigation: value.featuredInNavigation,
+      }
+    : value;
+  const [draft, setDraft] = useState(initial);
+  useEffect(() => setDraft(initial), [initial]);
+
+  // Auto-restore design content if sections are missing/blank so editor never looks empty
+  useEffect(() => {
+    if (designTemplate && (!value.sections || value.sections.length === 0)) {
+      setDraft({
+        ...cloneCmsValue(designTemplate),
+        id: value.id,
+        status: value.status,
+        sortOrder: value.sortOrder,
+        featuredOnHome: value.featuredOnHome,
+        featuredInNavigation: value.featuredInNavigation,
+      });
+    }
+  }, [designTemplate, value.sections?.length]);
 
   return (
     <DocumentCard title={draft.title} badge={draft.status} onSave={() => onSave(draft)} onDelete={onDelete} onPreview={draft.sections ? () => openPreview(draft.title, draft.sections) : undefined}>

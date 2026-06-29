@@ -332,8 +332,9 @@ export default function PublicServicePage() {
     return <Navigate to="/services" replace />;
   }
 
-  const longestRow = Math.max(...service.offeringRows.map((row) => row.length));
-  const hasStageItems = service.stageBand.items.length > 0;
+  const offeringRows = offeringRows && offeringRows.length > 0 ? offeringRows : [];
+  const longestRow = offeringRows.length > 0 ? Math.max(...offeringRows.map((row) => row.length)) : 0;
+  const hasStageItems = (service.stageBand?.items?.length ?? 0) > 0;
   const hasHeroOverlay = (service.heroOverlayChoices?.length ?? 0) > 0;
   const heroBadgeLayout = heroBadgeLayouts[service.slug];
   const heroBadgeGridClassName = heroBadgeLayout?.badgeGridClassName ?? defaultHeroBadgeGridClassName;
@@ -421,13 +422,13 @@ export default function PublicServicePage() {
 
             {service.offeringsStyle === "split" ? (
               <div className="mt-8 overflow-hidden rounded-[20px] bg-white">
-                {service.offeringRows.map((row, index) => (
-                  <SplitOfferingRow key={`${service.slug}-${index}`} offerings={row} isLast={index === service.offeringRows.length - 1} />
+                {offeringRows.map((row, index) => (
+                  <SplitOfferingRow key={`${service.slug}-${index}`} offerings={row} isLast={index === offeringRows.length - 1} />
                 ))}
               </div>
             ) : (
               <div className="mt-8 space-y-4">
-                {service.offeringRows.map((row, index) => (
+                {offeringRows.map((row, index) => (
                   <div key={`${service.slug}-${index}`} className={cn("grid gap-4", getOfferingGridClassName(row.length), row.length <= 3 && row.length < longestRow && longestRow >= 5 && "mx-auto w-full max-w-[980px]")}>
                     {row.map((offering) =>
                       service.offeringsStyle === "condition" ? (
