@@ -368,25 +368,21 @@ export default function PublicLandingPage() {
         </section>
 
         <section className={`${shellClassName} py-8 lg:py-10`}>
-          <div className="rounded-[20px] border border-[#dde5f4] bg-[#eef4ff] shadow-[0_18px_38px_-34px_rgba(19,48,107,0.22)]">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4">
-              {displayedStats.map((item, index) => (
-                <div
-                  key={item.label}
-                  className={`flex items-center justify-center gap-4 px-6 py-6 ${
-                    index < displayedStats.length - 1 ? "border-b border-[#d7e2f5] sm:border-b-0 lg:border-r" : ""
-                  }`}
-                >
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#c7d4eb] bg-white text-[#13306b]">
-                    <item.icon className="h-7 w-7" />
-                  </div>
-                  <div className="min-w-[132px]">
-                    <p className="text-[2rem] font-black leading-none tracking-tight text-[#13306b]">{item.value}</p>
-                    <p className="mt-1 text-[0.98rem] font-bold text-[#4f6796]">{item.label}</p>
-                  </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {displayedStats.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-4 rounded-2xl border border-[#d9e4f5] bg-[#f5f8ff] px-5 py-5 shadow-[0_10px_24px_-16px_rgba(19,48,107,0.14)] sm:px-6 sm:py-6"
+              >
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#c7d4eb] bg-white text-[#13306b]">
+                  <item.icon className="h-7 w-7" />
                 </div>
-              ))}
-            </div>
+                <div>
+                  <p className="text-[1.85rem] font-black leading-none tracking-tight text-[#13306b] sm:text-[2rem]">{item.value}</p>
+                  <p className="mt-1 text-[0.95rem] font-bold leading-snug text-[#4f6796] sm:text-[0.98rem]">{item.label}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -488,34 +484,34 @@ export default function PublicLandingPage() {
         </section>
 
         <section id="contact" className={`${shellClassName} pb-10 pt-2`}>
-          <div className="grid overflow-hidden rounded-[22px] bg-[#13306b] text-white lg:grid-cols-[1.12fr_1fr_0.88fr]">
-            <div className="flex items-center gap-5 border-b border-white/10 px-7 py-8 lg:border-b-0 lg:border-r">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-white/20">
-                <Calendar className="h-7 w-7" />
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.12fr_1fr_0.88fr] lg:gap-0 lg:overflow-hidden lg:rounded-[22px] lg:bg-[#13306b]">
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#13306b] px-6 py-6 text-white sm:flex-row sm:items-start sm:gap-5 lg:rounded-none lg:border-r lg:border-white/10 lg:bg-transparent lg:px-7 lg:py-8">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-white/20 sm:h-14 sm:w-14">
+                <Calendar className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
               <div>
-                <p className="text-[1.18rem] font-black leading-tight lg:whitespace-nowrap xl:text-[1.35rem]">{contactTitle}</p>
-                <p className="mt-2 text-sm leading-6 text-white/75">{contactBody}</p>
+                <p className="text-[1.1rem] font-black leading-tight sm:text-[1.18rem] lg:whitespace-nowrap xl:text-[1.32rem]">{contactTitle}</p>
+                <p className="mt-2 text-[0.92rem] leading-6 text-white/80 sm:text-sm">{contactBody}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-5 border-b border-white/10 px-7 py-8 lg:border-b-0 lg:border-r">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-white/20">
-                <Phone className="h-7 w-7" />
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#13306b] px-6 py-6 text-white sm:flex-row sm:items-start sm:gap-5 lg:rounded-none lg:border-r lg:border-white/10 lg:bg-transparent lg:px-7 lg:py-8">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-white/20 sm:h-14 sm:w-14">
+                <Phone className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">Call Us Today</p>
-                <a href={`tel:+1${phoneLabel.replace(/\D/g, "")}`} className="mt-1 block whitespace-nowrap text-[1.78rem] font-black leading-none tracking-tight xl:text-[2rem]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/55 sm:text-xs">Call Us Today</p>
+                <a href={`tel:+1${phoneLabel.replace(/\D/g, "")}`} className="mt-0.5 block whitespace-nowrap text-[1.6rem] font-black leading-none tracking-tight sm:mt-1 sm:text-[1.75rem] xl:text-[1.95rem]">
                   {phoneLabel}
                 </a>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center px-7 py-8">
-              <Button className="btn-mock-red h-12 rounded-md text-[13px] uppercase" onClick={() => setAppointmentOpen(true)}>
+            <div className="flex flex-col justify-center rounded-2xl bg-[#13306b] px-6 py-6 text-white lg:rounded-none lg:bg-transparent lg:px-7 lg:py-8">
+              <Button className="btn-mock-red h-11 w-full rounded-md text-[13px] uppercase tracking-[0.03em] sm:w-auto" onClick={() => setAppointmentOpen(true)}>
                 {contactButtonLabel}
               </Button>
-              <p className="mt-3 text-sm leading-6 text-white/75">
+              <p className="mt-3 text-[0.92rem] leading-6 text-white/80 sm:text-sm">
                 {preferPublicCopy(contactSection?.subtitle, "Appointments available in-office or via telehealth.")}
               </p>
             </div>

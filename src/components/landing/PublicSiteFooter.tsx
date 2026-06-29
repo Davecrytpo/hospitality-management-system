@@ -99,45 +99,45 @@ export function PublicSiteFooter() {
             </div>
           </div>
 
-          <div className="mt-4 grid overflow-hidden rounded-[18px] bg-[#103066] text-white shadow-[0_22px_44px_-36px_rgba(16,48,102,0.58)] lg:grid-cols-[0.92fr_0.9fr_0.98fr_1.06fr]">
-            <div className="flex items-center gap-4 border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25">
-                <Calendar className="h-6 w-6" />
+          <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-[0.92fr_0.9fr_0.98fr_1.06fr] lg:gap-0 lg:overflow-hidden lg:rounded-[18px] lg:bg-[#103066] lg:shadow-[0_22px_44px_-36px_rgba(16,48,102,0.58)]">
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#103066] px-5 py-5 text-white sm:flex-row sm:items-start sm:gap-4 lg:rounded-none lg:border-r lg:border-white/10 lg:bg-transparent lg:px-6 lg:py-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 sm:h-12 sm:w-12">
+                <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div className="min-w-0">
-                <p className="text-[1.04rem] font-black leading-tight xl:text-[1.12rem]">{footerCtaTitle}</p>
-                <p className="mt-1.5 text-[0.92rem] leading-6 text-white/76">{footerSummary}</p>
+                <p className="text-[1.05rem] font-black leading-tight sm:text-[1.08rem] xl:text-[1.12rem]">{footerCtaTitle}</p>
+                <p className="mt-1.5 text-[0.92rem] leading-6 text-white/80">{footerSummary}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25">
-                <Phone className="h-6 w-6" />
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#103066] px-5 py-5 text-white sm:flex-row sm:items-start sm:gap-4 lg:rounded-none lg:border-r lg:border-white/10 lg:bg-transparent lg:px-6 lg:py-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 sm:h-12 sm:w-12">
+                <Phone className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div className="min-w-0">
-                <p className="whitespace-nowrap text-xs font-bold uppercase tracking-[0.14em] text-white/55">{footerPhoneLabel}</p>
-                <a href={`tel:+1${phoneLabel.replace(/\D/g, "")}`} className="mt-1 block whitespace-nowrap text-[1.56rem] font-black leading-none tracking-tight xl:text-[1.74rem]">
+                <p className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.14em] text-white/55 sm:text-xs">{footerPhoneLabel}</p>
+                <a href={`tel:+1${phoneLabel.replace(/\D/g, "")}`} className="mt-0.5 block whitespace-nowrap text-[1.55rem] font-black leading-none tracking-tight sm:mt-1 xl:text-[1.7rem]">
                   {phoneLabel}
                 </a>
-                <p className="mt-1.5 text-[0.92rem] leading-6 text-white/76">{footerPhoneDescription}</p>
+                <p className="mt-1 text-[0.9rem] leading-6 text-white/80">{footerPhoneDescription}</p>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
-              <Button className="btn-mock-red h-11 rounded-md text-[12px] uppercase tracking-[0.04em]" type="button" onClick={() => setAppointmentOpen(true)}>
+            <div className="flex flex-col justify-center rounded-2xl bg-[#103066] px-5 py-5 text-white lg:rounded-none lg:border-r lg:border-white/10 lg:bg-transparent lg:px-6 lg:py-6">
+              <Button className="btn-mock-red h-11 w-full rounded-md text-[13px] uppercase tracking-[0.03em] sm:w-auto" type="button" onClick={() => setAppointmentOpen(true)}>
                 {footerAppointmentLabel}
               </Button>
-              <p className="mt-2.5 text-[0.92rem] leading-6 text-white/76">{footerAppointmentDescription}</p>
+              <p className="mt-3 text-[0.9rem] leading-6 text-white/80">{footerAppointmentDescription}</p>
             </div>
 
-            <div className="flex items-center gap-4 px-6 py-6">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25">
-                <Lock className="h-6 w-6" />
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#103066] px-5 py-5 text-white sm:flex-row sm:items-start sm:gap-4 lg:rounded-none lg:bg-transparent lg:px-6 lg:py-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 sm:h-12 sm:w-12">
+                <Lock className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div className="min-w-0">
-                <p className="text-[1.02rem] font-black leading-tight xl:text-[1.08rem]">{footerPortalTitle}</p>
-                <p className="mt-1.5 max-w-[240px] text-[0.92rem] leading-6 text-white/76">{footerPortalDescription}</p>
-                <Link to="/patient-portal/login" className="mt-2.5 inline-flex items-center text-[0.82rem] font-black uppercase tracking-[0.08em] text-white transition-colors hover:text-white/80">
+                <p className="text-[1.02rem] font-black leading-tight sm:text-[1.05rem] xl:text-[1.08rem]">{footerPortalTitle}</p>
+                <p className="mt-1.5 text-[0.9rem] leading-6 text-white/80">{footerPortalDescription}</p>
+                <Link to="/patient-portal/login" className="mt-2.5 inline-flex items-center text-[0.82rem] font-black uppercase tracking-[0.06em] text-white transition-colors hover:text-white/75">
                   {footerPortalLinkLabel}
                 </Link>
               </div>

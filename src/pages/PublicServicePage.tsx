@@ -89,14 +89,13 @@ function getOfferingGridClassName(rowLength: number) {
 function renderAction(action: ServiceAction | undefined, onAppointment: () => void, variant: "red" | "outline") {
   if (!action) return null;
 
+  const redCls = "btn-mock-red h-11 sm:h-12 rounded-md px-6 sm:px-7 text-[13px] font-black uppercase tracking-[0.03em]";
+  const outlineCls = "h-11 rounded-md border border-white/30 bg-transparent px-5 sm:px-6 text-[13px] font-black uppercase tracking-[0.03em] text-white hover:bg-white/10";
+
   if (action.kind === "appointment") {
     return (
       <Button
-        className={cn(
-          variant === "red"
-            ? "btn-mock-red h-12 rounded-md px-7 text-[12px] font-black uppercase tracking-[0.04em]"
-            : "h-11 rounded-md border border-white/30 bg-transparent px-6 text-[12px] font-black uppercase tracking-[0.04em] text-white hover:bg-white/10",
-        )}
+        className={cn(variant === "red" ? redCls : outlineCls)}
         variant={variant === "outline" ? "outline" : undefined}
         onClick={onAppointment}
       >
@@ -107,22 +106,22 @@ function renderAction(action: ServiceAction | undefined, onAppointment: () => vo
 
   if (action.kind === "link") {
     return variant === "red" ? (
-      <Button className="btn-mock-red h-12 rounded-md px-7 text-[12px] font-black uppercase tracking-[0.04em]" asChild>
+      <Button className={redCls} asChild>
         <Link to={action.href}>{action.label}</Link>
       </Button>
     ) : (
-      <Button variant="outline" className="h-11 rounded-md border border-white/30 bg-transparent px-6 text-[12px] font-black uppercase tracking-[0.04em] text-white hover:bg-white/10" asChild>
+      <Button variant="outline" className={outlineCls} asChild>
         <Link to={action.href}>{action.label}</Link>
       </Button>
     );
   }
 
   return variant === "red" ? (
-    <Button className="btn-mock-red h-12 rounded-md px-7 text-[12px] font-black uppercase tracking-[0.04em]" asChild>
+    <Button className={redCls} asChild>
       <a href={action.href}>{action.label}</a>
     </Button>
   ) : (
-    <Button variant="outline" className="h-11 rounded-md border border-white/30 bg-transparent px-6 text-[12px] font-black uppercase tracking-[0.04em] text-white hover:bg-white/10" asChild>
+    <Button variant="outline" className={outlineCls} asChild>
       <a href={action.href}>{action.label}</a>
     </Button>
   );
@@ -252,51 +251,63 @@ function BulletPanel({ panel }: { panel: ServiceBulletPanel }) {
 
 function CtaPanel({ panel, onAppointment }: { panel: ServiceCtaPanel; onAppointment: () => void }) {
   return (
-    <article className="flex h-full flex-col items-center justify-center rounded-[20px] bg-[#10306a] px-7 py-8 text-center text-white shadow-[0_22px_46px_-34px_rgba(16,48,106,0.58)]">
-      <panel.icon className="h-16 w-16 text-[#ffd2d4]" strokeWidth={1.5} />
-      <h3 className="mt-6 text-[1.7rem] font-black leading-tight">{panel.title}</h3>
-      <p className="mt-4 max-w-[360px] text-[1rem] leading-8 text-white/90">{panel.intro}</p>
-      <div className="mt-7">{renderAction(panel.action, onAppointment, "red")}</div>
-      {panel.footnote && <p className="mt-4 text-[0.92rem] leading-6 text-white/80">{panel.footnote}</p>}
+    <article className="flex h-full flex-col items-center justify-center rounded-[20px] bg-[#10306a] px-6 py-7 text-center text-white shadow-[0_22px_46px_-34px_rgba(16,48,106,0.58)] sm:px-7 sm:py-8">
+      <panel.icon className="h-14 w-14 text-[#ffd2d4] sm:h-16 sm:w-16" strokeWidth={1.5} />
+      <h3 className="mt-5 text-[1.55rem] font-black leading-tight sm:mt-6 sm:text-[1.7rem]">{panel.title}</h3>
+      <p className="mt-3 max-w-[360px] text-[0.95rem] leading-7 text-white/90 sm:mt-4 sm:text-[1rem] sm:leading-8">{panel.intro}</p>
+      <div className="mt-6 sm:mt-7">{renderAction(panel.action, onAppointment, "red")}</div>
+      {panel.footnote && <p className="mt-3 text-[0.9rem] leading-6 text-white/80 sm:mt-4">{panel.footnote}</p>}
     </article>
   );
 }
 
 function ChoicePanel({ panel }: { panel: ServiceChoicePanel }) {
   return (
-    <article className="rounded-[20px] bg-[#10306a] px-7 py-8 text-white shadow-[0_22px_46px_-34px_rgba(16,48,106,0.58)]">
-      <h3 className="text-[1.7rem] font-black leading-tight">{panel.title}</h3>
+    <article className="rounded-[20px] bg-[#10306a] px-6 py-7 text-white shadow-[0_22px_46px_-34px_rgba(16,48,106,0.58)] sm:px-7 sm:py-8">
+      <h3 className="text-[1.55rem] font-black leading-tight sm:text-[1.7rem]">{panel.title}</h3>
       <div className="mt-3 h-[4px] w-14 rounded-full bg-[#ef2027]" />
-      <p className="mt-4 text-[1rem] leading-8 text-white/90">{panel.intro}</p>
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <p className="mt-3 text-[0.95rem] leading-7 text-white/90 sm:mt-4 sm:text-[1rem] sm:leading-8">{panel.intro}</p>
+      <div className="mt-5 grid gap-5 sm:gap-5 md:grid-cols-2">
         {panel.options.map((option, index) => (
           <div key={option.title} className={cn("flex items-start gap-4", index === 0 ? "md:border-r md:border-white/15 md:pr-5" : "md:pl-1")}>
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-white/25 text-white">
-              <option.icon className="h-7 w-7" strokeWidth={1.7} />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-white/25 text-white sm:h-14 sm:w-14">
+              <option.icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.7} />
             </div>
             <div>
-              <h4 className="text-[1.25rem] font-black leading-tight">{option.title}</h4>
-              <p className="mt-3 text-[0.95rem] leading-7 text-white/85">{option.description}</p>
+              <h4 className="text-[1.15rem] font-black leading-tight sm:text-[1.25rem]">{option.title}</h4>
+              <p className="mt-2 text-[0.9rem] leading-6 text-white/85 sm:mt-3 sm:text-[0.95rem] sm:leading-7">{option.description}</p>
             </div>
           </div>
         ))}
       </div>
-      {panel.footnote && <p className="mt-6 border-t border-white/15 pt-5 text-center text-[0.96rem] font-semibold text-white/90">{panel.footnote}</p>}
+      {panel.footnote && <p className="mt-5 border-t border-white/15 pt-4 text-center text-[0.92rem] font-semibold text-white/90 sm:mt-6 sm:pt-5 sm:text-[0.96rem]">{panel.footnote}</p>}
     </article>
   );
 }
 
 function FooterColumnCard({ column, onAppointment }: { column: ServiceFooterColumn; onAppointment: () => void }) {
+  const isPortal = column.title.toLowerCase().includes("portal");
+  const isPhone = !!column.emphasis;
+  const isAction = !!column.action;
+
   return (
-    <div className="flex h-full items-center gap-5 border-b border-white/12 px-7 py-7 lg:border-b-0 lg:px-8">
-      <div className="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-full border-2 border-white/35 text-white">
-        <column.icon className="h-9 w-9" strokeWidth={1.7} />
+    <div className="flex flex-col gap-4 rounded-2xl bg-[#10306a] px-6 py-6 text-white shadow-[0_10px_30px_-18px_rgba(16,48,106,0.5)] sm:flex-row sm:items-start sm:gap-5 sm:rounded-none sm:bg-transparent sm:px-6 sm:py-7 sm:shadow-none lg:px-7 lg:py-8">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-white/30 text-white sm:h-[66px] sm:w-[66px]">
+        <column.icon className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.7} />
       </div>
-      <div className="min-w-0">
-        <h4 className="text-[1.12rem] font-black leading-tight text-white">{column.title}</h4>
-        {column.emphasis && <p className="mt-3 text-[2rem] font-black leading-none tracking-tight text-white">{column.emphasis}</p>}
-        <p className="mt-3 whitespace-pre-line text-[0.94rem] leading-6 text-white/82">{column.description}</p>
-        {column.action && <div className="mt-5">{renderAction(column.action, onAppointment, column.action.kind === "link" && column.title.includes("Portal") ? "outline" : "red")}</div>}
+      <div className="min-w-0 flex-1">
+        <h4 className="text-[1.08rem] font-black leading-tight tracking-[-0.01em] text-white sm:text-[1.15rem]">{column.title}</h4>
+        {column.emphasis && (
+          <a href={`tel:+1${column.emphasis.replace(/\D/g, "")}`} className="mt-1.5 block text-[1.65rem] font-black leading-none tracking-[-0.02em] text-white hover:underline sm:text-[1.85rem]">
+            {column.emphasis}
+          </a>
+        )}
+        <p className="mt-2 text-[0.92rem] leading-6 text-white/80 sm:mt-2.5 sm:text-[0.95rem]">{column.description}</p>
+        {column.action && (
+          <div className="mt-4 sm:mt-5">
+            {renderAction(column.action, onAppointment, isPortal ? "outline" : "red")}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -475,9 +486,14 @@ export default function PublicServicePage() {
 
         <section className="pt-6 lg:pt-8">
           <div className={shellClassName}>
-            <div className="grid overflow-hidden rounded-[22px] bg-[#10306a] text-white shadow-[0_26px_58px_-42px_rgba(16,48,106,0.6)] lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-0 lg:overflow-hidden lg:rounded-[22px] lg:bg-[#10306a] lg:shadow-[0_26px_58px_-42px_rgba(16,48,106,0.6)]">
               {service.footerColumns.map((column, index) => (
-                <div key={column.title} className={cn(index < service.footerColumns.length - 1 && "lg:border-r lg:border-white/12")}>
+                <div
+                  key={column.title}
+                  className={cn(
+                    index < service.footerColumns.length - 1 && "lg:border-r lg:border-white/12",
+                  )}
+                >
                   <FooterColumnCard column={column} onAppointment={() => setAppointmentOpen(true)} />
                 </div>
               ))}

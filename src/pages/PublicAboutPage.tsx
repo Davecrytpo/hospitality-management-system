@@ -114,13 +114,13 @@ function OutlineIcon({ icon: Icon, accent }: IconCard) {
 
 function FeaturePanelCard({ title, description, icon: Icon }: FeaturePanel) {
   return (
-    <div className="flex items-start gap-5 px-6 py-7 xl:px-8">
-      <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-full border border-[#1ba1ff] text-white">
-        <Icon className="h-7 w-7" strokeWidth={1.9} />
+    <div className="flex flex-col gap-3.5 rounded-2xl bg-[#10306a] px-5 py-5 text-white sm:flex-row sm:items-start sm:gap-5 lg:rounded-none lg:bg-transparent lg:px-6 lg:py-7 xl:px-8">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#1ba1ff] text-white sm:h-[56px] sm:w-[56px]">
+        <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.9} />
       </div>
       <div>
-        <h3 className="text-[1.05rem] font-black leading-tight text-white sm:text-[1.1rem]">{title}</h3>
-        <p className="mt-3 max-w-[235px] text-[0.94rem] leading-7 text-white/88">{description}</p>
+        <h3 className="text-[1.02rem] font-black leading-tight text-white sm:text-[1.08rem]">{title}</h3>
+        <p className="mt-2 text-[0.9rem] leading-6 text-white/85 sm:mt-2.5 sm:text-[0.94rem]">{description}</p>
       </div>
     </div>
   );
@@ -245,9 +245,9 @@ export default function PublicAboutPage() {
         </section>
 
         <section className={`${shellClassName} pt-5`}>
-          <div className="grid overflow-hidden rounded-[24px] bg-[#10306a] text-white shadow-[0_26px_58px_-42px_rgba(16,48,106,0.6)] lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-4 lg:gap-0 lg:overflow-hidden lg:rounded-[24px] lg:bg-[#10306a] lg:shadow-[0_26px_58px_-42px_rgba(16,48,106,0.6)]">
             {displayedFeaturePanels.map((item, index) => (
-              <div key={item.title} className={cn(index < displayedFeaturePanels.length - 1 && "border-b border-white/12 lg:border-b-0 lg:border-r lg:border-white/14")}>
+              <div key={item.title} className={cn(index < displayedFeaturePanels.length - 1 && "lg:border-r lg:border-white/12 lg:border-white/14")}>
                 <FeaturePanelCard {...item} />
               </div>
             ))}
@@ -346,52 +346,52 @@ export default function PublicAboutPage() {
         </section>
 
         <section className={`${shellClassName} pb-4 pt-5`}>
-          <div className="grid overflow-hidden rounded-[24px] bg-[#10306a] text-white shadow-[0_26px_58px_-42px_rgba(16,48,106,0.6)] lg:grid-cols-[1.02fr_0.86fr_0.96fr_1fr]">
-            <div className="flex items-center gap-4 border-b border-white/12 px-6 py-6 lg:border-b-0 lg:border-r lg:px-8">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/24">
-                <CalendarDays className="h-6 w-6" />
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.02fr_0.86fr_0.96fr_1fr] lg:gap-0 lg:overflow-hidden lg:rounded-[24px] lg:bg-[#10306a] lg:shadow-[0_26px_58px_-42px_rgba(16,48,106,0.6)]">
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#10306a] px-5 py-5 text-white sm:flex-row sm:items-start sm:gap-4 lg:rounded-none lg:border-r lg:border-white/12 lg:bg-transparent lg:px-6 lg:py-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/24 sm:h-12 sm:w-12">
+                <CalendarDays className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <p className="text-[1.15rem] font-black leading-tight">{settings.publicUi.footerCtaTitle || "Ready to Take the Next Step?"}</p>
-                <p className="mt-2 text-[0.95rem] leading-6 text-white/76">{settings.footer.summary || "We're here to help you live a healthier, happier life."}</p>
+                <p className="text-[1.08rem] font-black leading-tight sm:text-[1.12rem]">{settings.publicUi.footerCtaTitle || "Ready to Take the Next Step?"}</p>
+                <p className="mt-1.5 text-[0.9rem] leading-6 text-white/82">{settings.footer.summary || "We're here to help you live a healthier, happier life."}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 border-b border-white/12 px-6 py-6 lg:border-b-0 lg:border-r lg:px-8">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/24">
-                <Phone className="h-6 w-6" />
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#10306a] px-5 py-5 text-white sm:flex-row sm:items-start sm:gap-4 lg:rounded-none lg:border-r lg:border-white/12 lg:bg-transparent lg:px-6 lg:py-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/24 sm:h-12 sm:w-12">
+                <Phone className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/55">{settings.publicUi.footerPhoneLabel || "Call Us Today"}</p>
-                <a href={`tel:+1${phoneLabel.replace(/\D/g, "")}`} className="mt-1 block whitespace-nowrap text-[1.8rem] font-black leading-none tracking-tight">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/55 sm:text-xs">{settings.publicUi.footerPhoneLabel || "Call Us Today"}</p>
+                <a href={`tel:+1${phoneLabel.replace(/\D/g, "")}`} className="mt-0.5 block whitespace-nowrap text-[1.6rem] font-black leading-none tracking-tight sm:mt-1 sm:text-[1.7rem]">
                   {phoneLabel}
                 </a>
-                <p className="mt-2 text-[0.95rem] leading-6 text-white/76">{settings.publicUi.footerPhoneDescription || "Our team is here to help you."}</p>
+                <p className="mt-1.5 text-[0.9rem] leading-6 text-white/82">{settings.publicUi.footerPhoneDescription || "Our team is here to help you."}</p>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center border-b border-white/12 px-6 py-6 lg:border-b-0 lg:border-r lg:px-8">
-              <Button className="btn-mock-red h-12 rounded-md text-[12px] uppercase tracking-[0.04em]" onClick={() => setAppointmentOpen(true)}>
+            <div className="flex flex-col justify-center rounded-2xl bg-[#10306a] px-5 py-5 text-white lg:rounded-none lg:border-r lg:border-white/12 lg:bg-transparent lg:px-6 lg:py-6">
+              <Button className="btn-mock-red h-11 w-full rounded-md text-[13px] uppercase tracking-[0.03em] sm:w-auto" onClick={() => setAppointmentOpen(true)}>
                 <span className="inline-flex items-center gap-2">
                   {settings.publicUi.footerAppointmentLabel || "Book Appointment Now"}
                   <ArrowRight className="h-4 w-4" />
                 </span>
               </Button>
-              <p className="mt-3 text-[0.95rem] leading-6 text-white/76">{settings.publicUi.footerAppointmentDescription || "Appointments available in-office or via telehealth."}</p>
+              <p className="mt-3 text-[0.9rem] leading-6 text-white/82">{settings.publicUi.footerAppointmentDescription || "Appointments available in-office or via telehealth."}</p>
             </div>
 
-            <div className="flex items-center gap-4 px-6 py-6 lg:px-8">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/24">
-                <Lock className="h-6 w-6" />
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#10306a] px-5 py-5 text-white sm:flex-row sm:items-start sm:gap-4 lg:rounded-none lg:bg-transparent lg:px-6 lg:py-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/24 sm:h-12 sm:w-12">
+                <Lock className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <p className="text-[1.08rem] font-black leading-tight">{settings.publicUi.footerPortalTitle || "Patient Portal Login"}</p>
-                <p className="mt-2 max-w-[250px] text-[0.95rem] leading-6 text-white/76">
+                <p className="text-[1.02rem] font-black leading-tight sm:text-[1.06rem]">{settings.publicUi.footerPortalTitle || "Patient Portal Login"}</p>
+                <p className="mt-1.5 text-[0.9rem] leading-6 text-white/82">
                   {settings.publicUi.footerPortalDescription || "Access your health information, appointments, and more."}
                 </p>
                 <Link
                   to="/patient-portal/login"
-                  className="mt-3 inline-flex items-center gap-2 text-[0.82rem] font-black uppercase tracking-[0.08em] text-white transition-colors hover:text-white/80"
+                  className="mt-2.5 inline-flex items-center gap-2 text-[0.82rem] font-black uppercase tracking-[0.06em] text-white transition-colors hover:text-white/75"
                 >
                   {settings.publicUi.footerPortalLinkLabel || "Login Now"}
                   <ArrowRight className="h-3.5 w-3.5" />
