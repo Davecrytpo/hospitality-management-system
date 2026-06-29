@@ -9,6 +9,7 @@ import {
   Eye,
   ExternalLink,
   FileText,
+  GripVertical,
   ImagePlus,
   LayoutDashboard,
   Loader2,
@@ -964,6 +965,33 @@ function ButtonsEditor({ value, onChange }: { value: CmsButton[]; onChange: (nex
 }
 
 function ItemsEditor({ value, onChange }: { value: CmsItem[]; onChange: (next: CmsItem[]) => void }) {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  const handleDragStart = (index: number) => (e: React.DragEvent) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (index: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) {
+      setDraggedIndex(null);
+      return;
+    }
+    const newItems = [...value];
+    const [moved] = newItems.splice(draggedIndex, 1);
+    newItems.splice(index, 0, moved);
+    onChange(newItems);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => setDraggedIndex(null);
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -975,9 +1003,22 @@ function ItemsEditor({ value, onChange }: { value: CmsItem[]; onChange: (next: C
       </div>
       <div className="space-y-4">
         {value.map((entry, index) => (
-          <div key={entry.id} className="space-y-3 rounded-lg border border-border p-4">
+          <div
+            key={entry.id}
+            draggable
+            onDragStart={handleDragStart(index)}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop(index)}
+            onDragEnd={handleDragEnd}
+            className={`group space-y-3 rounded-lg border border-border p-4 transition-all ${draggedIndex === index ? "opacity-60" : "hover:border-primary/30"}`}
+          >
             <div className="flex items-center justify-between gap-2">
-              <Badge variant="secondary">Item {index + 1}</Badge>
+              <div className="flex items-center gap-2">
+                <div className="cursor-grab active:cursor-grabbing p-1 opacity-50 group-hover:opacity-100">
+                  <GripVertical className="h-4 w-4" />
+                </div>
+                <Badge variant="secondary">Item {index + 1}</Badge>
+              </div>
               <div className="flex gap-2">
                 <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
                   <ArrowUp className="h-4 w-4" />
@@ -997,7 +1038,7 @@ function ItemsEditor({ value, onChange }: { value: CmsItem[]; onChange: (next: C
               <Input value={entry.title} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, title: event.target.value } : itemValue)))} placeholder="Title" />
               <Input value={entry.subtitle ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, subtitle: event.target.value } : itemValue)))} placeholder="Subtitle" />
             </div>
-            <Textarea value={entry.description ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, description: event.target.value } : itemValue)))} placeholder="Description" rows={3} />
+            <RichTextField value={entry.description ?? ""} onChange={(v) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, description: v } : itemValue)))} placeholder="Description" />
             <div className="grid gap-3 lg:grid-cols-4">
               <Input value={entry.value ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, value: event.target.value } : itemValue)))} placeholder="Value / stat" />
               <Input value={entry.href ?? ""} onChange={(event) => onChange(value.map((itemValue) => (itemValue.id === entry.id ? { ...itemValue, href: event.target.value } : itemValue)))} placeholder="Link" />
@@ -1033,148 +1074,244 @@ function ItemsEditor({ value, onChange }: { value: CmsItem[]; onChange: (next: C
           </div>
         ))}
       </div>
+      <p className="text-xs text-muted-foreground">Drag items using the grip handle to reorder.</p>
     </div>
   );
 }
 
 function SectionsEditor({ value, onChange }: { value: CmsSection[]; onChange: (next: CmsSection[]) => void }) {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [undoStack, setUndoStack] = useState<CmsSection[][]>([]);
+
+  const safeOnChange = (next: CmsSection[]) => {
+    setUndoStack((s) => [...s.slice(-4), value]); // keep last 5
+    onChange(next);
+  };
+
+  const handleDragStart = (index: number) => (e: React.DragEvent) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (index: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) {
+      setDraggedIndex(null);
+      return;
+    }
+    const newItems = [...value];
+    const [moved] = newItems.splice(draggedIndex, 1);
+    newItems.splice(index, 0, moved);
+    onChange(newItems);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => setDraggedIndex(null);
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <FieldLabel>Page Sections</FieldLabel>
-        <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("richText")])}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Section
-        </Button>
+        <div className="flex gap-2 flex-wrap">
+          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("hero")])}>
+            + Hero
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("featureGrid")])}>
+            + Feature Grid
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("cta")])}>
+            + CTA
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, createEmptySection("richText")])}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Section
+          </Button>
+        </div>
       </div>
-      <Accordion type="multiple" className="space-y-4">
+      <Accordion type="multiple" className="space-y-3">
         {value.map((sectionValue, index) => (
-          <AccordionItem key={sectionValue.id} value={sectionValue.id} className="overflow-hidden rounded-2xl border border-border bg-card/50 px-0">
-            <AccordionTrigger className="px-4 py-4 hover:no-underline">
-              <div className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                <Badge variant="secondary">{getSectionTypeLabel(sectionValue.type)}</Badge>
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-foreground">{sectionValue.name}</p>
-                  <p className="truncate text-sm text-muted-foreground">{sectionValue.title || "Untitled section"}</p>
-                </div>
-                <div className="ml-auto flex items-center gap-2 pr-2">
-                  <StatusDot status={sectionValue.isVisible ? "published" : "draft"} />
-                  <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                    {sectionValue.isVisible ? "Visible" : "Hidden"}
-                  </span>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pb-5">
-              <div className="space-y-4 border-t border-border pt-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 rounded-lg border px-3 py-2">
-                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Visible</span>
-                    <Switch checked={sectionValue.isVisible} onCheckedChange={(checked) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, isVisible: checked } : entry)))} />
+          <div
+            key={sectionValue.id}
+            draggable
+            onDragStart={handleDragStart(index)}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop(index)}
+            onDragEnd={handleDragEnd}
+            className={`group rounded-2xl border border-border bg-card/50 transition-all ${draggedIndex === index ? "opacity-50 scale-[0.985]" : "hover:border-primary/30"}`}
+          >
+            <AccordionItem value={sectionValue.id} className="border-none px-0">
+              <AccordionTrigger className="px-4 py-4 hover:no-underline">
+                <div className="flex min-w-0 flex-1 items-center gap-3 text-left">
+                  <div 
+                    className="cursor-grab active:cursor-grabbing opacity-60 group-hover:opacity-100 p-1 -ml-1"
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
+                    <GripVertical className="h-4 w-4" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
-                      <ArrowUp className="h-4 w-4" />
-                    </Button>
-                    <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
-                      <ArrowDown className="h-4 w-4" />
-                    </Button>
-                    <Button type="button" variant="outline" size="icon" onClick={() => onChange([...value, { ...cloneCmsValue(sectionValue), id: createCmsId("section"), name: `${sectionValue.name} Copy` }])}>
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((entry) => entry.id !== sectionValue.id))}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <Badge variant="secondary">{getSectionTypeLabel(sectionValue.type)}</Badge>
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-foreground">{sectionValue.name}</p>
+                    <p className="truncate text-sm text-muted-foreground">{sectionValue.title || "Untitled section"}</p>
+                  </div>
+                  <div className="ml-auto flex items-center gap-2 pr-2">
+                    <StatusDot status={sectionValue.isVisible ? "published" : "draft"} />
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      {sectionValue.isVisible ? "Visible" : "Hidden"}
+                    </span>
                   </div>
                 </div>
-
-                <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-3 text-sm leading-6 text-muted-foreground">
-                  {getSectionEditorHint(sectionValue)}
-                </div>
-
-                <div className="grid gap-3 lg:grid-cols-4">
-                  <Input value={sectionValue.name} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, name: event.target.value } : entry)))} placeholder="Section name" />
-                  <Select value={sectionValue.type} onValueChange={(nextType) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, type: nextType as CmsSection["type"] } : entry)))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sectionTypes.map((entryType) => (
-                        <SelectItem key={entryType} value={entryType}>
-                          {getSectionTypeLabel(entryType)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={sectionValue.theme} onValueChange={(theme) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, theme: theme as CmsSection["theme"] } : entry)))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sectionThemes.map((theme) => (
-                        <SelectItem key={theme} value={theme}>
-                          {theme}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={sectionValue.dataSource} onValueChange={(source) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, dataSource: source as CmsSection["dataSource"] } : entry)))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {dataSources.map((source) => (
-                        <SelectItem key={source} value={source}>
-                          {source}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Input value={sectionValue.eyebrow ?? ""} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, eyebrow: event.target.value } : entry)))} placeholder="Eyebrow" />
-                <div className="grid gap-3 lg:grid-cols-2">
-                  <Input value={sectionValue.title} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, title: event.target.value } : entry)))} placeholder="Section title" />
-                  <Input value={sectionValue.subtitle ?? ""} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, subtitle: event.target.value } : entry)))} placeholder="Section subtitle" />
-                </div>
-                <Textarea value={sectionValue.body ?? ""} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, body: event.target.value } : entry)))} placeholder="Section body" rows={4} />
-                <div className="grid gap-3 lg:grid-cols-2">
-                  <Select value={String(sectionValue.columns ?? 3)} onValueChange={(columns) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, columns: Number(columns) as CmsSection["columns"] } : entry)))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 column</SelectItem>
-                      <SelectItem value="2">2 columns</SelectItem>
-                      <SelectItem value="3">3 columns</SelectItem>
-                      <SelectItem value="4">4 columns</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={sectionValue.style ?? "grid"} onValueChange={(style) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, style: style as CmsSection["style"] } : entry)))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="grid">Grid</SelectItem>
-                      <SelectItem value="band">Band</SelectItem>
-                      <SelectItem value="split">Split</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <ImageFields label="Section Image" value={sectionValue.image} onChange={(next) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, image: next } : entry)))} />
-                <ButtonsEditor value={sectionValue.buttons} onChange={(next) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, buttons: next } : entry)))} />
-                {sectionValue.dataSource === "manual" ? (
-                  <ItemsEditor value={sectionValue.items} onChange={(next) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, items: next } : entry)))} />
-                ) : (
-                  <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-                    This section pulls from the <strong>{sectionValue.dataSource}</strong> collection. Add items there instead of hardcoding them into the page.
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-5">
+                <div className="space-y-4 border-t border-border pt-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 rounded-lg border px-3 py-2">
+                      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Visible</span>
+                      <Switch checked={sectionValue.isVisible} onCheckedChange={(checked) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, isVisible: checked } : entry)))} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, -1))}>
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button type="button" variant="outline" size="icon" onClick={() => onChange(moveItem(value, index, 1))}>
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button type="button" variant="outline" size="icon" onClick={() => onChange([...value, { ...cloneCmsValue(sectionValue), id: createCmsId("section"), name: `${sectionValue.name} Copy` }])}>
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button type="button" variant="destructive" size="icon" onClick={() => onChange(value.filter((entry) => entry.id !== sectionValue.id))}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+
+                  <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-3 text-sm leading-6 text-muted-foreground">
+                    {getSectionEditorHint(sectionValue)}
+                  </div>
+
+                  <div className="grid gap-3 lg:grid-cols-4">
+                    <Input value={sectionValue.name} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, name: event.target.value } : entry)))} placeholder="Section name" />
+                    <Select value={sectionValue.type} onValueChange={(nextType) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, type: nextType as CmsSection["type"] } : entry)))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sectionTypes.map((entryType) => (
+                          <SelectItem key={entryType} value={entryType}>
+                            {getSectionTypeLabel(entryType)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={sectionValue.theme} onValueChange={(theme) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, theme: theme as CmsSection["theme"] } : entry)))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sectionThemes.map((theme) => (
+                          <SelectItem key={theme} value={theme}>
+                            {theme}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={sectionValue.dataSource} onValueChange={(source) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, dataSource: source as CmsSection["dataSource"] } : entry)))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dataSources.map((source) => (
+                          <SelectItem key={source} value={source}>
+                            {source}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Input value={sectionValue.eyebrow ?? ""} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, eyebrow: event.target.value } : entry)))} placeholder="Eyebrow" />
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <Input value={sectionValue.title} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, title: event.target.value } : entry)))} placeholder="Section title" />
+                    <Input value={sectionValue.subtitle ?? ""} onChange={(event) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, subtitle: event.target.value } : entry)))} placeholder="Section subtitle" />
+                  </div>
+                  <RichTextField value={sectionValue.body ?? ""} onChange={(v) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, body: v } : entry)))} placeholder="Section body (supports **bold** *italic*)" />
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <Select value={String(sectionValue.columns ?? 3)} onValueChange={(columns) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, columns: Number(columns) as CmsSection["columns"] } : entry)))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 column</SelectItem>
+                        <SelectItem value="2">2 columns</SelectItem>
+                        <SelectItem value="3">3 columns</SelectItem>
+                        <SelectItem value="4">4 columns</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={sectionValue.style ?? "grid"} onValueChange={(style) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, style: style as CmsSection["style"] } : entry)))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="grid">Grid</SelectItem>
+                        <SelectItem value="band">Band</SelectItem>
+                        <SelectItem value="split">Split</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <ImageFields label="Section Image" value={sectionValue.image} onChange={(next) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, image: next } : entry)))} />
+                  <ButtonsEditor value={sectionValue.buttons} onChange={(next) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, buttons: next } : entry)))} />
+                  {sectionValue.dataSource === "manual" ? (
+                    <ItemsEditor value={sectionValue.items} onChange={(next) => onChange(value.map((entry) => (entry.id === sectionValue.id ? { ...entry, items: next } : entry)))} />
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
+                      This section pulls from the <strong>{sectionValue.dataSource}</strong> collection. Add items there instead of hardcoding them into the page.
+                    </div>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </div>
         ))}
       </Accordion>
+      <p className="text-xs text-muted-foreground">Drag using the <GripVertical className="inline h-3 w-3" /> handle to reorder sections. Changes are live in the Preview.</p>
+    </div>
+  );
+}
+
+function RichTextField({ value, onChange, placeholder = "Content..." }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const applyFormat = (before: string, after = before) => {
+    const textarea = document.activeElement as HTMLTextAreaElement;
+    if (!textarea || textarea.tagName !== "TEXTAREA") {
+      // fallback: just wrap
+      onChange(before + value + after);
+      return;
+    }
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const selected = value.substring(start, end);
+    const newVal = value.substring(0, start) + before + selected + after + value.substring(end);
+    onChange(newVal);
+    // restore focus roughly
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + before.length, start + before.length + selected.length);
+    }, 0);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1">
+        <Button type="button" variant="outline" size="sm" onClick={() => applyFormat("**", "**")}>B</Button>
+        <Button type="button" variant="outline" size="sm" onClick={() => applyFormat("*", "*")}>I</Button>
+        <Button type="button" variant="outline" size="sm" onClick={() => applyFormat("- ", "")}>• List</Button>
+        <Button type="button" variant="outline" size="sm" onClick={() => applyFormat("[Link](", ")")}>Link</Button>
+      </div>
+      <Textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={5} />
+      <p className="text-[10px] text-muted-foreground">Use **bold**, *italic*, - for lists. Preview shows formatted result.</p>
     </div>
   );
 }
@@ -1332,8 +1469,34 @@ function PageEditorCard({ value, onSave, onDelete }: { value: CmsPage; onSave: (
         </TabsContent>
 
         <TabsContent value="sections" className="space-y-5">
-          <WorkspacePanel title="Section Management" description="Organize hero, content, testimonials, FAQs, CTAs, and other page sections in a cleaner accordion workspace.">
-            <SectionsEditor value={draft.sections} onChange={(next) => setDraft({ ...draft, sections: next })} />
+          <WorkspacePanel title="Section Management" description="Organize hero, content, testimonials, FAQs, CTAs, and other page sections. Drag to reorder. Live preview updates as you edit.">
+            <div className="grid gap-6 xl:grid-cols-2">
+              <div>
+                <SectionsEditor value={draft.sections} onChange={(next) => setDraft({ ...draft, sections: next })} />
+              </div>
+              {/* Split-pane live preview on desktop */}
+              <div className="hidden xl:block">
+                <div className="sticky top-4 rounded-2xl border bg-white p-4 shadow-sm">
+                  <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    <span>Live Preview (Desktop)</span>
+                    <Button variant="ghost" size="sm" className="h-6 text-[10px]" onClick={() => { setPreviewTitle(draft.title); setPreviewSections(draft.sections); setPreviewOpen(true); }}>Open Full Preview</Button>
+                  </div>
+                  <div className="max-h-[620px] overflow-auto rounded-xl border bg-[#fbfcff] p-4 text-sm text-[#13306b]">
+                    {draft.sections.filter(s => s.isVisible).length > 0 ? (
+                      draft.sections.filter(s => s.isVisible).slice(0, 5).map((section, idx) => (
+                        <div key={idx} className="mb-3 last:mb-0 rounded-lg border border-[#e3eaf7] p-3 bg-white">
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-[#ef2027]">{getSectionTypeLabel(section.type)}</div>
+                          <div className="font-black text-base leading-tight mt-0.5">{section.title || section.name}</div>
+                          {section.subtitle && <div className="text-[#ef2027] text-xs mt-0.5">{section.subtitle}</div>}
+                          {section.body && <div className="text-xs mt-1 line-clamp-2 text-[#4f6796]">{section.body}</div>}
+                        </div>
+                      ))
+                    ) : <div className="text-muted-foreground py-8 text-center text-xs">Add visible sections to see preview here.</div>}
+                  </div>
+                  <p className="mt-2 text-[10px] text-center text-muted-foreground">Updates live • Click full preview for complete view</p>
+                </div>
+              </div>
+            </div>
           </WorkspacePanel>
         </TabsContent>
 
@@ -1495,10 +1658,27 @@ function BlogEditorCard({ value, onSave, onDelete }: { value: CmsBlogPost; onSav
         </TabsContent>
 
         <TabsContent value="content" className="space-y-5">
-          <WorkspacePanel title="Editorial Content" description="Manage the post summary, cover image, and content sections.">
-            <Textarea value={draft.excerpt} onChange={(event) => setDraft({ ...draft, excerpt: event.target.value })} placeholder="Post excerpt" rows={3} />
-            <ImageFields label="Cover Image" value={draft.coverImage} onChange={(next) => setDraft({ ...draft, coverImage: next })} />
-            <SectionsEditor value={draft.sections} onChange={(next) => setDraft({ ...draft, sections: next })} />
+          <WorkspacePanel title="Editorial Content" description="Manage the post summary, cover image, and content sections. Live preview on right (xl+).">
+            <div className="grid gap-6 xl:grid-cols-2">
+              <div className="space-y-4">
+                <Textarea value={draft.excerpt} onChange={(event) => setDraft({ ...draft, excerpt: event.target.value })} placeholder="Post excerpt" rows={3} />
+                <ImageFields label="Cover Image" value={draft.coverImage} onChange={(next) => setDraft({ ...draft, coverImage: next })} />
+                <SectionsEditor value={draft.sections} onChange={(next) => setDraft({ ...draft, sections: next })} />
+              </div>
+              <div className="hidden xl:block">
+                <div className="sticky top-4 rounded-2xl border bg-white p-4 shadow-sm">
+                  <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Live Preview</div>
+                  <div className="max-h-[620px] overflow-auto rounded-xl border bg-[#fbfcff] p-4 text-sm text-[#13306b]">
+                    {draft.sections.filter(s => s.isVisible).length > 0 ? draft.sections.filter(s => s.isVisible).slice(0, 5).map((section, idx) => (
+                      <div key={idx} className="mb-3 last:mb-0 rounded-lg border border-[#e3eaf7] p-3 bg-white">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-[#ef2027]">{getSectionTypeLabel(section.type)}</div>
+                        <div className="font-black text-base leading-tight mt-0.5">{section.title || section.name}</div>
+                      </div>
+                    )) : <div className="text-muted-foreground py-8 text-center text-xs">No sections yet.</div>}
+                  </div>
+                </div>
+              </div>
+            </div>
           </WorkspacePanel>
         </TabsContent>
 
@@ -2036,16 +2216,62 @@ function SiteSettingsEditor({
         </TabsContent>
 
         <TabsContent value="theme" className="space-y-5">
-          <WorkspacePanel title="Theme Settings" description="Adjust the website brand colors used across the frontend experience.">
+          <WorkspacePanel title="Theme Settings" description="Adjust the website brand colors. Changes preview live below and apply on save.">
             <div className="grid gap-3 lg:grid-cols-3">
-              <Input value={draft.theme.primaryColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, primaryColor: event.target.value } })} placeholder="#13306b" />
-              <Input value={draft.theme.accentColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, accentColor: event.target.value } })} placeholder="#ef2027" />
-              <Input value={draft.theme.softColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, softColor: event.target.value } })} placeholder="#f4f8ff" />
+              <div>
+                <FieldLabel>Primary (Navy)</FieldLabel>
+                <div className="flex gap-2">
+                  <Input type="color" value={draft.theme.primaryColor || "#13306b"} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, primaryColor: event.target.value } })} className="h-10 w-16 p-1" />
+                  <Input value={draft.theme.primaryColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, primaryColor: event.target.value } })} placeholder="#13306b" />
+                </div>
+              </div>
+              <div>
+                <FieldLabel>Accent (Red)</FieldLabel>
+                <div className="flex gap-2">
+                  <Input type="color" value={draft.theme.accentColor || "#ef2027"} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, accentColor: event.target.value } })} className="h-10 w-16 p-1" />
+                  <Input value={draft.theme.accentColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, accentColor: event.target.value } })} placeholder="#ef2027" />
+                </div>
+              </div>
+              <div>
+                <FieldLabel>Soft BG</FieldLabel>
+                <div className="flex gap-2">
+                  <Input type="color" value={draft.theme.softColor || "#f4f8ff"} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, softColor: event.target.value } })} className="h-10 w-16 p-1" />
+                  <Input value={draft.theme.softColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, softColor: event.target.value } })} placeholder="#f4f8ff" />
+                </div>
+              </div>
             </div>
             <div className="grid gap-3 lg:grid-cols-3">
-              <Input value={draft.theme.backgroundColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, backgroundColor: event.target.value } })} placeholder="#ffffff" />
-              <Input value={draft.theme.textColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, textColor: event.target.value } })} placeholder="#13306b" />
-              <Input value={draft.theme.footerColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, footerColor: event.target.value } })} placeholder="#10306a" />
+              <div>
+                <FieldLabel>Background</FieldLabel>
+                <div className="flex gap-2">
+                  <Input type="color" value={draft.theme.backgroundColor || "#ffffff"} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, backgroundColor: event.target.value } })} className="h-10 w-16 p-1" />
+                  <Input value={draft.theme.backgroundColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, backgroundColor: event.target.value } })} placeholder="#ffffff" />
+                </div>
+              </div>
+              <div>
+                <FieldLabel>Text</FieldLabel>
+                <div className="flex gap-2">
+                  <Input type="color" value={draft.theme.textColor || "#13306b"} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, textColor: event.target.value } })} className="h-10 w-16 p-1" />
+                  <Input value={draft.theme.textColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, textColor: event.target.value } })} placeholder="#13306b" />
+                </div>
+              </div>
+              <div>
+                <FieldLabel>Footer / Dark</FieldLabel>
+                <div className="flex gap-2">
+                  <Input type="color" value={draft.theme.footerColor || "#10306a"} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, footerColor: event.target.value } })} className="h-10 w-16 p-1" />
+                  <Input value={draft.theme.footerColor} onChange={(event) => setDraft({ ...draft, theme: { ...draft.theme, footerColor: event.target.value } })} placeholder="#10306a" />
+                </div>
+              </div>
+            </div>
+
+            {/* Live theme preview */}
+            <div className="mt-4 rounded-xl border p-4" style={{ backgroundColor: draft.theme.backgroundColor || "#fff", color: draft.theme.textColor || "#13306b" }}>
+              <div className="text-xs uppercase tracking-widest mb-2" style={{ color: draft.theme.accentColor || "#ef2027" }}>Theme Preview</div>
+              <div className="font-black text-xl" style={{ color: draft.theme.primaryColor || "#13306b" }}>Sample Heading</div>
+              <div className="mt-1 text-sm">This is how text and accents will look. The footer and buttons will use the dark and accent colors.</div>
+              <div className="mt-3 inline-block px-3 py-1 text-xs rounded" style={{ backgroundColor: draft.theme.accentColor || "#ef2027", color: "#fff" }}>Accent Button</div>
+              <div className="mt-3 rounded p-3 text-xs" style={{ backgroundColor: draft.theme.softColor || "#f4f8ff" }}>Soft background area</div>
+              <div className="mt-2 text-xs p-2 rounded" style={{ backgroundColor: draft.theme.footerColor || "#10306a", color: "#fff" }}>Footer / Dark area</div>
             </div>
           </WorkspacePanel>
         </TabsContent>
@@ -3342,7 +3568,49 @@ export default function CmsManagementPage() {
               )}
             </div>
 
-            <div className="space-y-6">{workspace}</div>
+            {/* Advanced CMS Sidebar + Main Content */}
+            <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+              {/* Sidebar Navigation */}
+              <div className="hidden lg:block">
+                <Card className="sticky top-4">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm">Workspace</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-1 p-2">
+                    {collectionOrder.map((key) => {
+                      const meta = collectionMeta[key as Exclude<CmsCollectionKey, "overview">] || { label: key, icon: FileText };
+                      const Icon = meta.icon || FileText;
+                      const isActive = activeCollection === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => {
+                            const href = key === "settings" ? buildSettingsHref("branding") : buildCmsHref(key as any, (collectionMeta as any)[key]?.defaultScope);
+                            navigate(href);
+                          }}
+                          className={cn(
+                            "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-medium transition",
+                            isActive ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted"
+                          )}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{meta.label || key}</span>
+                        </button>
+                      );
+                    })}
+                    <div className="pt-3 border-t">
+                      <button onClick={() => navigate("/")} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-muted">
+                        <ExternalLink className="h-4 w-4" /> View Live Site
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6 min-w-0">
+                {workspace}
+              </div>
+            </div>
           </div>
 
           {/* Advanced Live Preview - Professional CMS feature */}
