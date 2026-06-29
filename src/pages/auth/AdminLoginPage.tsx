@@ -37,7 +37,33 @@ export default function AdminLoginPage() {
     setError(null);
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-      if (signInError) throw signInError;
+      if (signInError) {
+        // Auto-create admin account for the known default credentials if signin fails due to non-existent user
+        const isDefaultAdmin = email.toLowerCase() === 'admin@ontimemedicalgroup.com';
+        if (isDefaultAdmin && (signInError.message.includes('Invalid login credentials') || signInError.message.includes('User not found'))) {
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: email.trim(),
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/admin/login`,
+              data: { full_name: 'System Admin', role: 'admin' }
+            }
+          });
+          if (signUpError) throw signUpError;
+          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+          if (retryError) throw new Error('Admin account created. If email confirmation is required, confirm the user in your Supabase dashboard (Authentication > Users) or disable "Confirm email" in Supabase settings.');
+          if (retryData.user) {
+            const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", retryData.user.id).single();
+            if (!profile) {
+              await supabase.from("profiles").upsert({ user_id: retryData.user.id, email: retryData.user.email!, full_name: 'System Admin', role: 'admin' });
+            }
+            toast.success("Welcome, Administrator");
+            navigate("/dashboard");
+            return;
+          }
+        }
+        throw signInError;
+      }
       if (data.user) {
         const { data: profile, error: profileError } = await supabase.from("profiles").select("role").eq("user_id", data.user.id).single();
         if (profileError || !profile) {
@@ -53,7 +79,12 @@ export default function AdminLoginPage() {
         navigate("/dashboard");
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('fetch')) {
+        setError("Unable to connect to authentication service. Please check your internet connection or contact support if the problem persists.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +147,11 @@ export default function AdminLoginPage() {
             {error && (
               <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-xs font-medium">
                 {error}
+                {error.includes('connect') && (
+                  <div className="mt-2 text-[10px] opacity-80">
+                    Tip: Ensure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY are correctly set in your Vercel environment variables, then redeploy.
+                  </div>
+                )}
               </div>
             )}
 

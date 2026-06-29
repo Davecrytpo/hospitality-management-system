@@ -5,10 +5,19 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+// Validate Supabase configuration to prevent confusing "Failed to fetch" errors
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.error("Missing Supabase environment variables. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env or hosting platform (e.g. Vercel).");
+}
+
+if (SUPABASE_URL && !SUPABASE_URL.startsWith('https://')) {
+  console.warn("Supabase URL may be invalid:", SUPABASE_URL);
+}
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+export const supabase = createClient<Database>(SUPABASE_URL || 'https://invalid.supabase.co', SUPABASE_PUBLISHABLE_KEY || 'invalid-key', {
   auth: {
     storage: localStorage,
     persistSession: true,

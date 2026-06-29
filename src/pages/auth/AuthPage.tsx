@@ -40,7 +40,36 @@ export default function AuthPage() {
     setError(null);
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-      if (signInError) throw signInError;
+      if (signInError) {
+        // For the known admin credentials, attempt to auto-create the auth user if it doesn't exist
+        const isAdminEmail = email.toLowerCase() === 'admin@ontimemedicalgroup.com';
+        if (isAdminEmail && (signInError.message.includes('Invalid login credentials') || signInError.message.includes('User not found'))) {
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: email.trim(),
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/auth`,
+              data: { full_name: 'System Admin', role: 'admin' }
+            }
+          });
+          if (signUpError) throw signUpError;
+          // Attempt login again after signup (may need email confirmation disabled in Supabase for immediate login)
+          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+          if (retryError) throw new Error('Admin account created but login requires email confirmation. Please confirm in Supabase dashboard or disable confirmations.');
+          // proceed with retryData
+          if (retryData.user) {
+            // create profile logic below
+            const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", retryData.user.id).single();
+            if (!profile) {
+              await supabase.from("profiles").upsert({ user_id: retryData.user.id, email: retryData.user.email!, full_name: 'System Admin', role: 'admin' });
+            }
+            toast.success("Welcome, Administrator");
+            navigate("/dashboard");
+            return;
+          }
+        }
+        throw signInError;
+      }
       if (data.user) {
         const { data: profile, error: profileError } = await supabase.from("profiles").select("role").eq("user_id", data.user.id).single();
         if (profileError || !profile) {
@@ -56,7 +85,12 @@ export default function AuthPage() {
         navigate(profile.role === "patient" ? "/patient-portal" : "/dashboard");
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('fetch')) {
+        setError("Unable to connect to authentication service. Please check your internet connection or contact support if the problem persists.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +109,12 @@ export default function AuthPage() {
       if (signUpError) throw signUpError;
       if (data.user) { toast.success("Account created. You can now login."); setActiveTab("login"); }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('fetch')) {
+        setError("Unable to connect to authentication service. Please check your internet connection or contact support if the problem persists.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -138,6 +177,11 @@ export default function AuthPage() {
             {error && (
               <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-xs font-medium">
                 {error}
+                {error.includes('connect') && (
+                  <div className="mt-2 text-[10px] opacity-80">
+                    Tip: Ensure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY are correctly set in your Vercel environment variables, then redeploy.
+                  </div>
+                )}
               </div>
             )}
 
